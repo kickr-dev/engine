@@ -18,8 +18,6 @@ var (
 		Use:   "upgrade",
 		Short: "Upgrade or install craft",
 		Run: func(cmd *cobra.Command, _ []string) {
-			ctx := cmd.Context()
-
 			options := []upgrade.RunOption{
 				upgrade.WithDestination(dest),
 				upgrade.WithHTTPClient(cleanhttp.DefaultClient()),
@@ -28,20 +26,17 @@ var (
 				upgrade.WithPrereleases(prereleases),
 			}
 
-			version, err := upgrade.Run(ctx, "craft", version, upgrade.GithubReleases("kilianpaquier", "craft"), options...)
+			version, err := upgrade.Run(cmd.Context(), "craft", version, upgrade.GithubReleases("kilianpaquier", "craft"), options...)
 			if err != nil {
 				switch {
-				case errors.Is(err, upgrade.ErrInvalidOptions):
-					logger.Fatal(err)
 				case errors.Is(err, upgrade.ErrNoNewVersion):
 					logger.Info(err)
-					return
 				case errors.Is(err, upgrade.ErrAlreadyInstalled):
 					logger.Infof("version '%s' is already installed", version)
-					return
 				default:
 					logger.Fatal(err)
 				}
+				return
 			}
 			logger.Infof("successfully installed version '%s'", version)
 		},

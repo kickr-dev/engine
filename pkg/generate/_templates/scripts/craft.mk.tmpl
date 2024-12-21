@@ -9,4 +9,4 @@ clean:
 {{- if hasKey .Languages "golang" }}
 	@go clean
 {{- end }}
-	@git clean -Xf ./*
+	@git clean -dfX
