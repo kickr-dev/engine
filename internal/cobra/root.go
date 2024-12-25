@@ -9,7 +9,10 @@ import (
 )
 
 var (
-	logger    = log.New(os.Stderr)
+	logger = log.NewWithOptions(os.Stderr, log.Options{
+		CallerFormatter: log.ShortCallerFormatter,
+		ReportCaller:    true,
+	})
 	logLevel  = "info"
 	logFormat = "text"
 	rootCmd   = &cobra.Command{
