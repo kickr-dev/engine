@@ -8,12 +8,20 @@ include:
     ref: "3"
     file: "templates/gitlab-ci-semrel.yml"
 
+  # Renovate template
+  - project: "to-be-continuous/renovate"
+    ref: "1"
+    file: "templates/gitlab-ci-renovate.yml"
+
   # Node.js template
   - project: "to-be-continuous/node"
     ref: "3"
     file: "templates/gitlab-ci-node.yml"
 
 variables:
+
+  RENOVATE_AUTODISCOVER: "true"
+  RENOVATE_AUTODISCOVER_FILTER: $CI_PROJECT_PATH
 
   NODE_AUDIT_DISABLED: "false"
   NODE_BUILD_ARGS: "run build --prod"
@@ -60,3 +68,19 @@ semantic-release-info:
 semantic-release:
   variables:
     GIT_DEPTH: "0"
+
+.renovate-rules: &renovate-rules
+  rules:
+    # see https://gitlab.com/to-be-continuous/renovate/-/blob/master/templates/gitlab-ci-renovate.yml?ref_type=heads#L348
+    # update mode only with schedule triggering
+    - if: $CI_PIPELINE_SOURCE == 'schedule'
+      variables:
+        RENOVATE_DRY_RUN: "false"
+    # dry run with web triggering
+    - if: $CI_PIPELINE_SOURCE == 'web'
+
+renovate-validator:
+  <<: *renovate-rules
+
+renovate-depcheck:
+  <<: *renovate-rules

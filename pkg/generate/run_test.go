@@ -166,7 +166,11 @@ func TestRun_Golang(t *testing.T) {
 			t.Run(ci, func(t *testing.T) {
 				// Arrange
 				config := craft.Configuration{
-					CI:       &craft.CI{Name: ci, Release: &craft.Release{}},
+					CI: &craft.CI{
+						Name:    ci,
+						Options: []string{craft.Sonar, craft.CodeQL, craft.Labeler},
+						Release: &craft.Release{},
+					},
 					NoChart:  true,
 					Platform: ci,
 				}
@@ -186,7 +190,10 @@ func TestRun_Golang(t *testing.T) {
 			t.Run(ci, func(t *testing.T) {
 				// Arrange
 				config := craft.Configuration{
-					CI:          &craft.CI{Name: ci},
+					CI: &craft.CI{
+						Name:    ci,
+						Options: []string{craft.CodeCov, craft.CodeQL, craft.Labeler},
+					},
 					Description: helpers.ToPtr("A useful project description"),
 					Docker:      &craft.Docker{},
 					NoMakefile:  true,
@@ -285,8 +292,12 @@ func TestRun_Node(t *testing.T) {
 			t.Run(ci, func(t *testing.T) {
 				// Arrange
 				config := craft.Configuration{
-					Bot:      helpers.ToPtr(craft.Dependabot),
-					CI:       &craft.CI{Name: ci, Release: &craft.Release{Backmerge: true}},
+					Bot: helpers.ToPtr(craft.Renovate),
+					CI: &craft.CI{
+						Name:    ci,
+						Auth:    craft.Auth{Maintenance: helpers.ToPtr(craft.PersonalToken)},
+						Release: &craft.Release{Backmerge: true},
+					},
 					NoChart:  true,
 					Platform: ci,
 				}

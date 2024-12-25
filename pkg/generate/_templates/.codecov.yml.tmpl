@@ -18,9 +18,8 @@ ignore:
   - "cmd"
   - "examples"
   - "**/cobra/**"
-  - "**/mocks/**"
-  - "**/tests/**"
-  - "**/testutils/**"
+  - "**/testdata/**"
+  - "**/logger.go"
 {{- end }}
 {{- if hasKey .Languages "node" }}
   - "dist"

@@ -9,6 +9,10 @@ include: .gitlab/workflows/.gitlab-ci.yml
 # GITLAB_TOKEN: A GitLab 'project access token' or 'personal access token' with `api`, `read_repository` and `write_repository` scopes.
 # SEMREL_GPG_SIGNKEY: Path to the GPG signkey exported with `gpg --armor --export-secret-key` (optional).
 
+# SONAR_TOKEN: SonarQube authentication token (depends on your authentication method)
+# SONAR_LOGIN: SonarQube login (depends on your authentication method)
+# SONAR_PASSWORD: SonarQube password (depends on your authentication method)
+
 variables:
   PROD_REF: /^(master|main)$/
   INTEG_REF: /^(staging|dev|develop|development)$/
