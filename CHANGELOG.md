@@ -1,3 +1,50 @@
+## [1.0.0-beta.17](https://github.com/kilianpaquier/craft/compare/v1.0.0-beta.16...v1.0.0-beta.17) (2024-12-25)
+
+### Features
+
+* **schema:** add conditions and Go validation following JSON schema - fixes [#66](https://github.com/kilianpaquier/craft/issues/66) ([485e464](https://github.com/kilianpaquier/craft/commit/485e4647a2f3da170222d918ab4301277ff45947))
+
+### Bug Fixes
+
+* **github:** allow codecov reporting to fail without failing the whole workflow ([b8ee5cf](https://github.com/kilianpaquier/craft/commit/b8ee5cf664ef83bf7ddb67afa9633a5dacd200f0))
+* **github:** ignore coverage on renovate branches ([19a4f13](https://github.com/kilianpaquier/craft/commit/19a4f13923cda3e1d8006782192ff29cf1565fba))
+* **github:** missing or build step present where is should not have been present or missing and avoid nodejs static configuration without any main ([6c7c547](https://github.com/kilianpaquier/craft/commit/6c7c547c08a5e42c702a84a0ed932bc3e8ad74ce))
+* **gitlab:** run renovate jobs only on web and schedule triggers ([c16ce5f](https://github.com/kilianpaquier/craft/commit/c16ce5fbc52736c9c30a0c59b3cd0a2377e5d1df))
+* **renovate:** update dry run option and improve logging behavior ([ad6c47f](https://github.com/kilianpaquier/craft/commit/ad6c47fa42fbd67679007aa1303bdf7c9cfb5905))
+* **validation:** avoid error on generate when craft file doesn't exist ([10d152b](https://github.com/kilianpaquier/craft/commit/10d152b2997422bd242d777e32eb7c11a89f1ee6))
+
+### Reverts
+
+* **github:** use codecov action v4 since `codecov_yml_path` cannot be used ([0fbab2e](https://github.com/kilianpaquier/craft/commit/0fbab2ebc4b99f1d81e9998a26f31ee6ab8f3f52))
+
+### Chores
+
+* **cmd:** report caller in logs ([e7bdb5d](https://github.com/kilianpaquier/craft/commit/e7bdb5dd6cc1eb063109b8647231519fac84c216))
+* **codecov:** update CodeCov Action version ([65c6055](https://github.com/kilianpaquier/craft/commit/65c60557579baee91ac439de71d22278fe73fae0))
+* **deps:** bump github.com/charmbracelet/bubbletea ([c9c81e4](https://github.com/kilianpaquier/craft/commit/c9c81e40fb08df319e3249b138c2ae3f3dbf385d))
+* **deps:** bump github.com/charmbracelet/bubbletea ([21a822b](https://github.com/kilianpaquier/craft/commit/21a822b39b94a6c1ac69668e50197932d56ac6ee))
+* **deps:** bump github.com/charmbracelet/bubbletea ([e020aec](https://github.com/kilianpaquier/craft/commit/e020aec3ecb8fe49428c2cf2c7fb9f8bf740114a))
+* **deps:** bump github.com/charmbracelet/bubbletea ([d78a8d9](https://github.com/kilianpaquier/craft/commit/d78a8d92f0a3c7634f951c9000760e19e4018bf7))
+* **deps:** bump github.com/go-playground/validator/v10 ([d34333e](https://github.com/kilianpaquier/craft/commit/d34333e3941a8b9d023fae2702af642a12423d7b))
+* **deps:** bump github.com/stretchr/testify in the minor-patch group ([673ffcd](https://github.com/kilianpaquier/craft/commit/673ffcdadc66727b3fad1bc59f431758cc5ac5f8))
+* **deps:** bump github.com/xanzy/go-gitlab in the minor-patch group ([245345d](https://github.com/kilianpaquier/craft/commit/245345d8263f3a86541490f41ef471aa1a887fd1))
+* **deps:** bump github.com/xanzy/go-gitlab in the minor-patch group ([a6f2b32](https://github.com/kilianpaquier/craft/commit/a6f2b32f8b1a9031923a0479b900121acb28abc1))
+* **deps:** bump golang.org/x/mod in the minor-patch group ([a268fdf](https://github.com/kilianpaquier/craft/commit/a268fdfdaaff2c56b9fe352fe2a4d7e3cee44e56))
+* **deps:** migrate GitLab Go SDK to gitlab.com/gitlab-org/api/client-go ([ebc3daa](https://github.com/kilianpaquier/craft/commit/ebc3daa34933900ea16f25f6daf1154850fde4c9))
+* **deps:** upgrade codecov github action version to v5 ([89dbcc3](https://github.com/kilianpaquier/craft/commit/89dbcc36cb0b0171d0c05815c38b7b30c65bec67))
+* **deps:** upgrade various dependencies ([d042bb9](https://github.com/kilianpaquier/craft/commit/d042bb9c3f480c5286911c179e3d7814596f38a6))
+* **go:** edit test coverage ignore and golangci-lint linters (remove errcheck since it's covered by revive) ([4b082f3](https://github.com/kilianpaquier/craft/commit/4b082f3c04f9b651214dcd23e709b470c19fb488))
+* **helm:** avoid running cronjobs every minutes ([f159fa7](https://github.com/kilianpaquier/craft/commit/f159fa71f7e5e235579547b14e8d06260a64ced2))
+* **mk:** clean ignored directories in make clean ([35aa2e3](https://github.com/kilianpaquier/craft/commit/35aa2e3ef68d5410390f412d14caed434a1210e0))
+* **mk:** move mk files to subdir scripts/mk ([c2c8031](https://github.com/kilianpaquier/craft/commit/c2c80313d796ccd1f9a0a35deaec8f2ce32c838b))
+* **renovate:** bump github action version ([08b09b3](https://github.com/kilianpaquier/craft/commit/08b09b33e2bfb491e90b87cb3d96cec3337a7b0a))
+* **schema:** removed duplicated information ([dbd1e22](https://github.com/kilianpaquier/craft/commit/dbd1e2229aa20c65937de11e5e315a11f82e60b0))
+
+### Code Refactoring
+
+* **log:** migrate internal logging to charmbracelet/log and remove clog usage in generate package ([0b8c7a1](https://github.com/kilianpaquier/craft/commit/0b8c7a1c8843b2fc6b6b7d02badc50386b36a49d))
+* simplify the whole CI (reducing the number of executable workflows) and rework engine to avoid multiple weird types ([c40c1e3](https://github.com/kilianpaquier/craft/commit/c40c1e3baad293c24e71e6f552eb197d6ae96a9e))
+
 ## [1.0.0-beta.16](https://github.com/kilianpaquier/craft/compare/v1.0.0-beta.15...v1.0.0-beta.16) (2024-10-30)
 
 ### 🐛 Bug Fixes
