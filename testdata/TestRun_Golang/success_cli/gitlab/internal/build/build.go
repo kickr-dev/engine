@@ -4,7 +4,16 @@ package build
 
 import (
 	"fmt"
+	"regexp"
 	"time"
+)
+
+var (
+	// devRegexp represents v0.0.0-<number of commits>-<vcs letter (g)><sha>
+	devRegexp = regexp.MustCompile(`^v[0-9]+(\.[0-9]+){2}-[0-9]+-[a-z]`)
+
+	// preRegexp represents v0.0.0-<identifier>.<number of prerelease>
+	preRegexp = regexp.MustCompile(`^v[0-9]+(\.[0-9]+){2}-[a-zA-Z]\.[0-9]+$`)
 )
 
 var version = "v0.0.0"
@@ -34,7 +43,13 @@ var _ fmt.Stringer = (*Info)(nil) // ensure interface is implemented
 
 // String returns a string representation of the build.
 func (i Info) String() string {
-	return fmt.Sprintf("%s-%s+%s %s", i.Version, i.Commit, i.Branch, i.Date.Format(time.RFC3339))
+	if devRegexp.MatchString(i.Version) { // v0.0.0-<number of commits>-<vcs letter (g)><sha> so no need to print commit sha additionally
+		return fmt.Sprintf("%s+%s %s", i.Version, i.Branch, i.Date.Format(time.RFC3339))
+	}
+	if preRegexp.MatchString(i.Version) { // v0.0.0-<identifier>.<number of prerelease> so no need to print branch additionally
+		return fmt.Sprintf("%s-%s %s", i.Version, i.Commit, i.Date.Format(time.RFC3339))
+	}
+	return fmt.Sprintf("%s-%s+%s %s", i.Version, i.Commit, i.Branch, i.Date.Format(time.RFC3339)) // v0.0.0 so let's print commit and branch
 }
 
 // GetInfo returns the build information.
