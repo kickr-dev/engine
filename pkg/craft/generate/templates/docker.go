@@ -5,7 +5,7 @@ import (
 	"github.com/kilianpaquier/craft/pkg/engine"
 )
 
-// Docker is the handler for Docker files generation.
+// Docker returns the slice of templates related to Docker generation (Dockerfile, .dockerignore, etc.).
 func Docker() []engine.Template[craft.Config] {
 	var templates []engine.Template[craft.Config]
 

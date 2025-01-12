@@ -29,8 +29,7 @@ var (
 // It takes a configuration and various run options.
 //
 // It executes all parsers given in options (or default ones)
-// and then dives into all directories from option filesystem (or default one)
-// to generates template files (.tmpl) specified by the handlers returned from parsers.
+// and then iterates over provided templates to generate or remove those.
 func Generate[T any](parent context.Context, config T, opts ...GenerateOption[T]) (T, error) {
 	genOpts, err := newGenerateOpt(opts...)
 	if err != nil {

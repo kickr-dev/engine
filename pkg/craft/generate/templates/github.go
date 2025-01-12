@@ -9,7 +9,7 @@ import (
 	"github.com/kilianpaquier/craft/pkg/engine/parser"
 )
 
-// GitHub is the handler for GitHub specific files generation.
+// GitHub returns the slice of templates related to GitHub configuration.
 func GitHub() []engine.Template[craft.Config] {
 	return slices.Concat(githubWorkflow(), githubConfig())
 }

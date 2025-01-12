@@ -8,7 +8,7 @@ import (
 	"github.com/kilianpaquier/craft/pkg/engine/parser"
 )
 
-// CodeCov is the handler for codecov generation.
+// CodeCov returns the slice of templates related to codecov configuration.
 func CodeCov() []engine.Template[craft.Config] {
 	name := ".codecov.yml"
 	return []engine.Template[craft.Config]{
@@ -23,7 +23,7 @@ func CodeCov() []engine.Template[craft.Config] {
 	}
 }
 
-// Sonar is the handler for Sonar generation.
+// Sonar returns the slice of templates related to SonarCloud / SonarQube configuration.
 func Sonar() []engine.Template[craft.Config] {
 	name := "sonar.properties"
 	return []engine.Template[craft.Config]{

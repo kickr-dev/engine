@@ -7,7 +7,19 @@ import (
 	"github.com/kilianpaquier/craft/pkg/engine"
 )
 
-// Git is the handler for git specific files generation.
+// Codeowners returns the slice of templates related to code owners configuration.
+func Codeowners() []engine.Template[craft.Config] {
+	name := "CODEOWNERS"
+	return []engine.Template[craft.Config]{
+		{
+			Delimiters: engine.DelimitersBracket(),
+			Globs:      []string{name + engine.TmplExtension},
+			Out:        name,
+		},
+	}
+}
+
+// Git returns the slice of templates related to git configuration.
 func Git() []engine.Template[craft.Config] {
 	name := ".gitignore"
 	return []engine.Template[craft.Config]{
@@ -19,7 +31,7 @@ func Git() []engine.Template[craft.Config] {
 	}
 }
 
-// Makefile is the handler for Makefile(s) generation.
+// Makefile returns the slice of templates related to make configuration (build, test, docker make tasks).
 func Makefile() []engine.Template[craft.Config] {
 	var templates []engine.Template[craft.Config] //nolint:prealloc
 
@@ -61,7 +73,7 @@ func Makefile() []engine.Template[craft.Config] {
 	return templates
 }
 
-// Readme is the handler for README.md generation.
+// Readme returns the slice of templates related to README.md generation.
 func Readme() []engine.Template[craft.Config] {
 	name := "README.md"
 	return []engine.Template[craft.Config]{

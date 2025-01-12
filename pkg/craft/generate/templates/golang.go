@@ -7,7 +7,7 @@ import (
 	"github.com/kilianpaquier/craft/pkg/engine"
 )
 
-// Golang is the handler for goreleaser option generation matching.
+// Golang returns the slice of templates related to Golang generation (golangci-lint, goreleaser, etc.).
 func Golang() []engine.Template[craft.Config] {
 	// Go wasn't parsed during parsers processing
 	noGo := func(config craft.Config) bool {

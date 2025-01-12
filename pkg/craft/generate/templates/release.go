@@ -8,7 +8,7 @@ import (
 	"github.com/kilianpaquier/craft/pkg/engine/parser"
 )
 
-// SemanticRelease is the handler for releaserc generation.
+// SemanticRelease returns the slice of templates related to semantic-release configuration.
 func SemanticRelease() []engine.Template[craft.Config] {
 	var templates []engine.Template[craft.Config]
 

@@ -7,7 +7,7 @@ import (
 	"github.com/kilianpaquier/craft/pkg/engine"
 )
 
-// Helm is the handler for chart folder generation.
+// Helm returns the slice of templates related to helm chart generation.
 func Helm() []engine.Template[craft.Config] {
 	var templates []engine.Template[craft.Config] //nolint:prealloc
 

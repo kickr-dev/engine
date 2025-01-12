@@ -8,7 +8,7 @@ import (
 	"github.com/kilianpaquier/craft/pkg/engine/parser"
 )
 
-// GitLab is the handler for GitLab specific files generation.
+// GitLab returns the slice of templates related to GitLab configuration.
 func GitLab() []engine.Template[craft.Config] {
 	srcs := []string{".gitlab-ci.yml", path.Join(".gitlab", "workflows", ".gitlab-ci.yml")}
 

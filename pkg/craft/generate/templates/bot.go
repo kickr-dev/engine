@@ -8,7 +8,7 @@ import (
 	"github.com/kilianpaquier/craft/pkg/engine/parser"
 )
 
-// Dependabot is the handler for dependabot files generation.
+// Dependabot returns the slice of templates related to dependabot configuration.
 func Dependabot() []engine.Template[craft.Config] {
 	name := path.Join(".github", "dependabot.yml")
 	return []engine.Template[craft.Config]{
@@ -23,7 +23,7 @@ func Dependabot() []engine.Template[craft.Config] {
 	}
 }
 
-// Renovate is the handler for renovate bot files generation.
+// Renovate returns the slice of templates related to renovate configuration.
 func Renovate() []engine.Template[craft.Config] {
 	var templates []engine.Template[craft.Config]
 

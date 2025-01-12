@@ -21,7 +21,7 @@ func TestGenerate(t *testing.T) {
 
 	nooparser := func(context.Context, string, *testconfig) error { return nil }
 
-	t.Run("error_missing_handlers_parsers", func(t *testing.T) {
+	t.Run("error_missing_parsers_templates", func(t *testing.T) {
 		// Act
 		_, err := engine.Generate(ctx, testconfig{})
 

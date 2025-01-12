@@ -34,7 +34,7 @@ func FS() fs.FS {
 func All() []engine.Template[craft.Config] {
 	return slices.Concat(
 		CodeCov(), Sonar(),
-		Git(), Makefile(), Readme(),
+		Codeowners(), Git(), Makefile(), Readme(),
 		Dependabot(), Renovate(),
 		Docker(),
 		GitHub(),
