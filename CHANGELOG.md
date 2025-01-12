@@ -1,3 +1,22 @@
+## [1.0.0-beta.18](https://github.com/kilianpaquier/craft/compare/v1.0.0-beta.17...v1.0.0-beta.18) (2025-01-12)
+
+### Features
+
+* **golang:** add a bunch of build info variables in Dockerfile and Makefile for easier build identification ([66effd0](https://github.com/kilianpaquier/craft/commit/66effd0371bff37e3ae5b45447e0d774a2ba9ca4))
+
+### Chores
+
+* **build:** rename Makefile command when only one binary is present ([09f5cd0](https://github.com/kilianpaquier/craft/commit/09f5cd007e9d496aaa971530e480c87053a47d45))
+* **config:** use vcs instead of git for naming ([ad13de1](https://github.com/kilianpaquier/craft/commit/ad13de1ec0f1bd64f937d8c0778df253186bdb31))
+* **deps:** migrate from cli-sdk to compare to compare tests results ([59a2f0a](https://github.com/kilianpaquier/craft/commit/59a2f0a383acceee0c7e3a3381a1d7f26c6c4642))
+* **deps:** upgrade dependencies ([f6078f9](https://github.com/kilianpaquier/craft/commit/f6078f992539df3127dd2754d053d4d7b584d759))
+* **go:** add more dynamic build.go version Stringer implementation depending on version format ([88c1141](https://github.com/kilianpaquier/craft/commit/88c11410f506987680ab8831ca9f9027ca18a9c3))
+
+### Code Refactoring
+
+* **engine:** allow any configuration type to be used in SDK mode ([6425cee](https://github.com/kilianpaquier/craft/commit/6425ceea695e3487d2101283e66e45e82f542343))
+* split craft engine from craft specific layout generator ([3a63aba](https://github.com/kilianpaquier/craft/commit/3a63aba9b896db68de9f0ecaced4f2cd1d22e51b))
+
 ## [1.0.0-beta.17](https://github.com/kilianpaquier/craft/compare/v1.0.0-beta.16...v1.0.0-beta.17) (2024-12-25)
 
 ### Features
