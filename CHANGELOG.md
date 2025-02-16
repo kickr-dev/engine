@@ -1,3 +1,19 @@
+## [1.0.0-beta.19](https://github.com/kilianpaquier/craft/compare/v1.0.0-beta.18...v1.0.0-beta.19) (2025-02-16)
+
+### Features
+
+* **templates:** add simple CODEOWNERS file generation ([ed19b3f](https://github.com/kilianpaquier/craft/commit/ed19b3ff1d84359dbca1ea9ef2d3d46b87433ab7))
+
+### Chores
+
+* **deps:** bump github.com/goccy/go-yaml in the minor-patch group ([3d77c9a](https://github.com/kilianpaquier/craft/commit/3d77c9ad3008fd5901b93681364e92e6fa696d94))
+* **deps:** bump the minor-patch group with 2 updates ([7826ab5](https://github.com/kilianpaquier/craft/commit/7826ab5f81b853a6b6c4780526baea56cadaf0b0))
+* **deps:** update indirect dependencies ([5f97c69](https://github.com/kilianpaquier/craft/commit/5f97c69f147778469e1e9171d68c269ac8ce96fe))
+
+### Code Refactoring
+
+* add flexibility on generation with Generator function instead of just templates, allow patching generations with git diff files and generate gitignore from https://docs.gitignore.io/use/api ([c481a82](https://github.com/kilianpaquier/craft/commit/c481a822fcf4f350f7a06059d307300f123fd0ea))
+
 ## [1.0.0-beta.18](https://github.com/kilianpaquier/craft/compare/v1.0.0-beta.17...v1.0.0-beta.18) (2025-01-12)
 
 ### Features
