@@ -34,7 +34,7 @@ var (
 //	type config struct { ... }
 //
 //	func GeneratorGitignore(ctx context.Context, destdir string, c config) error {
-//		return parser.DownloadGitignore(ctx, cleanhttp.DefaultClient(), filepath.Join(destdir, generator.FileGitignore), "java", "linux")
+//		return generator.DownloadGitignore(ctx, cleanhttp.DefaultClient(), filepath.Join(destdir, generator.FileGitignore), "java", "linux")
 //	}
 //
 // Note: Full list of templates is available here https://www.toptal.com/developers/gitignore/api/list.

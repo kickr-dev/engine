@@ -37,7 +37,7 @@ Examples:
 		destdir, _ := os.Getwd()
 
 		var c config
-		err := engine.Generate(ctx, destdir, c, []engine.Parser[config]{ParserNode})
+		err := engine.Generate(ctx, destdir, c, []engine.Parser[config]{ParserNode}, ...)
 		// handle err
 	}
 */
