@@ -38,4 +38,4 @@ build:
 			-X 'github.com/kilianpaquier/craft/internal/build.date=$(shell TZ="UTC" date '+%Y-%m-%dT%TZ')' \
 			-X 'github.com/kilianpaquier/craft/internal/build.version=${VERSION}' \
 		" \
-		-o craft cmd/craft/main.go
+		-o craft ./cmd/craft

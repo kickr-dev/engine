@@ -22,7 +22,7 @@ RUN go mod download && \
             -X 'gitlab.com/kilianpaquier/craft/internal/build.date=$(TZ="UTC" date '+%Y-%m-%dT%TZ')' \
             -X 'gitlab.com/kilianpaquier/craft/internal/build.version=$VERSION' \
         " \
-        -o cron-name cmd/cron-name/main.go && \
+        -o cron-name ./cmd/cron-name && \
     CGO_ENABLED=$CGO_ENABLED go build \
         -ldflags "\
             -X 'gitlab.com/kilianpaquier/craft/internal/build.branch=$GIT_REF_NAME' \
@@ -30,7 +30,7 @@ RUN go mod download && \
             -X 'gitlab.com/kilianpaquier/craft/internal/build.date=$(TZ="UTC" date '+%Y-%m-%dT%TZ')' \
             -X 'gitlab.com/kilianpaquier/craft/internal/build.version=$VERSION' \
         " \
-        -o job-name cmd/job-name/main.go && \
+        -o job-name ./cmd/job-name && \
     CGO_ENABLED=$CGO_ENABLED go build \
         -ldflags "\
             -X 'gitlab.com/kilianpaquier/craft/internal/build.branch=$GIT_REF_NAME' \
@@ -38,7 +38,7 @@ RUN go mod download && \
             -X 'gitlab.com/kilianpaquier/craft/internal/build.date=$(TZ="UTC" date '+%Y-%m-%dT%TZ')' \
             -X 'gitlab.com/kilianpaquier/craft/internal/build.version=$VERSION' \
         " \
-        -o worker-name cmd/worker-name/main.go
+        -o worker-name ./cmd/worker-name
 
 #############################
 #         STAGE RUN         #

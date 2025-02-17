@@ -33,7 +33,7 @@ RUN go mod download{{ range $name, $config := $binaries }} && \
             -X '{{ $specifics.Module }}/internal/build.date=$(TZ="UTC" date '+%Y-%m-%dT%TZ')' \
             -X '{{ $specifics.Module }}/internal/build.version=$VERSION' \
         " \
-        -o {{ $name }} cmd/{{ $name }}/main.go
+        -o {{ $name }} ./cmd/{{ $name }}
 {{- end }}
 
 #############################

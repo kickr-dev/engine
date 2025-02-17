@@ -34,7 +34,6 @@ buildall: build-cron-name build-job-name build-worker-name
 
 .PHONY: cron-name job-name worker-name
 build-%:
-	@[ -f "cmd/$*/main.go" ] || (echo "cmd/$*/main.go does not exist" && exit 1)
 	@CGO_ENABLED=0 go build \
 		-ldflags "\
 			-X 'gitlab.com/kilianpaquier/craft/internal/build.branch=$(shell git rev-parse --abbrev-ref HEAD)' \
@@ -42,12 +41,11 @@ build-%:
 			-X 'gitlab.com/kilianpaquier/craft/internal/build.date=$(shell TZ="UTC" date '+%Y-%m-%dT%TZ')' \
 			-X 'gitlab.com/kilianpaquier/craft/internal/build.version=${VERSION}' \
 		" \
-		-o $* cmd/$*/main.go
+		-o $* ./cmd/$*
 
 .PHONY: cron-name job-name worker-name
 local-%:
-	@[ -f "cmd/$*/main.go" ] || (echo "cmd/$*/main.go does not exist" && exit 1)
-	@go run cmd/$*/main.go
+	@go run ./cmd/$*
 
 .PHONY: docker
 docker:

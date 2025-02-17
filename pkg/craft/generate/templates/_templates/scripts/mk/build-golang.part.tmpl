@@ -48,7 +48,7 @@ build:
 			-X '{{ $specifics.Module }}/internal/build.date=$(shell TZ="UTC" date '+%Y-%m-%dT%TZ')' \
 			-X '{{ $specifics.Module }}/internal/build.version=${VERSION}' \
 		" \
-		-o {{ $binary }} cmd/{{ $binary }}/main.go
+		-o {{ $binary }} ./cmd/{{ $binary }}
 {{- end }}
 
 {{- if gt .Binaries 1 }}
@@ -58,7 +58,6 @@ buildall:{{ range $name, $config := $binaries }} build-{{ $name }}{{ end }}
 
 .PHONY:{{ range $name, $config := $binaries }} {{ $name }}{{ end }}
 build-%:
-	@[ -f "cmd/$*/main.go" ] || (echo "cmd/$*/main.go does not exist" && exit 1)
 	@CGO_ENABLED=0 go build \
 		-ldflags "\
 			-X '{{ $specifics.Module }}/internal/build.branch=$(shell git rev-parse --abbrev-ref HEAD)' \
@@ -66,12 +65,11 @@ build-%:
 			-X '{{ $specifics.Module }}/internal/build.date=$(shell TZ="UTC" date '+%Y-%m-%dT%TZ')' \
 			-X '{{ $specifics.Module }}/internal/build.version=${VERSION}' \
 		" \
-		-o $* cmd/$*/main.go
+		-o $* ./cmd/$*
 
 .PHONY:{{ range $name, $config := $binaries }} {{ $name }}{{ end }}
 local-%:
-	@[ -f "cmd/$*/main.go" ] || (echo "cmd/$*/main.go does not exist" && exit 1)
-	@go run cmd/$*/main.go
+	@go run ./cmd/$*
 {{- end }}
 
 {{- if .Docker }}

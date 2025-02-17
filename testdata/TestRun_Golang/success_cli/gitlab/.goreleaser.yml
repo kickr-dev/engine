@@ -3,7 +3,7 @@
 version: 2
 
 builds:
-  - main: cmd/name/main.go
+  - main: ./cmd/name
     env:
       - CGO_ENABLED=0
     ldflags:

@@ -38,4 +38,4 @@ build:
 			-X 'gitlab.com/kilianpaquier/craft/internal/build.date=$(shell TZ="UTC" date '+%Y-%m-%dT%TZ')' \
 			-X 'gitlab.com/kilianpaquier/craft/internal/build.version=${VERSION}' \
 		" \
-		-o name cmd/name/main.go
+		-o name ./cmd/name

@@ -3,7 +3,7 @@
 version: 2
 
 builds:
-  - main: cmd/craft/main.go
+  - main: ./cmd/craft
     env:
       - CGO_ENABLED=0
     ldflags:
