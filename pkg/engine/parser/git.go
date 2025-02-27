@@ -2,9 +2,10 @@ package parser
 
 import (
 	"fmt"
-	"os/exec"
 	"path"
 	"strings"
+
+	"github.com/go-git/go-git/v5"
 )
 
 // Git reads the input destdir directory remote.origin.url
@@ -40,19 +41,24 @@ func Git(destdir string) (VCS, error) {
 	}, nil
 }
 
-// gitOriginURL returns input directory git config --get remote.origin.url.
+// gitOriginURL returns input directory remote origin by using go-git.
+//
+// Two errors may be checked with errors.Is when one is returned:
+//   - git.ErrRepositoryNotExists
+//   - git.ErrRemoteNotFound
 func gitOriginURL(destdir string) (string, error) {
-	cmd := exec.Command("git", "config", "--get", "remote.origin.url")
-	cmd.Dir = destdir
-
-	out, err := cmd.CombinedOutput()
+	repository, err := git.PlainOpen(destdir)
 	if err != nil {
-		if len(out) > 0 {
-			return "", fmt.Errorf("retrieve remote url with response '%s': %w", string(out), err)
-		}
-		return "", fmt.Errorf("retrieve remote url: %w", err)
+		return "", fmt.Errorf("open repository: %w", err)
 	}
-	return string(out), nil
+	origin, err := repository.Remote("origin")
+	if err != nil {
+		return "", fmt.Errorf("get remote 'origin': %w", err)
+	}
+	if len(origin.Config().URLs) == 0 {
+		return "", fmt.Errorf("no URL associated to remote: %w", git.ErrRemoteNotFound)
+	}
+	return origin.Config().URLs[0], nil
 }
 
 // gitParseRemote returns the current repository host and path to repository on the given host's platform.

@@ -1,6 +1,7 @@
 package parser //nolint:testpackage
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -26,7 +27,7 @@ func TestGit(t *testing.T) {
 		}
 
 		// Act
-		vcs, err := Git("")
+		vcs, err := Git(filepath.Join("..", "..", ".."))
 
 		// Assert
 		require.NoError(t, err)
@@ -35,7 +36,7 @@ func TestGit(t *testing.T) {
 }
 
 func TestGitOriginURL(t *testing.T) {
-	t.Run("empty_no_git", func(t *testing.T) {
+	t.Run("error_no_git", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()
 
@@ -43,13 +44,13 @@ func TestGitOriginURL(t *testing.T) {
 		originURL, err := gitOriginURL(destdir)
 
 		// Assert
-		assert.ErrorContains(t, err, "retrieve remote url")
+		assert.ErrorContains(t, err, "open repository")
 		assert.Empty(t, originURL)
 	})
 
 	t.Run("valid_git_repository", func(t *testing.T) {
 		// Act
-		originURL, err := gitOriginURL(".")
+		originURL, err := gitOriginURL(filepath.Join("..", "..", ".."))
 
 		// Assert
 		require.NoError(t, err)

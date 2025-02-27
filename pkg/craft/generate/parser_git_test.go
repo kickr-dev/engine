@@ -1,6 +1,7 @@
 package generate_test
 
 import (
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -40,7 +41,7 @@ func TestParserGit(t *testing.T) {
 		config := craft.Config{}
 
 		// Act
-		err := generate.ParserGit(ctx, "", &config)
+		err := generate.ParserGit(ctx, filepath.Join("..", "..", ".."), &config)
 
 		// Assert
 		require.NoError(t, err)
