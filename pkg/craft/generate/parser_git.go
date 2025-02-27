@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/go-git/go-git/v5"
+
 	craft "github.com/kilianpaquier/craft/pkg/craft/configuration"
 	"github.com/kilianpaquier/craft/pkg/engine"
 	"github.com/kilianpaquier/craft/pkg/engine/parser"
