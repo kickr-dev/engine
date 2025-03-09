@@ -97,7 +97,8 @@ jobs:
         with:
           hugo-version: latest
           extended: true
-      - run: hugo --gc --minify --destination dist
+      - run: |
+          hugo --gc --enableGitInfo --minify --destination "${GITHUB_WORKSPACE}/dist"
         env:
           VERSION: ${{ needs.version.outputs.version }}
       - uses: actions/upload-pages-artifact@v3

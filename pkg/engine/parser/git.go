@@ -47,7 +47,7 @@ func Git(destdir string) (VCS, error) {
 //   - git.ErrRepositoryNotExists
 //   - git.ErrRemoteNotFound
 func gitOriginURL(destdir string) (string, error) {
-	repository, err := git.PlainOpen(destdir)
+	repository, err := git.PlainOpenWithOptions(destdir, &git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
 		return "", fmt.Errorf("open repository: %w", err)
 	}

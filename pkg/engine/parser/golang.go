@@ -205,7 +205,11 @@ func ReadGoCmd(destdir string) (Executables, error) {
 }
 
 // HugoConfig represents the parse'd hugo.* or theme.* file associated to hugo configuration file.
-type HugoConfig struct{}
+type HugoConfig struct {
+	// IsTheme expresses whether a theme.* configuration is present,
+	// meaning current hugo repository is a theme one.
+	IsTheme bool
+}
 
 // Hugo detects if the project is a Hugo project.
 //
@@ -232,5 +236,8 @@ func Hugo(destdir string) (HugoConfig, bool) {
 	// detect hugo theme
 	themes, _ := filepath.Glob(filepath.Join(destdir, "theme.*"))
 
-	return HugoConfig{}, len(configs) > 0 || len(themes) > 0
+	if len(configs) == 0 && len(themes) == 0 {
+		return HugoConfig{}, false
+	}
+	return HugoConfig{IsTheme: len(themes) > 0}, true
 }

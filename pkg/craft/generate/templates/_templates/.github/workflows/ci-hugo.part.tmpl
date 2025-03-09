@@ -1,5 +1,6 @@
 jobs:
 <<- define "hugo" >>
+<<- $specifics := get .Languages "hugo" >>
 
   hugo-build:
     name: Hugo Build
@@ -21,7 +22,11 @@ jobs:
         with:
           hugo-version: latest
           extended: true
-      - run: hugo --gc --minify --destination dist
+      - run: |
+<<- if $specifics.IsTheme >>
+          if [ -d exampleSite ]; then cd exampleSite; fi
+<<- end >>
+          hugo --gc --enableGitInfo --minify --destination "${GITHUB_WORKSPACE}/dist"
         env:
           VERSION: ${{ needs.version.outputs.version }}
 <<- if .IsStatic "pages" >>
