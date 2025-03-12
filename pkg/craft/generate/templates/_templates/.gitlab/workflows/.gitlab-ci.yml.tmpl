@@ -211,6 +211,7 @@ go-build:
 {{- end }}
 
 {{- if $hugo }}
+{{- $specifics := get .Languages "hugo" }}
 
 hugo-build:
   image: registry.gitlab.com/pages/hugo/hugo_extended:latest
@@ -220,7 +221,10 @@ hugo-build:
   before_script:
     - apk add go
   script:
-    - hugo --gc --minify --destination "$DIST_FOLDER"
+{{- if $specifics.IsTheme }}
+    - if [ -d exampleSite ]; then cd exampleSite; fi
+{{- end }}
+    - hugo --gc --minify --destination "$CI_PROJECT_DIR/$DIST_FOLDER"
   artifacts:
     name: $ENV
     paths:

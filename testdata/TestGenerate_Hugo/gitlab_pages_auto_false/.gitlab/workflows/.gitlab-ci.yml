@@ -58,7 +58,7 @@ hugo-build:
   before_script:
     - apk add go
   script:
-    - hugo --gc --minify --destination "$DIST_FOLDER"
+    - hugo --gc --minify --destination "$CI_PROJECT_DIR/$DIST_FOLDER"
   artifacts:
     name: $ENV
     paths:
