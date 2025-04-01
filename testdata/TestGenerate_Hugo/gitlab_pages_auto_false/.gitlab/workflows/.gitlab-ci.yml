@@ -51,7 +51,7 @@ semantic-release:
     GIT_DEPTH: "0"
 
 hugo-build:
-  image: registry.gitlab.com/pages/hugo/hugo_extended:latest
+  image: hugomods/hugo:exts
   stage: build
   variables:
     DIST_FOLDER: dist
