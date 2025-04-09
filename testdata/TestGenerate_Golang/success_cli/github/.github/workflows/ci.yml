@@ -117,29 +117,9 @@ jobs:
           go-package: ./...
           go-version-file: go.mod
 
-  go-lint:
-    name: Go Lint
-    runs-on: ubuntu-latest
-    needs: run-workflow
-    permissions:
-      checks: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          cache: false
-          check-latest: true
-          go-version-file: go.mod
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - run: mkdir -p reports/
-      - uses: golangci/golangci-lint-action@v6
-        with:
-          args: --config .golangci.yml --timeout 240s --fast --sort-results --out-format checkstyle:reports/go-ci-lint.checkstyle.xml,colored-line-number
-
   go-test:
     name: Go Test
     runs-on: ${{ matrix.os }}
-    needs: go-lint
     strategy:
       fail-fast: false
       matrix:
@@ -155,6 +135,9 @@ jobs:
           go-version-file: go.mod
           token: ${{ secrets.GITHUB_TOKEN }}
       - run: mkdir -p reports/
+      - uses: golangci/golangci-lint-action@v6
+        with:
+          args: --config .golangci.yml --timeout 240s --fast --sort-results --out-format checkstyle:reports/go-ci-lint.checkstyle.xml,colored-line-number
       - run: go test ./... -coverpkg="./..." -covermode="count" -coverprofile="reports/go-coverage.native.out" -timeout=15s
 
   go-build:
