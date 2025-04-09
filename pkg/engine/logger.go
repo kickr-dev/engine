@@ -86,5 +86,5 @@ func (b *testLogger) Warnf(format string, args ...any) {
 }
 
 func (b *testLogger) print(format string, args ...any) {
-	b.writer.Write([]byte(fmt.Sprintf(format, args...)))
+	b.writer.Write(fmt.Appendf(nil, format, args...))
 }

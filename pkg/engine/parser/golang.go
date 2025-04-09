@@ -35,7 +35,7 @@ var (
 
 var versionRegexp = regexp.MustCompile("^v[0-9]+$")
 
-// Gomod represents the parsed struct for go.mod file
+// Gomod represents the parsed struct for go.mod file.
 type Gomod struct {
 	// Go is the go statement,
 	// i.e. "go 1.23.4" without "go" (and space) part.

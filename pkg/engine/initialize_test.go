@@ -17,16 +17,16 @@ const (
 	// defaultSubmit is appended to all responses to move to the next one. These represent \r\n.
 	defaultSubmit = "\x0D\x0A"
 
-	// selectSubmit is a special case where the defaultSubmit messes up the input in select statements
+	// selectSubmit is a special case where the defaultSubmit messes up the input in select statements.
 	_ = "\x0D"
 
-	// selectOption is used in a select and multiselect to mark or unmark an item
+	// selectOption is used in a select and multiselect to mark or unmark an item.
 	_ = "\x20"
 
-	// arrowDown is used in a select and multiselect to move downwards
+	// arrowDown is used in a select and multiselect to move downwards.
 	_ = "\x1b[B"
 
-	// arrowRight is used in a confirm to move between yes and no
+	// arrowRight is used in a confirm to move between yes and no.
 	_ = "\x1b[C"
 )
 
