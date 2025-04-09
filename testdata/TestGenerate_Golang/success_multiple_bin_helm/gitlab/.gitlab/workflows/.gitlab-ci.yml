@@ -55,7 +55,7 @@ variables:
   DOCKER_TRIVY_ARGS: "--ignore-unfixed --exit-code 1 --exit-on-eol 1"
   DOCKER_TRIVY_SECURITY_LEVEL_THRESHOLD: "MEDIUM,HIGH,CRITICAL"
 
-  GO_CI_LINT_ARGS: "--config .golangci.yml --timeout 240s --fast --sort-results"
+  GO_CI_LINT_ARGS: "--config .golangci.yml --timeout 240s --allow-parallel-runners --output.checkstyle.path reports/go-ci-lint.checkstyle.xml --output.text.path stdout"
   GO_CI_LINT_IMAGE: "registry.hub.docker.com/golangci/golangci-lint:latest-alpine"
   GO_IMAGE: "registry.hub.docker.com/library/golang:latest"
   GO_OUTDATED_DISABLED: "false" # https://github.com/psampaz/go-mod-outdated
