@@ -16,7 +16,7 @@ import (
 // and .craft overrides in chart fodler.
 //
 // Note, since it does marshal input configuration in JSON
-// and merges it with <destdir>/chart/.craft, this parser should be the last one call
+// and merges it with <destdir>/chart/.craft, this parser should be the last one called
 // to ensure the configuration is in a final state.
 func ParserChart(_ context.Context, destdir string, config *craft.Config) error {
 	chartdir := filepath.Join(destdir, "chart")
