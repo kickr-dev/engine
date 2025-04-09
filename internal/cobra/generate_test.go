@@ -290,21 +290,39 @@ func TestGenerate_Node(t *testing.T) {
 	})
 
 	t.Run("success_library", func(t *testing.T) {
-		for _, ci := range []string{parser.GitLab, parser.GitHub} {
-			t.Run(ci, func(t *testing.T) {
+		type testcase struct {
+			Bot            string
+			CI             string
+			PackageManager string
+		}
+		cases := []testcase{
+			{Bot: craft.Renovate, CI: parser.GitLab, PackageManager: "bun@1.1.6"},
+			{Bot: craft.Dependabot, CI: parser.GitLab, PackageManager: "bun@1.1.6"},
+			{Bot: craft.Renovate, CI: parser.GitLab, PackageManager: "npm@7.0.0"},
+			{Bot: craft.Dependabot, CI: parser.GitLab, PackageManager: "npm@7.0.0"},
+
+			{Bot: craft.Renovate, CI: parser.GitHub, PackageManager: "bun@1.1.6"},
+			{Bot: craft.Dependabot, CI: parser.GitHub, PackageManager: "bun@1.1.6"},
+			{Bot: craft.Renovate, CI: parser.GitHub, PackageManager: "npm@7.0.0"},
+			{Bot: craft.Dependabot, CI: parser.GitHub, PackageManager: "npm@7.0.0"},
+		}
+
+		for _, tc := range cases {
+			name := fmt.Sprint(tc.CI, "_", tc.Bot, "_", tc.PackageManager)
+			t.Run(name, func(t *testing.T) {
 				// Arrange
 				config := craft.Config{
-					Bot: helpers.ToPtr(craft.Renovate),
+					Bot: helpers.ToPtr(tc.Bot),
 					CI: &craft.CI{
-						Name:    ci,
+						Name:    tc.CI,
 						Auth:    craft.Auth{Maintenance: helpers.ToPtr(craft.PersonalToken)},
 						Release: &craft.Release{Backmerge: true},
 					},
 					Exclude: []string{craft.Chart},
-					VCS:     parser.VCS{Platform: ci},
+					VCS:     parser.VCS{Platform: tc.CI},
 				}
 				node := func(_ context.Context, _ string, config *craft.Config) error {
-					config.SetLanguage("node", parser.PackageJSON{Name: "craft", PackageManager: "bun@1.1.6"})
+					config.SetLanguage("node", parser.PackageJSON{Name: "craft", PackageManager: tc.PackageManager})
 					return nil
 				}
 

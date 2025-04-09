@@ -76,8 +76,10 @@ updates:
 {{- end }}
 
 {{- if $node }}
+{{- $specifics := get .Languages "node" }}
+{{- $manager := cutAfter $specifics.PackageManager "@" }}
 
-  - package-ecosystem: npm
+  - package-ecosystem: {{ ternary "bun" "npm" (eq $manager "bun") }}
     directory: /
     schedule:
       interval: daily
