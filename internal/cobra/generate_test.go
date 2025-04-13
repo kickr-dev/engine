@@ -251,7 +251,7 @@ func TestGenerate_Hugo(t *testing.T) {
 			// Arrange
 			config := craft.Config{
 				CI:      &ci,
-				Exclude: []string{craft.Chart, craft.Makefile},
+				Exclude: []string{craft.Chart},
 				VCS:     parser.VCS{Platform: ci.Name},
 			}
 			hugo := func(_ context.Context, _ string, config *craft.Config) error {
