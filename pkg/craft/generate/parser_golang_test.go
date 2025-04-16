@@ -43,6 +43,36 @@ func TestParserGolang(t *testing.T) {
 		assert.Zero(t, config)
 	})
 
+	t.Run("success_hugo", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+
+		err := os.WriteFile(filepath.Join(destdir, parser.FileGomod), []byte(
+			`module github.com/kilianpaquier/craft
+
+			go 1.22`,
+		), files.RwRR)
+		require.NoError(t, err)
+
+		hugoconfig, err := os.Create(filepath.Join(destdir, "hugo.toml"))
+		require.NoError(t, err)
+		require.NoError(t, hugoconfig.Close())
+
+		expected := craft.Config{
+			Languages: map[string]any{
+				"hugo": parser.HugoConfig{},
+			},
+		}
+		config := craft.Config{}
+
+		// Act
+		err = generate.ParserGolang(ctx, destdir, &config)
+
+		// Assert
+		require.NoError(t, err)
+		assert.Equal(t, expected, config)
+	})
+
 	t.Run("success_go_no_cmd", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()

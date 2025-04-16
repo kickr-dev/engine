@@ -47,7 +47,6 @@ func gen(generators ...engine.Generator[craft.Config]) func(cmd *cobra.Command, 
 		parsers := []engine.Parser[craft.Config]{
 			generate.ParserGit,
 			generate.ParserGolang,
-			generate.ParserHugo,
 			generate.ParserNode,
 			generate.ParserShell,
 			// must be kept last since it marshals config and merges it with chart overrides
