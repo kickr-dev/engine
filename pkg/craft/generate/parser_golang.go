@@ -20,6 +20,12 @@ import (
 // If a hugo config or theme file is present, it will be detected
 // and 'hugo' will be set as the language ('go' will not in that case).
 func ParserGolang(_ context.Context, destdir string, config *craft.Config) error {
+	if hugoconfig, ok := parser.Hugo(destdir); ok {
+		engine.GetLogger().Infof("hugo detected, theme or hugo files are present")
+		config.SetLanguage("hugo", hugoconfig)
+		return nil
+	}
+
 	gomod, err := parser.ReadGomod(destdir)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
