@@ -1,9 +1,13 @@
 {{- define "golang" }}
 {{- $specifics := get .Languages "go" }}
 
-GOCI_LINT_PATH  ?= .golangci.yml
 {{- if gt .Binaries 0 }}
+
+GOCI_LINT_PATH  ?= .golangci.yml
 VERSION         ?= v0.0.0
+{{- else }}
+
+GOCI_LINT_PATH ?= .golangci.yml
 {{- end }}
 
 .PHONY: reports
