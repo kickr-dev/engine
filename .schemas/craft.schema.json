@@ -241,6 +241,7 @@
                             "goreleaser",
                             "makefile",
                             "pre-commit",
+                            "pre-commit:auto-commit",
                             "shell"
                         ]
                     },
