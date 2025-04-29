@@ -205,6 +205,7 @@ exclude:
   - goreleaser
   - makefile
   - pre-commit
+  - pre-commit:auto-commit
   - shell
 
 # platform override in case of gitlab on premise, bitbucket on premise, etc.
