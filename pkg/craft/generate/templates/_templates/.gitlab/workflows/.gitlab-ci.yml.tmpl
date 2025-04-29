@@ -224,7 +224,7 @@ hugo-build:
 {{- if $specifics.IsTheme }}
     - if [ -d exampleSite ]; then cd exampleSite; fi
 {{- end }}
-    - hugo --gc --minify --destination "$CI_PROJECT_DIR/$DIST_FOLDER"
+    - hugo --gc --minify --destination "$CI_PROJECT_DIR/$DIST_FOLDER" --logLevel debug
   artifacts:
     name: $ENV
     paths:

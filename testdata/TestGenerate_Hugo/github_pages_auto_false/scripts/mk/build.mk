@@ -2,11 +2,11 @@
 
 .PHONY: build
 build:
-	@hugo --gc --minify --destination dist
+	@hugo --gc --minify --destination dist --logLevel debug
 
 .PHONY: serve
 serve:
-	@hugo server --disableFastRender --destination dist
+	@hugo server --disableFastRender --destination dist --logLevel debug
 
 .PHONY: production
 production: build

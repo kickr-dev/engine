@@ -26,7 +26,7 @@ jobs:
 <<- if $specifics.IsTheme >>
           if [ -d exampleSite ]; then cd exampleSite; fi
 <<- end >>
-          hugo --gc --enableGitInfo --minify --destination "${GITHUB_WORKSPACE}/dist"
+          hugo --gc --enableGitInfo --minify --destination "${GITHUB_WORKSPACE}/dist" --logLevel debug
         env:
           VERSION: ${{ needs.version.outputs.version }}
 <<- if .IsStatic "pages" >>
