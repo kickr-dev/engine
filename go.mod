@@ -2,16 +2,16 @@ module github.com/kilianpaquier/craft
 
 go 1.24
 
-toolchain go1.24.0
+toolchain go1.24.2
 
 require (
 	dario.cat/mergo v1.0.1
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/bluekeyes/go-gitdiff v0.8.1
-	github.com/charmbracelet/bubbletea v1.3.4
-	github.com/charmbracelet/huh v0.6.0
+	github.com/charmbracelet/bubbletea v1.3.5
+	github.com/charmbracelet/huh v0.7.0
 	github.com/charmbracelet/log v0.4.1
-	github.com/go-git/go-git/v5 v5.14.0
+	github.com/go-git/go-git/v5 v5.16.0
 	github.com/go-viper/mapstructure/v2 v2.2.1
 	github.com/goccy/go-yaml v1.17.1
 	github.com/jarcoal/httpmock v1.4.0
@@ -19,7 +19,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.1
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
-	gitlab.com/gitlab-org/api/client-go v0.127.0
+	gitlab.com/gitlab-org/api/client-go v0.128.0
 	golang.org/x/mod v0.24.0
 	golang.org/x/text v0.24.0
 )
@@ -28,18 +28,18 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
-	github.com/ProtonMail/go-crypto v1.1.6 // indirect
+	github.com/ProtonMail/go-crypto v1.2.0 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/catppuccin/go v0.3.0 // indirect
 	github.com/charmbracelet/bubbles v0.21.0 // indirect
-	github.com/charmbracelet/colorprofile v0.3.0 // indirect
+	github.com/charmbracelet/colorprofile v0.3.1 // indirect
 	github.com/charmbracelet/lipgloss v1.1.0 // indirect
-	github.com/charmbracelet/x/ansi v0.8.0 // indirect
+	github.com/charmbracelet/x/ansi v0.9.2 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.13 // indirect
-	github.com/charmbracelet/x/exp/strings v0.0.0-20250407102404-92fd13048199 // indirect
+	github.com/charmbracelet/x/exp/strings v0.0.0-20250429191325-f402b009fe75 // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
-	github.com/cloudflare/circl v1.6.0 // indirect
+	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/cyphar/filepath-securejoin v0.4.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
