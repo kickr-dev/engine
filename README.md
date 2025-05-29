@@ -230,7 +230,7 @@ Multiple examples:
 - A `go.mod` is detected with `Golang` parser, combined with `ci` configuration, then the appropriate CI will be generated.
 - A `go.mod` is detected with `Golang` parser and a `hugo.(toml|yaml|...)` or `theme.(toml|yaml|...)` is detected too, combined with the `ci` and `static` options,
   then the appropriate **Netlify** or **Pages** (it can be **GitLab** or **GitHub**) deployment will be generated in CI files.
-- If `exclude: [chart]` is given, a custom craft helm chart will be generated.
+- If `exclude: [chart]` is not given, a custom craft helm chart will be generated.
   This helm chart can deploy cronjobs, jobs and workers easily from `values.yaml` file.
 - A `package.json` is detected with `Node` parser, combined with `ci` configuration, then the appropriate CI will be generated
   (codecov analysis, sonar analysis, lint, tests, build if needed).
