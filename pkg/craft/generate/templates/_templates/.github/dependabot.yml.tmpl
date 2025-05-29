@@ -46,7 +46,7 @@ updates:
       prefix: chore
 {{- end }}
 
-{{- if $golang }}
+{{- if or $golang $hugo }}
 
   - package-ecosystem: gomod
     directory: /
