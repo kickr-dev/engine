@@ -1,7 +1,6 @@
 package cobra
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -17,8 +16,7 @@ var initializeCmd = &cobra.Command{
 	Short: "Initialize new craft project",
 	Run: func(cmd *cobra.Command, _ []string) {
 		ctx := cmd.Context()
-		destdir, _ := os.Getwd()
-		dest := filepath.Join(destdir, craft.File)
+		dest := filepath.Join(wd, craft.File)
 
 		if files.Exists(dest) {
 			logger.Info("project already initialized")

@@ -19,8 +19,8 @@ import (
 func gen(generators ...engine.Generator[craft.Config]) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
 		ctx := cmd.Context()
-		destdir, _ := os.Getwd()
-		dest := filepath.Join(destdir, craft.File)
+		dest := filepath.Join(wd, craft.File)
+		logger.Infof("generating layout in %s", wd)
 
 		// initialize configuration if it does not exist
 		if !files.Exists(dest) {
@@ -52,7 +52,7 @@ func gen(generators ...engine.Generator[craft.Config]) func(cmd *cobra.Command, 
 			// must be kept last since it marshals config and merges it with chart overrides
 			generate.ParserChart,
 		}
-		config, err := engine.Generate(ctx, destdir, config, parsers, generators)
+		config, err := engine.Generate(ctx, wd, config, parsers, generators)
 		if err != nil {
 			logger.Fatal(err)
 		}

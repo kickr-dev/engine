@@ -65,6 +65,7 @@ Available Commands:
   version     Show current craft version
 
 Flags:
+  -d, --dir string          set directory where generation will be made (default is current directory)
   -h, --help                help for craft
       --log-format string   set logging format (either "text" or "json") (default "text")
       --log-level string    set logging level (default "info")
@@ -84,6 +85,7 @@ Flags:
   -h, --help   help for init
 
 Global Flags:
+  -d, --dir string          set directory where generation will be made (default is current directory)
       --log-format string   set logging format (either "text" or "json") (default "text")
       --log-level string    set logging level (default "info")
 ```
@@ -100,22 +102,7 @@ Flags:
   -h, --help   help for generate
 
 Global Flags:
-      --log-format string   set logging format (either "text" or "json") (default "text")
-      --log-level string    set logging level (default "info")
-```
-
-#### Chart
-
-```
-Generate project layout's helm chart
-
-Usage:
-  craft chart [flags]
-
-Flags:
-  -h, --help   help for chart
-
-Global Flags:
+  -d, --dir string          set directory where generation will be made (default is current directory)
       --log-format string   set logging format (either "text" or "json") (default "text")
       --log-level string    set logging level (default "info")
 ```
@@ -252,11 +239,14 @@ Multiple examples:
 
 - https://github.com/kilianpaquier/compare (Golang library)
 - https://github.com/kilianpaquier/craft (Golang CLI with executables as artifacts in releases)
+- https://github.com/kilianpaquier/dotfiles (Dotfiles repository with various shell scripts)
 - https://github.com/kilianpaquier/gitlab-storage-cleaner (Golang CLI with Docker deployment and executables as artifacts in releases)
 - https://github.com/kilianpaquier/go-builder-generator (Golang CLI with executables as artifacts in releases)
+- https://github.com/kilianpaquier/hugo-primer (Hugo theme)
 - https://github.com/kilianpaquier/kilianpaquier.github.io (Hugo static website deployed with **Netlify**)
 - https://github.com/kilianpaquier/pooling (Golang library)
 - https://github.com/kilianpaquier/semantic-release-backmerge (**semantic-release** plugin with static build deployed in npmjs.org)
+- https://github.com/kilianpaquier/zsh-plugins (ZSH plugins repository with various shell scripts)
 - https://gitlab.com/nath7098/personal-website (Node static website deployed with Docker)
 
 ## Craft as an SDK

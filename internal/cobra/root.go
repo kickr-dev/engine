@@ -2,6 +2,7 @@ package cobra
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/charmbracelet/log"
@@ -9,13 +10,16 @@ import (
 )
 
 var (
+	logFormat = "text"
+	logLevel  = "info"
+	wd        = ""
+
 	logger = log.NewWithOptions(os.Stderr, log.Options{
 		CallerFormatter: log.ShortCallerFormatter,
 		ReportCaller:    true,
 	})
-	logLevel  = "info"
-	logFormat = "text"
-	rootCmd   = &cobra.Command{
+
+	rootCmd = &cobra.Command{
 		Use:   "craft",
 		Short: generateCmd.Short,
 		Long: `Craft initializes or generates craft projects. Craft projects are only defined by a .craft file
@@ -30,6 +34,7 @@ Additional generation command are available to generate only subparts of craft l
 )
 
 func init() {
+	rootCmd.PersistentFlags().StringVarP(&wd, "dir", "d", "", "set directory where generation will be made (default is current directory)")
 	rootCmd.PersistentFlags().StringVar(&logLevel, "log-level", "info", "set logging level")
 	rootCmd.PersistentFlags().StringVar(&logFormat, "log-format", "text", `set logging format (either "text" or "json")`)
 
@@ -64,5 +69,13 @@ func globalFlags(_ *cobra.Command, _ []string) error {
 		level = log.InfoLevel
 	}
 	logger.SetLevel(level)
+
+	if wd == "" {
+		pwd, err := os.Getwd()
+		if err != nil {
+			return fmt.Errorf("get wd: %w", err)
+		}
+		wd = pwd
+	}
 	return nil
 }

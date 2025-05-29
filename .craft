@@ -12,6 +12,7 @@ ci:
   release: {}
 exclude:
   - chart
+  - shell
 license: mit
 maintainers:
   - name: kilianpaquier
