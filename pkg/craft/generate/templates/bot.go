@@ -19,6 +19,14 @@ func Dependabot() []engine.Template[craft.Config] {
 				return config.Platform != parser.GitHub || !config.IsBot(craft.Dependabot)
 			},
 		},
+		{
+			Delimiters: engine.DelimitersBracket(),
+			Globs:      []string{path.Join(".gitlab", "dependabot.yml") + engine.TmplExtension},
+			Out:        path.Join(".gitlab", "dependabot.yml"),
+			Remove: func(config craft.Config) bool {
+				return !config.IsCI(parser.GitLab) || !config.IsBot(craft.Dependabot)
+			},
+		},
 	}
 }
 

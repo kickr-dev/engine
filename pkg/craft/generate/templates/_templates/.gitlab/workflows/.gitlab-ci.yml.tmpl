@@ -40,6 +40,14 @@ include:
     file: "templates/gitlab-ci-renovate.yml"
 {{- end }}
 
+{{- if .IsBot "dependabot" }}
+
+  # Dependabot template
+  - project: dependabot-gitlab/dependabot-standalone
+    ref: 3.58.0
+    file: .gitlab-ci.yml
+{{- end }}
+
 {{- if .Docker }}
 
   # Docker template
@@ -99,6 +107,11 @@ variables:
 
   RENOVATE_AUTODISCOVER: "true"
   RENOVATE_AUTODISCOVER_FILTER: {{ eq (len .Languages) 0 | ternary "$CI_PROJECT_NAMESPACE" "$CI_PROJECT_PATH" }}
+{{- end }}
+
+{{- if .IsBot "dependabot" }}
+
+  SETTINGS__GITLAB_URL: $CI_SERVER_FQDN
 {{- end }}
 
 {{- if .Docker }}

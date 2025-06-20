@@ -9,6 +9,7 @@ include: .gitlab/workflows/.gitlab-ci.yml
 # GITLAB_TOKEN: A GitLab 'project access token' or 'personal access token' with `api`, `read_repository` and `write_repository` scopes.
 # SEMREL_GPG_SIGNKEY: Path to the GPG signkey exported with `gpg --armor --export-secret-key` (optional).
 
+# don't forget to setup a scheduled pipeline every once in a while to run Renovate updates checks.
 # RENOVATE_TOKEN: A GitLab access token to allow Renovate crawl your projects. [See doc](https://docs.renovatebot.com/modules/platform/gitlab/#authentication)
 # GITHUB_COM_TOKEN: A GitHub access token to allow Renovate fetch changelogs. [See doc](https://docs.renovatebot.com/getting-started/running/#githubcom-token-for-changelogs)
 

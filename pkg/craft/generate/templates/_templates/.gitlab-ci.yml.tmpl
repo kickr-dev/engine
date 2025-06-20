@@ -27,8 +27,16 @@ include: .gitlab/workflows/.gitlab-ci.yml
 
 {{- if .IsBot "renovate" }}
 
+# don't forget to setup a scheduled pipeline every once in a while to run Renovate updates checks.
 # RENOVATE_TOKEN: A GitLab access token to allow Renovate crawl your projects. [See doc](https://docs.renovatebot.com/modules/platform/gitlab/#authentication)
 # GITHUB_COM_TOKEN: A GitHub access token to allow Renovate fetch changelogs. [See doc](https://docs.renovatebot.com/getting-started/running/#githubcom-token-for-changelogs)
+{{- end }}
+
+{{- if .IsBot "dependabot" }}
+
+# don't forget to setup a scheduled pipeline every once in a while to run Dependabot updates checks.
+# SETTINGS__GITLAB_ACCESS_TOKEN: A GitLab access token to allow Dependabot creating merge requests. [See doc](https://dependabot-gitlab.gitlab.io/dependabot/config/environment.html#access)
+# SETTINGS__GITHUB_ACCESS_TOKEN: A GitHub access token to allow Dependabot fetch changelogs. [See doc](https://dependabot-gitlab.gitlab.io/dependabot/config/environment.html#access)
 {{- end }}
 
 {{- if $netlify }}

@@ -13,6 +13,11 @@ include:
     ref: "1"
     file: "templates/gitlab-ci-pre-commit.yml"
 
+  # Dependabot template
+  - project: dependabot-gitlab/dependabot-standalone
+    ref: 3.58.0
+    file: .gitlab-ci.yml
+
   # Go template
   - project: "to-be-continuous/golang"
     ref: "4"
@@ -31,6 +36,8 @@ variables:
   SEMREL_TAG_FORMAT: v$${version}
 
   PRE_COMMIT_FILE: .pre-commit-config.yaml
+
+  SETTINGS__GITLAB_URL: $CI_SERVER_FQDN
 
   GO_CI_LINT_ARGS: "--config .golangci.yml --timeout 240s --allow-parallel-runners --output.checkstyle.path reports/go-ci-lint.checkstyle.xml --output.text.path stdout"
   GO_CI_LINT_IMAGE: "registry.hub.docker.com/golangci/golangci-lint:latest-alpine"
