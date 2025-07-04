@@ -1,3 +1,81 @@
+## [1.0.0-beta.20](https://github.com/kilianpaquier/craft/compare/v1.0.0-beta.19...v1.0.0-beta.20) (2025-07-04)
+
+### Features
+
+* add pre-commit configuration alongside shellcheck in CI / pre-commit depending on CI activation ([4f2023a](https://github.com/kilianpaquier/craft/commit/4f2023a9dfd8a7c65ce0761b5d8bc3154db095ba))
+* allow generating craft in another directory while defaulting to current directory ([8a6e2ee](https://github.com/kilianpaquier/craft/commit/8a6e2ee432dbcb22e68b2551a08eb23f1e26c814))
+* **chart:** add helm github and gitlab CI (lint, testing, deployment) ([56605c1](https://github.com/kilianpaquier/craft/commit/56605c15fb2ce45db6fcfae35a3108a1a7f3a9a8))
+* **dependabot:** add bot option with GitLab CI/CD ([d5aec51](https://github.com/kilianpaquier/craft/commit/d5aec51ac869e111c966a35d95a3689624b7e0e3))
+* **dependabot:** add cooldown configuration to 5 days ([cf42d24](https://github.com/kilianpaquier/craft/commit/cf42d2459567d7ae6683ee73bd1768cedc7fd3ff))
+* **go:** add test report for GitHub Actions with codecov and sonar ([0dbf5a0](https://github.com/kilianpaquier/craft/commit/0dbf5a04bacf5f6be60406cb768fecc0d53e98a7))
+* **go:** add tidy (via include) in pre-commit ([b20074d](https://github.com/kilianpaquier/craft/commit/b20074dcc7fd1a6e542f60838e6044577692d287))
+* **golang:** add tools property in parsed go.mod ([6c2a210](https://github.com/kilianpaquier/craft/commit/6c2a21081f6f17a69b71430a9ef58736614d98be))
+* **hugo:** add IsTheme property in returned struct to introduce custom behaviors depending on hugo themes and hugo sites ([7dff8a8](https://github.com/kilianpaquier/craft/commit/7dff8a840535fb30086f4efde6c7c9000371941a))
+* **node:** add test report on GitHub Actions for both codecov and sonar ([67991f6](https://github.com/kilianpaquier/craft/commit/67991f6da69ae6f9e8181f2321cb2ce53c9c7315))
+
+### Bug Fixes
+
+* **codecov:** add testutils in coverage ignore paths ([e14c398](https://github.com/kilianpaquier/craft/commit/e14c3988ed36451594dea319b79eecf8317d67f5))
+* **dependabot:** change ecosystem from npm to bun when package manager is bun ([c191833](https://github.com/kilianpaquier/craft/commit/c191833aa6abaf4728ea0868e9dd8c80900fa363))
+* **dependabot:** maintain go.mod with hugo too ([f0a4559](https://github.com/kilianpaquier/craft/commit/f0a4559d0f591a7fed5fb8b3394a796791caa545))
+* **github:** remove useless actions checkbox on CI workflow ([22d449a](https://github.com/kilianpaquier/craft/commit/22d449adfa482c158ce1919508336d5c4ae2ae05))
+* **gitlab:** add hugo theme example site deployment ([94270e4](https://github.com/kilianpaquier/craft/commit/94270e49938f3b3b4f338d8a142f8f095b70f108))
+* **gitlab:** add missing semantic-release plugins for CICD ([1fd0c84](https://github.com/kilianpaquier/craft/commit/1fd0c84aaca8af2d3525b36ec3426e9e850f7bfb))
+* **gitlab:** remove unnecessary semrel comments when not working with releases ([0da0c69](https://github.com/kilianpaquier/craft/commit/0da0c69647b7e4878147b09e6f7d87f1fb0f88b9))
+* **git:** use go-git instead of exec.Cmd when retrieving git remote origin URL ([3c16589](https://github.com/kilianpaquier/craft/commit/3c1658969c07523030554e82b9ec3a2b33ae0b79))
+* **go:** avoid additional space in build.mk when there's no binary in project ([5c1c1b2](https://github.com/kilianpaquier/craft/commit/5c1c1b2cfc5af0949aaddce8454ced4eb92b4736))
+* **go:** build / run packages instead of main directly to get access to runtime/debug build information ([7a21c71](https://github.com/kilianpaquier/craft/commit/7a21c71d6c61e60f2ee9f48251ef20d328109186))
+* **go:** enable cache on lint job since it's now before test jobs ([8bd4800](https://github.com/kilianpaquier/craft/commit/8bd4800133a3c2345c9d10253eecb69151370741))
+* **golangci-lint:** enable formatters (lol) ([a8d201a](https://github.com/kilianpaquier/craft/commit/a8d201af405849d88ef18cb21946e74fce11aa40))
+* **golangci-lint:** update generated configuration ([17ec334](https://github.com/kilianpaquier/craft/commit/17ec3346feed6857034399e281fd10e725c14c28))
+* **golangci-lint:** update github actions and gitlab cicd arguments ([e7559b5](https://github.com/kilianpaquier/craft/commit/e7559b5c3ff3b954724f40b6968c43053e99a5f2))
+* **golangci-lint:** update Makefile command ([44b0e80](https://github.com/kilianpaquier/craft/commit/44b0e806d63802d35111683e60ad7c634ce554ca))
+* **go:** use specific golangci-lint version in CI ([90880ae](https://github.com/kilianpaquier/craft/commit/90880aebb80e89adb63f4167c040e8abf6ffae46))
+* **helm:** invalid config for worker port in template ([a096751](https://github.com/kilianpaquier/craft/commit/a0967512f6a955d49572ba78f0cb9a26f005912b))
+* **helm:** remove default storage requests and limits ([29d73a4](https://github.com/kilianpaquier/craft/commit/29d73a440aa5af30d677ed55deb2fe8b4f2697b0))
+* **hugo:** save make serve files in dist like build ([5bc5944](https://github.com/kilianpaquier/craft/commit/5bc5944d9d185bc13137ad9ab5fd15b229debe18))
+* **hugo:** set loglevel to debug ([3a97b75](https://github.com/kilianpaquier/craft/commit/3a97b755b6a5ffb34fb2ef3212ff7113b5dab53c))
+* **hugo:** use up-to-date image on GitLab CI/CD ([8da9fc6](https://github.com/kilianpaquier/craft/commit/8da9fc62b4c0548f0100f94c6f4d39e8dcc8e041))
+* **pre-commit:** allow disable auto-commit (GitHub only) and remove json, toml and yaml check ([6423c47](https://github.com/kilianpaquier/craft/commit/6423c47562e0779f07edb547e62c3d1eb118a892))
+
+### Reverts
+
+* "chore(github): merge lint and test jobs" since test jobs are executed on multiple env ([5d72077](https://github.com/kilianpaquier/craft/commit/5d72077bcf4cf35f0a5c6929e55c2b0337e553ad))
+
+### Documentation
+
+* **generator:** missing package documentation ([9efaf5d](https://github.com/kilianpaquier/craft/commit/9efaf5d852b70ab681161d89b66ee7a30485f30f))
+* **readme:** add new available exclusion in README ([cbe00ce](https://github.com/kilianpaquier/craft/commit/cbe00cedce64c81d9e67f9f4cc5797675727a7d3))
+
+### Chores
+
+* **dependabot:** enable beta ecosystem by default ([0ba2ccb](https://github.com/kilianpaquier/craft/commit/0ba2ccb58aceac0705931b272b13a57742faaf30))
+* **dependabot:** remove reviewers following deprecation notice in favor of CODEOWNERS file ([36837c9](https://github.com/kilianpaquier/craft/commit/36837c9f8de9b11926bd7bddf6df5c144c4d394a))
+* **deps:** bump github.com/goccy/go-yaml in the minor-patch group ([53ac4af](https://github.com/kilianpaquier/craft/commit/53ac4afdbc0c860df9142d9ab578234590567c8d))
+* **deps:** bump helm.sh/helm/v3 ([334ab6e](https://github.com/kilianpaquier/craft/commit/334ab6e9a916ece1441e6704cc7260202765bae3))
+* **deps:** bump the minor-patch group across 1 directory with 5 updates ([f83c1c8](https://github.com/kilianpaquier/craft/commit/f83c1c8179c3470d879b0650cdc416f78a4c3fa4))
+* **deps:** bump the minor-patch group with 2 updates ([5efe6eb](https://github.com/kilianpaquier/craft/commit/5efe6eb724dba2016e364033842915932f4a7e64))
+* **deps:** upgrade charmbracelet/bubbles ([161fca7](https://github.com/kilianpaquier/craft/commit/161fca79cf000c97899ac311e4ec3872b5ad1196))
+* **deps:** upgrade dependencies ([689dc0b](https://github.com/kilianpaquier/craft/commit/689dc0bacf799d7ae3a8bc9eb23c2ee2ad822ba9))
+* **deps:** upgrade dependencies ([a2dc997](https://github.com/kilianpaquier/craft/commit/a2dc99706cb76a80f1f8c4771bd664f98e626b69))
+* **deps:** upgrade dependencies ([f411df1](https://github.com/kilianpaquier/craft/commit/f411df1eaf8a9fcc2e0ffc9a42a0b0d00710ca80))
+* **deps:** upgrade dependencies ([de1f95f](https://github.com/kilianpaquier/craft/commit/de1f95f6e720a73e4ef633ed99306bf84eee1044))
+* **deps:** upgrade dependencies ([3eb9bfe](https://github.com/kilianpaquier/craft/commit/3eb9bfec05f6b7c1e1fbb863723e4cb8463c2943))
+* **deps:** upgrade dependencies ([70b056f](https://github.com/kilianpaquier/craft/commit/70b056f62e10601074fd782e82be30fd0674354c))
+* **deps:** upgrade dependencies ([7c491df](https://github.com/kilianpaquier/craft/commit/7c491dfc20225b533a7ce595f8d39cf78374dda1))
+* **deps:** upgrade dependencies ([e7d9b63](https://github.com/kilianpaquier/craft/commit/e7d9b63e8aa41dbdac21bc1f2349a4f1648da53e))
+* **deps:** upgrade golangci-lint GitHub Actions ([31be64c](https://github.com/kilianpaquier/craft/commit/31be64ce1e905d5ef841874f1e44c9b63e3ec3fc))
+* **deps:** upgrade stefanzweifel/git-auto-commit-action to v6 ([9ec9f1f](https://github.com/kilianpaquier/craft/commit/9ec9f1ff736cac59f1a918d252fc875df73bd29f))
+* **github:** merge lint and test jobs ([c49c547](https://github.com/kilianpaquier/craft/commit/c49c54736da7e5ab6624d90a10f9d2c912a2320d))
+* **golangci-lint:** migrate generation to v2 ([3c00939](https://github.com/kilianpaquier/craft/commit/3c00939d8ff6d9f7b162692f1502cfc93d428ff7))
+* **renovate:** reduce minimal age days to 5 ([84997bb](https://github.com/kilianpaquier/craft/commit/84997bb51d30bfd6937340fc9499d7f7ffcab54e))
+* **wd:** compute absolute path of generation dir ([f6a9d85](https://github.com/kilianpaquier/craft/commit/f6a9d854bcb2668bafd9a7b9dbe8d7f83f3378ea))
+
+### Code Refactoring
+
+* move pre-commit:auto-commit for exclude to include to avoid generating it by default. ([757ab9a](https://github.com/kilianpaquier/craft/commit/757ab9aabb36342722b897689f1c8bced97b7a61))
+* **pre-commit:** move auto-commit include to CI option ([b617293](https://github.com/kilianpaquier/craft/commit/b617293dc38099fff5316708e7e6d97b9cd84e27))
+
 ## [1.0.0-beta.19](https://github.com/kilianpaquier/craft/compare/v1.0.0-beta.18...v1.0.0-beta.19) (2025-02-16)
 
 ### Features
