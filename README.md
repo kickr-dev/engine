@@ -131,15 +131,15 @@ ci:
     # target path for docker push (i.e. kilianpaquier/craft)
     # (optional, by default will be provisionned with <owner>/<repository>)
     path: kilianpaquier/craft
+    # specific exposed port (optional, default is 3000)
+    # used in various places like helm values.yml service port
+    # Dockerfile exposed port
+    port: 3000
     # specific docker registry to push images on
     # (optional, by default the CI platform decides, both GitHub and GitLab CI/CD points to their own registry)
     # used in various places like helm values.yml images registry
     # github release workflow to push images
     registry: ghcr.io
-    # specific exposed port (optional, default is 3000)
-    # used in various places like helm values.yml service port
-    # Dockerfile exposed port
-    port: 3000
 
   deployment:
     # deployment automatisation on default branch
@@ -181,6 +181,17 @@ ci:
 # Dockerfile description label
 description: some useful description
 
+# list of parts to not generate.
+exclude:
+  - goreleaser
+  - makefile
+  - pre-commit
+  - shell
+
+# list of optional parts to generate.
+include:
+  - pre-commit:gomod-tidy
+
 # project's license (optional)
 # providing it will download the appropriate license
 # used in various places like goreleaser executables license
@@ -198,17 +209,6 @@ maintainers:
   - name: maintainer
     email: maintainer@example.com
     url: maintainer.example.com
-
-# list of parts to not generate.
-exclude:
-  - goreleaser
-  - makefile
-  - pre-commit
-  - shell
-
-# list of optional parts to generate.
-include:
-  - pre-commit:gomod-tidy
 
 # platform override in case of gitlab on premise, bitbucket on premise, etc.
 # by default, an on premise gitlab will be matched if the host contains "gitlab"
