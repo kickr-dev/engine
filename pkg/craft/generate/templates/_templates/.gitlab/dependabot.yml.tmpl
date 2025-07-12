@@ -6,11 +6,26 @@
 # https://dependabot-gitlab.gitlab.io/dependabot/config/configuration.html#configuration
 
 {{- $golang := hasKey .Languages "go" }}
+{{- $helm := and .CI .CI.Helm }}
 {{- $hugo := hasKey .Languages "hugo" }}
 {{- $node := hasKey .Languages "node" }}
 
 version: 2
 updates:
+
+  - package-ecosystem: gitsubmodule
+    directory: /
+    auto-merge:
+      allow:
+        - dependency-name: "*"
+          update-types:
+            - version-update:semver-minor
+            - version-update:semver-patch
+      delay: 10
+    commit-message:
+      include: scope
+      prefix: chore
+
 {{- if .CI.Docker }}
 
   - package-ecosystem: docker
@@ -27,9 +42,10 @@ updates:
       prefix: chore
 {{- end }}
 
-{{- if or $golang $hugo }}
+{{- if $helm }}
 
-  - package-ecosystem: gomod
+  - package-ecosystem: helm
+    directory: /
     auto-merge:
       allow:
         - dependency-name: "*"
@@ -37,7 +53,22 @@ updates:
             - version-update:semver-minor
             - version-update:semver-patch
       delay: 10
+    commit-message:
+      include: scope
+      prefix: chore
+{{- end }}
+
+{{- if or $golang $hugo }}
+
+  - package-ecosystem: gomod
     directory: /
+    auto-merge:
+      allow:
+        - dependency-name: "*"
+          update-types:
+            - version-update:semver-minor
+            - version-update:semver-patch
+      delay: 10
     commit-message:
       include: scope
       prefix: chore
@@ -48,6 +79,7 @@ updates:
 {{- $manager := cutAfter $specifics.PackageManager "@" }}
 
   - package-ecosystem: {{ eq $manager "bun" | ternary "bun" "npm" }}
+    directory: /
     auto-merge:
       allow:
         - dependency-name: "*"
@@ -55,7 +87,6 @@ updates:
             - version-update:semver-minor
             - version-update:semver-patch
       delay: 10
-    directory: /
     commit-message:
       include: scope
       prefix: chore
