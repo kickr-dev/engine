@@ -12,14 +12,14 @@
 include:
 
   # semantic-release template
-  - project: "to-be-continuous/semantic-release"
+  - project: to-be-continuous/semantic-release
     ref: "3"
     file: "templates/gitlab-ci-semrel.yml"
 
 {{- if not (has "pre-commit" .Exclude) }}
 
   # pre-commit template
-  - project: "to-be-continuous/pre-commit"
+  - project: to-be-continuous/pre-commit
     ref: "1"
     file: "templates/gitlab-ci-pre-commit.yml"
 {{- end }}
@@ -27,7 +27,7 @@ include:
 {{- if $shell }}
 
   # Bash template
-  - project: "to-be-continuous/bash"
+  - project: to-be-continuous/bash
     ref: "3"
     file: "/templates/gitlab-ci-bash.yml"
 {{- end }}
@@ -35,7 +35,7 @@ include:
 {{- if eq .Bot "renovate" }}
 
   # Renovate template
-  - project: "to-be-continuous/renovate"
+  - project: to-be-continuous/renovate
     ref: "1"
     file: "templates/gitlab-ci-renovate.yml"
 {{- end }}
@@ -51,7 +51,7 @@ include:
 {{- if .CI.Docker }}
 
   # Docker template
-  - project: "to-be-continuous/docker"
+  - project: to-be-continuous/docker
     ref: "5"
     file: "templates/gitlab-ci-docker.yml"
 {{- end }}
@@ -59,7 +59,7 @@ include:
 {{- if .CI.Helm }}
 
   # Helm template
-  - project: "to-be-continuous/helm"
+  - project: to-be-continuous/helm
     ref: "8"
     file: "templates/gitlab-ci-helm.yml"
 {{- end }}
@@ -67,7 +67,7 @@ include:
 {{- if $golang }}
 
   # Go template
-  - project: "to-be-continuous/golang"
+  - project: to-be-continuous/golang
     ref: "4"
     file: "templates/gitlab-ci-golang.yml"
 {{- end }}
@@ -75,7 +75,7 @@ include:
 {{- if $node }}
 
   # Node.js template
-  - project: "to-be-continuous/node"
+  - project: to-be-continuous/node
     ref: "3"
     file: "templates/gitlab-ci-node.yml"
 {{- end }}
@@ -83,15 +83,12 @@ include:
 {{- if has "sonar" .CI.Options }}
 
   # SonarQube template
-  - project: "to-be-continuous/sonar"
+  - project: to-be-continuous/sonar
     ref: "4"
     file: "templates/gitlab-ci-sonar.yml"
 {{- end }}
 
 variables:
-  GIT_AUTHOR_EMAIL: $GITLAB_USER_EMAIL
-  GIT_COMMITTER_EMAIL: $GITLAB_USER_EMAIL
-
   SEMREL_AUTO_RELEASE_ENABLED: {{ .IsAutoRelease | ternary "$CI_COMMIT_REF_PROTECTED" "false" }}
   SEMREL_BRANCHES_REF: /^(master|main|v[0-9]+\.x|v[0-9]+\.[0-9]+\.x|next|alpha|beta|staging|dev|develop|development)$/
   SEMREL_HOOKS_DIR: scripts
@@ -129,9 +126,9 @@ variables:
   DOCKER_RELEASE_IMAGE: "{{ $registry }}/{{ $path }}:$SEMREL_INFO_NEXT_VERSION"
   DOCKER_SNAPSHOT_IMAGE: "{{ $registry }}/{{ $path }}/snapshot:$SEMREL_INFO_NEXT_VERSION"
 
+  DOCKER_BUILD_TOOL: buildah
   DOCKER_HEALTHCHECK_DISABLED: "true" # https://docs.docker.com/reference/dockerfile/#healthcheck
-  DOCKER_KANIKO_IMAGE: "gcr.io/kaniko-project/executor:debug"
-  DOCKER_METADATA: |
+  DOCKER_BUILD_ARGS: |
     --build-arg GIT_REF_NAME=$CI_COMMIT_REF_NAME
     --build-arg GIT_COMMIT=$CI_COMMIT_SHA
     --build-arg VERSION=$SEMREL_INFO_NEXT_VERSION
@@ -139,11 +136,11 @@ variables:
     --label org.opencontainers.image.ref.name=$CI_COMMIT_REF_NAME
     --label org.opencontainers.image.revision=$CI_COMMIT_SHA
     --label org.opencontainers.image.version=$SEMREL_INFO_NEXT_VERSION
-  DOCKER_RELEASE_EXTRA_TAGS: "latest \\g<major>.\\g<minor> \\g<major"
+  DOCKER_RELEASE_EXTRA_TAGS: latest \\g<major>.\\g<minor> \\g<major
   DOCKER_SBOM_DISABLED: "true" # https://github.com/anchore/syft
   DOCKER_SEMREL_RELEASE_DISABLED: "true" # handled by docker build and push jobs to avoid too much dependency on semantic-release
-  DOCKER_TRIVY_ARGS: "--ignore-unfixed --exit-code 1 --exit-on-eol 1"
-  DOCKER_TRIVY_SECURITY_LEVEL_THRESHOLD: "MEDIUM,HIGH,CRITICAL"
+  DOCKER_TRIVY_ARGS: --ignore-unfixed --exit-code 1 --exit-on-eol 1
+  DOCKER_TRIVY_SECURITY_LEVEL_THRESHOLD: MEDIUM,HIGH,CRITICAL
 {{- end }}
 
 {{- if .CI.Helm }}
@@ -183,16 +180,16 @@ variables:
 {{- if $node }}
 
   NODE_AUDIT_DISABLED: "false"
-  NODE_BUILD_ARGS: "run build --prod"
-  NODE_IMAGE: "registry.hub.docker.com/library/node:lts-alpine"
+  NODE_BUILD_ARGS: run build --prod
+  NODE_IMAGE: registry.hub.docker.com/library/node:lts-alpine
   NODE_LINT_ARGS: "run lint"
   NODE_LINT_ENABLED: "true"
-  NODE_OUTDATED_ARGS: "--long"
+  NODE_OUTDATED_ARGS: --long
   NODE_OUTDATED_DISABLED: "false"
   NODE_PUBLISH_ENABLED: "false"
   NODE_SBOM_DISABLED: "true"
   NODE_SEMGREP_DISABLED: "false" # https://semgrep.dev/docs/
-  NODE_TEST_ARGS: "test -- --coverage"
+  NODE_TEST_ARGS: test -- --coverage
 {{- end }}
 
 {{- if $golang }}
@@ -208,7 +205,7 @@ variables:
 
 {{- if has "sonar" .CI.Options }}
 
-  SONAR_HOST_URL: "https://sonarcloud.io"
+  SONAR_HOST_URL: https://sonarcloud.io
   SONAR_BASE_ARGS: |
     -Dsonar.properties=sonar.properties
     -Dsonar.links.homepage=$CI_PROJECT_URL
