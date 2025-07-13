@@ -2,38 +2,30 @@
 
 // https://docs.renovatebot.com/configuration-options/
 
-<<- /* add all categories in case the current repository is an "empty" one, meaning not language associated */ ->>
-<<- $all := le (len .Languages) 0 >>
-
-<<- $categories := list >>
-<<- if or $all .CI >><<- $categories = concat $categories (list "cd" "ci") >><<- end >>
-<<- if or $all (and .CI .CI.Docker) >><<- $categories = append $categories "docker" >><<- end >>
-<<- if or $all (and .CI .CI.Helm) (.IsDeployment "kubernetes") >><<- $categories = append $categories "kubernetes" >><<- end >>
-<<- if or $all (and .CI .CI.Helm) >><<- $categories = append $categories "helm" >><<- end >>
-<<- if or $all (hasKey .Languages "go") (hasKey .Languages "hugo") >><<- $categories = append $categories "golang" >><<- end >>
-<<- if or $all (hasKey .Languages "node") >><<- $categories = append $categories "js" >><<- end >>
-<<- if or $all (hasKey .Languages "python") >><<- $categories = append $categories "python" >><<- end >>
-<<- if or $all (hasKey .Languages "rust") >><<- $categories = append $categories "rust" >><<- end >>
-
 {
-    "extends": [ ":gitSignOff" ],
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
     "enabled": true,
+    "extends": [
+        ":automergeMinor",
+        ":disableRateLimiting",
+{{- if not (has "pre-commit" .Exclude) }}
+        ":enablePreCommit",
+{{- end }}
+        ":enableVulnerabilityAlertsWithLabel(vulnerability)",
+        ":gitSignOff",
+        ":labels(dependencies, renovate)",
+        ":separateMultipleMajorReleases"
+    ],
     "branchPrefix": "renovate/",
-    "labels": [ "dependencies" ],
 
     "branchConcurrentLimit": 0,
-    "prConcurrentLimit": 0,
     "prCreation": "immediate",
-    "prHourlyLimit": 0,
 
     "ignorePaths": [
         "**/bower_components/**",
-        "**/examples/**",
-        "**/fixtures/**",
         "**/node_modules/**",
-        "**/test/**",
-        "**/testdata/**",
-        "**/tests/**",
+        "**/testdata/**"
     ],
 
     "dependencyDashboard": false,
@@ -47,39 +39,26 @@
     "semanticCommitType": "chore",
     "semanticCommitScope": "deps",
 
-    "separateMajorMinor": true,
-    "separateMinorPatch": false,
-    "separateMultipleMajor": true,
-    "separateMultipleMinor": false,
-
     "baseBranches": [
         "$default",
-        "/^v[0-9]+\.x/",
-        "/^v[0-9]+\.[0-9]+\.x/",
+        "/^v[0-9]+\\.x$/",
+        "/^v[0-9]+\\.[0-9]+\\.x$/"
     ],
 
-    "reviewers": [
-<<- range $.Maintainers >>
-        "<< .Name >>",
-<<- end >>
-    ],
+    "assigneesFromCodeOwners": true,
     "bbUseDefaultReviewers": true,
     "gitLabIgnoreApprovals": true,
+    "reviewersFromCodeOwners": true,
 
     "assignAutomerge": true,
-    "automerge": "false",
     "automergeStrategy": "fast-forward",
     "automergeType": "pr",
     "platformAutomerge": true,
 
     "rebaseLabel": "rebase",
-    "rebaseWhen": "behind-base-branch",
-    "recreateWhen": "auto",
     "stopUpdatingLabel": "pause",
 
-    "commitMessageLowerCase": "auto",
     "configMigration": false, // removes comments and sets indent to 2 and add a lot of newlines (https://github.com/renovatebot/renovate/issues/16359)
-    "platformCommit": "auto",
 
     "goGetDirs": [ "./..." ],
     "postUpdateOptions": [
@@ -91,48 +70,112 @@
     "updateLockFiles": true,
     "useBaseBranchConfig": "none",
 
-    "lockFileMaintenance": { "automerge": true },
-    "major": { "automerge": false },
-    "minor": { "automerge": true },
-    "patch": { "automerge": true },
-    "pin": { "automerge": true },
+    "gitlabci-include": {
+        "versioning": "docker"
+    },
+
+    "gitlabci": {
+        "versioning": "docker"
+    },
 
     "packageRules": [
-<<- range $categories >>
+        {
+            "matchCategories": [
+                "cd",
+                "ci",
+                "helm",
+                "kubernetes",
+                "pre-commit",
+                "terraform"
+            ],
+            "semanticCommitType": "ci"
+        },
+        {
+            "matchFileNames": [
+                "/(^|/)(workflow-templates|\\.(?:github|gitea|forgejo)/(?:workflows|actions))/.+\\.ya?ml\\.tmpl$/",
+                "/(^|/)action\\.ya?ml\\.tmpl$/",
+
+                "/\\.gitlab-ci\\.ya?ml\\.tmpl$/"
+            ],
+            "semanticCommitType": "ci"
+        },
         {
             "addLabels": [ "non-major" ],
-            "groupName": "<< . >> dependencies (non major)",
-            "matchCategories": [ "<< . >>" ],
             "matchUpdateTypes": [ "!major" ]
         },
         {
             "addLabels": [ "major" ],
-            "groupName": "<< . >> dependencies (major)",
-            "matchCategories": [ "<< . >>" ],
             "matchUpdateTypes": [ "major" ]
-        },
-<<- end >>
-    ],
-
-<<- if hasKey .Languages "tmpl" >>
-<<- $comment := "renovate: datasource=(?<datasource>.+)( depName=(?<depName>.+))? ( packageName=(?<packageName>.+))? versioning=(?<versioning>.+).+?\\n\\s*?" >>
-
-    "customManagers": [
-        {
-            "customType": "regex",
-            "description": "Update versions in .tmpl files",
-            "managerFilePatterns": [ "/^*.tmpl$/" ],
-            "matchStrings": [
-                // GitLab CI/CD 'include' versions
-                "<< $comment >>ref:\\s?\\"?(?<currentValue>.+)\\"?",
-
-                // GitHub Actions 'uses' versions
-                "<< $comment >>-?uses:\\s?(?<packageName>.+)@v?(?<currentValue>.+)",
-
-                // GitHub Actions 'with' versions
-                "<< $comment >>.*?version:\\s?v?(?<currentValue>.+)",
-            ]
         }
     ],
-<<- end >>
+
+{{- if has "renovate:post-upgrade" .Include }}
+
+    "postUpgradeTasks": {
+        "commands": [ "./scripts/sh/renovate.sh" ],
+        "executionMode": "branch"
+    },
+{{- end }}
+
+    "customManagers": [
+{{- if gt (len (glob "*.tmpl")) 0 }}
+        {
+            "customType": "regex",
+            "datasourceTemplate": "github-tags",
+            "description": "Update versions without needing a comment for 'uses' in GitHub Actions template files",
+            "managerFilePatterns": [
+                "/(^|/)(workflow-templates|\\.(?:github|gitea|forgejo)/(?:workflows|actions))/.+\\.ya?ml\\.tmpl$/",
+                "/(^|/)action\\.ya?ml\\.tmpl$/"
+            ],
+            "matchStrings": [
+                // see https://regex101.com/r/SXViyG/2
+                // uses: <packageName>@<the version>
+                "uses:\\s*(?<packageName>[^@\\s'\"]+)@(?<currentValue>[\\w.+-]+)"
+            ],
+            "versioningTemplate": "docker"
+        },
+        {
+            "customType": "regex",
+            "datasourceTemplate": "gitlab-tags",
+            "description": "Update versions without needing a comment for 'ref' in GitLab CI/CD template files",
+            "managerFilePatterns": [
+                "/\\.gitlab-ci\\.ya?ml\\.tmpl$/"
+            ],
+            "matchStrings": [
+                // see https://regex101.com/r/9JD1ox/1
+                // project: <packageName> ... <newline, tab, spaces, etc.> ref: <the version> (quotes may or may not be there)
+                "project:\\s*(?<packageName>\\S+)\\s*ref:\\s*['\"]?(?<currentValue>[\\w.+-]+)['\"]?"
+            ],
+            "versioningTemplate": "docker"
+        },
+{{- end }}
+        {
+            "customType": "regex",
+            "description": "Update versions in any files with generic regex",
+            "managerFilePatterns": [
+                "/(^|/|\\.)([Dd]ocker|[Cc]ontainer)file$/",
+                "/(^|/)([Dd]ocker|[Cc]ontainer)file[^/]*$/",
+
+                "/^.*\\.[\\w]*sh.*?$/",
+                "/^.*\\.json.*?$/",
+                "/^.*\\.ya?ml.*?$/"
+            ],
+            "matchStrings": [
+                // https://regex101.com/r/DMKexv/4
+                // matches <packageName> <the version>
+                "renovate:\\sdatasource=(?<datasource>\\S+)(?:\\sdepName=(?<depName>\\S+))?(?:\\sversioning=(?<versioning>\\S+))?\n(?:(?<key>\\S+)\\s)?(?<packageName>\\S+)\\s['\"]?(?<currentValue>[\\w.+-]+)['\"]?",
+                "renovate:\\sdatasource=(?<datasource>\\S+)(?:\\spackageName=(?<packageName>\\S+))?(?:\\sdepName=(?<depName>\\S+))?(?:\\sversioning=(?<versioning>\\S+))?\n(?:(?<key>\\S+)\\s)?(?<name>\\S+)\\s['\"]?(?<currentValue>[\\w.+-]+)['\"]?",
+
+                // https://regex101.com/r/BzJNUM/2
+                // matches *_VERSION=<the version>
+                "renovate:\\sdatasource=(?<datasource>\\S+)(?:\\sdepName=(?<depName>\\S+))?(?:\\sversioning=(?<versioning>\\S+))?\n(?:(?<key>\\S+)\\s)?(?<packageName>[^\\s_]+)_VERSION=['\"]?(?<currentValue>[\\w.+-]+)['\"]?",
+                "renovate:\\sdatasource=(?<datasource>\\S+)(?:\\spackageName=(?<packageName>\\S+))?(?:\\sdepName=(?<depName>\\S+))?(?:\\sversioning=(?<versioning>\\S+))?\n(?:(?<key>\\S+)\\s)?(?<name>[^\\s_]+)_VERSION=['\"]?(?<currentValue>[\\w.+-]+)['\"]?",
+
+                // see https://regex101.com/r/qXn2n5/9
+                // matches <yaml key>: <the version> or <yaml key>=<the version> or <yaml key>: <packageName>@<the version>, things like that
+                "renovate:\\sdatasource=(?<datasource>\\S+)(?:\\sdepName=(?<depName>\\S+))?(?:\\sversioning=(?<versioning>\\S+))?\n\\s*(?<key>\\S+)[:=]\\s{0,1}['\"]?(?:(?<packageName>\\S+)?@)?(?<currentValue>[\\w.+-]+)['\"]?",
+                "renovate:\\sdatasource=(?<datasource>\\S+)(?:\\spackageName=(?<packageName>\\S+))?(?:\\sdepName=(?<depName>\\S+))?(?:\\sversioning=(?<versioning>\\S+))?\n\\s*(?<key>\\S+)[:=]\\s{0,1}['\"]?(?:(?<name>\\S+)?@)?(?<currentValue>[\\w.+-]+)['\"]?"
+            ]
+        }
+    ]
 }
