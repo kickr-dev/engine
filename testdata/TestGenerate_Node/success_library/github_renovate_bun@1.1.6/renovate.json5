@@ -107,6 +107,10 @@
         {
             "addLabels": [ "major" ],
             "matchUpdateTypes": [ "major" ]
+        },
+        {
+            "enabled": false,
+            "matchDepTypes": [ "uses-with" ]
         }
     ],
 

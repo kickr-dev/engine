@@ -109,6 +109,18 @@
         {
             "addLabels": [ "major" ],
             "matchUpdateTypes": [ "major" ]
+        },
+{{- if hasKey .Languages "go" }}
+        {
+            "enabled": false,
+            "matchDepNames": [ "go" ],
+            "matchDepTypes": [ "golang" ],
+            "matchManagers": [ "gomod" ]
+        },
+{{- end }}
+        {
+            "enabled": false,
+            "matchDepTypes": [ "uses-with" ]
         }
     ],
 

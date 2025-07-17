@@ -107,6 +107,16 @@
         {
             "addLabels": [ "major" ],
             "matchUpdateTypes": [ "major" ]
+        },
+        {
+            "enabled": false,
+            "matchDepNames": [ "go" ],
+            "matchDepTypes": [ "golang" ],
+            "matchManagers": [ "gomod" ]
+        },
+        {
+            "enabled": false,
+            "matchDepTypes": [ "uses-with" ]
         }
     ],
 
