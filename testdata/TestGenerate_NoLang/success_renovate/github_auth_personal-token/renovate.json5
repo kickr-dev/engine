@@ -56,6 +56,9 @@
     "rebaseLabel": "rebase",
     "stopUpdatingLabel": "pause",
 
+    "separateMinorPatch": false,
+    "separateMultipleMinor": false,
+
     "configMigration": false, // removes comments and sets indent to 2 and add a lot of newlines (https://github.com/renovatebot/renovate/issues/16359)
 
     "goGetDirs": [ "./..." ],
