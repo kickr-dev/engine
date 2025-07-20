@@ -1,3 +1,42 @@
+## [1.0.0-beta.21](https://github.com/kilianpaquier/craft/compare/v1.0.0-beta.20...v1.0.0-beta.21) (2025-07-20)
+
+### Bug Fixes
+
+* **codecov:** always compute coverage ([7db5f58](https://github.com/kilianpaquier/craft/commit/7db5f58f6413a15153eea29631de54ba445bab9d))
+* **github actions:** add missing input optional release on deployment workflow ([579aad1](https://github.com/kilianpaquier/craft/commit/579aad1c28e6502b8c6240857232132b81b80791))
+* **github actions:** add missing pipefail on golang tests ([ba7ec54](https://github.com/kilianpaquier/craft/commit/ba7ec543868593e89e98a3b48c62eae78b41cee9))
+* **github actions:** add workflow_dispatch trigger on integration workflow ([665427b](https://github.com/kilianpaquier/craft/commit/665427b7adbba78bd777c8837f00d95ea24b4075))
+* **github actions:** cancel in progress workflows ([8654431](https://github.com/kilianpaquier/craft/commit/86544316a1cb38e62d2c9e2bc0ca05b339520590))
+* **github actions:** improve integration workflow check ([328c704](https://github.com/kilianpaquier/craft/commit/328c704f6c4f4d907f62ceb299cc46d800e784e8))
+* **github actions:** only run Go dependency submission when a change is made to a go.mod / go.sum ([bac8e29](https://github.com/kilianpaquier/craft/commit/bac8e293d4f01f355d32629cf8c22f91f1a099a0))
+* **github actions:** use different private key between renovate and release when using GitHub App as authentifcation ([62374ad](https://github.com/kilianpaquier/craft/commit/62374adb1a6728cd7f92c007f9eab4d1fbcec1e1))
+* **renovate:** disable go directive bump and uses-with ([c20652f](https://github.com/kilianpaquier/craft/commit/c20652f645e50c3ed6571d71ba857639c5fa2613))
+* **renovate:** don't separate minor and patch updates ([d66fcef](https://github.com/kilianpaquier/craft/commit/d66fcef02a9c12ed7d634ce2d34f75e80e6da80c))
+* **sonar:** use free SONAR_HOST_URL as SonarQube URL ([bd69408](https://github.com/kilianpaquier/craft/commit/bd694089a365d39966fe8f0a148465d3337769da))
+
+### Documentation
+
+* **readme:** reorder correctly properties presented for .craft file ([8c5802f](https://github.com/kilianpaquier/craft/commit/8c5802f81f3f281dc3635b078f26638f6a98f823))
+
+### Chores
+
+* **dependabot:** add gitsubmodules and helm configuration ([3c98b81](https://github.com/kilianpaquier/craft/commit/3c98b81bffbae4af33a5b127abe6fdb470940d6e))
+* **deps:** update dependency compilerla/conventional-pre-commit to v4.2.0 ([c633a87](https://github.com/kilianpaquier/craft/commit/c633a87980de3905e7ef9de73838cfdc2a54afb4))
+* **deps:** update module helm.sh/helm/v3 to v3.18.4 ([ae704de](https://github.com/kilianpaquier/craft/commit/ae704de2cbeca49c5b6b79db3e4090d4ca650dd3))
+* **deps:** upgrade dependencies ([34e818d](https://github.com/kilianpaquier/craft/commit/34e818d91f31e5808a69968436b7c437cd3c5a6c))
+* **github actions:** add link to setup-python action ([c8ce044](https://github.com/kilianpaquier/craft/commit/c8ce044f0b345a37d2aa758e243da7d096b017a8))
+* **github actions:** migrate sonarqube deprecated action ([3fccfe9](https://github.com/kilianpaquier/craft/commit/3fccfe97fd91098d371d8af887fd4a42d69ddb00))
+* **gitlab cicd:** remove useless quotes ([430240e](https://github.com/kilianpaquier/craft/commit/430240e6a7b6882033c44a215d8d8ed7956d7132))
+* **gitlab:** change docker build tool to buildah with kaniko deprecation ([3c6f12d](https://github.com/kilianpaquier/craft/commit/3c6f12dc519f7aad46b0438b5d412c0b02fbbe31))
+* **helpers:** remove internal helpers like ToPtr, FromPtr, Or, etc.. ([c5a4262](https://github.com/kilianpaquier/craft/commit/c5a426222c8d738f3a2ac4c90c4a546cc250130c))
+* **renovate:** use custom regex to handle pre-commit dependencies ([6ee1158](https://github.com/kilianpaquier/craft/commit/6ee1158b08862642573fcd869db0a3850f108cd7))
+* **templates:** add renovate custom manager to keep versions up to date ([1983836](https://github.com/kilianpaquier/craft/commit/19838364a5b665810c801344e9adce2c336e9bb2))
+
+### Code Refactoring
+
+* **github actions:** split ci into integration and deployment with workflow_run chaining ([61cb4ce](https://github.com/kilianpaquier/craft/commit/61cb4cefbb86cdd358eb7ffea8c517aa00d155c3))
+* **renovate:** rework configuration to handle more custom managers regexpes and post-upgrade ([f9c2185](https://github.com/kilianpaquier/craft/commit/f9c2185bc1702ed5ff6632d659bad1a7fc101bfc))
+
 ## [1.0.0-beta.20](https://github.com/kilianpaquier/craft/compare/v1.0.0-beta.19...v1.0.0-beta.20) (2025-07-04)
 
 ### Features
