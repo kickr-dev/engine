@@ -9,7 +9,6 @@
     "extends": [
         ":automergeMinor",
         ":disableRateLimiting",
-        ":enablePreCommit",
         ":enableVulnerabilityAlertsWithLabel(vulnerability)",
         ":gitSignOff",
         ":labels(dependencies, renovate)",

@@ -9,7 +9,6 @@
     "extends": [
         ":automergeMinor",
         ":disableRateLimiting",
-        ":enablePreCommit",
         ":enableVulnerabilityAlertsWithLabel(vulnerability)",
         ":gitSignOff",
         ":labels(dependencies, renovate)",
@@ -129,7 +128,7 @@
         {
             "customType": "regex",
             "datasourceTemplate": "github-tags",
-            "description": "Update versions without needing a comment for 'uses' in GitHub Actions template files",
+            "description": "Update 'uses' versions in GitHub Actions template files",
             "managerFilePatterns": [
                 "/(^|/)(workflow-templates|\\.(?:github|gitea|forgejo)/(?:workflows|actions))/.+\\.ya?ml\\.tmpl$/",
                 "/(^|/)action\\.ya?ml\\.tmpl$/"
@@ -144,7 +143,7 @@
         {
             "customType": "regex",
             "datasourceTemplate": "gitlab-tags",
-            "description": "Update versions without needing a comment for 'ref' in GitLab CI/CD template files",
+            "description": "Update 'ref' versions in GitLab CI/CD template files",
             "managerFilePatterns": [
                 "/\\.gitlab-ci\\.ya?ml\\.tmpl$/"
             ],
