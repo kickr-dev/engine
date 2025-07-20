@@ -116,7 +116,7 @@ jobs:
         # renovate: datasource=git-refs packageName=https://github.com/cycjimmy/semantic-release-action depName=cycjimmy/semantic-release-action versioning=docker
         uses: cycjimmy/semantic-release-action@v4
         with:
-          dry_run: ${{ inputs.release == 'false' }}
+          dry_run: ${{ inputs.release != 'true' }}
           # renovate: datasource=github-tags packageName=semantic-release/semantic-release versioning=docker
           semantic_version: 24
           extra_plugins: |-
