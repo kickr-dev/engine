@@ -38,6 +38,12 @@ on:
       - v[0-9]+.[0-9]+.x
 <<- end >>
   workflow_dispatch:
+<<- if .CI.Release >>
+    inputs:
+      release:
+        description: Run release job.
+        type: boolean
+<<- end >>
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
