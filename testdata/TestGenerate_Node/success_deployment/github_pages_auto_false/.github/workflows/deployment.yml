@@ -5,6 +5,14 @@ run-name: Deployment
 
 on:
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deployment run mode.
+        type: choice
+        options:
+          - full
+          - none
+        default: none
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -91,6 +99,7 @@ jobs:
   pages:
     name: Pages
     runs-on: ubuntu-latest
+    if: ${{ inputs.deploy != 'none' }}
     needs:
       - node-build
     environment:

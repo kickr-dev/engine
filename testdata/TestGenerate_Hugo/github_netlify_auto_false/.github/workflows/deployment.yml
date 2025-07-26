@@ -5,6 +5,14 @@ run-name: Deployment
 
 on:
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deployment run mode.
+        type: choice
+        options:
+          - full
+          - none
+        default: none
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -97,6 +105,7 @@ jobs:
   netlify:
     name: Netlify
     runs-on: ubuntu-latest
+    if: ${{ inputs.deploy != 'none' }}
     needs:
       - hugo-build
     environment:

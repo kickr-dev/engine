@@ -5,6 +5,15 @@ run-name: Deployment
 
 on:
   workflow_dispatch:
+    inputs:
+      helm_push:
+        description: Helm publish run mode.
+        type: choice
+        options:
+          - dry-run
+          - none
+          - full
+        default: dry-run
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -67,6 +76,7 @@ jobs:
   helm-push:
     name: Helm Push
     runs-on: ubuntu-latest
+    if: ${{ inputs.helm_push != 'none' }}
     needs:
       - version
     permissions:
@@ -85,9 +95,14 @@ jobs:
       - run: |-
           helm plugin install https://github.com/chartmuseum/helm-push
           helm registry login "$HELM_REGISTRY" -u "$HELM_REPO_USERNAME" -p "$HELM_REPO_ACCESS_TOKEN"
-          helm cm-push "$HELM_CHART_PATH" "$HELM_PUBLISH_URL"
+          if [ "$HELM_DRY_RUN" = "false" ]; then
+            helm cm-push "$HELM_CHART_PATH" "$HELM_PUBLISH_URL"
+          else
+            echo "should push $HELM_CHART_PATH to $HELM_PUBLISH_URL"
+          fi
         env:
           HELM_CHART_PATH: ${{ github.event.repository.name }}-${{ needs.version.outputs.version }}.tgz
+          HELM_DRY_RUN: ${{ inputs.helm_push != 'full' }}
           HELM_PUBLISH_URL: chartmuseum.example.com/path/to
           HELM_REGISTRY: chartmuseum.example.com
           HELM_REPO_ACCESS_TOKEN: ${{ secrets.HELM_REPO_ACCESS_TOKEN || secrets.HELM_REPO_PASSWORD }}

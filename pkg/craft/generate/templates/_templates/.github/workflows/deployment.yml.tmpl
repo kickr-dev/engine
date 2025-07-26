@@ -38,11 +38,43 @@ on:
       - v[0-9]+.[0-9]+.x
 <<- end >>
   workflow_dispatch:
-<<- if .CI.Release >>
     inputs:
+<<- if .CI.Deployment >>
+      deploy:
+        description: Deployment run mode.
+        type: choice
+        options:
+<<- if and .CI.Helm (eq .CI.Deployment.Platform "kubernetes") >>
+          - --dry-run=client
+          - --dry-run=none
+          - --dry-run=server
+          - none
+        default: << .CI.Deployment.Auto | ternary "--dry-run=none" "--dry-run=server" >>
+<<- else >>
+          - full
+          - none
+        default: << .CI.Deployment.Auto | ternary "full" "none" >>
+<<- end >>
+<<- end >>
+<<- if .HasHelmPublish >>
+      helm_push:
+        description: Helm publish run mode.
+        type: choice
+        options:
+          - dry-run
+          - none
+          - full
+        default: << eq .CI.Helm.Publish "auto" | ternary "full" "dry-run" >>
+<<- end >>
+<<- if .CI.Release >>
       release:
-        description: Run release job.
-        type: boolean
+        description: Release job run mode.
+        type: choice
+        options:
+          - dry-run
+          - none
+          - release
+        default: << .CI.Release.Auto | ternary "release" "dry-run" >>
 <<- end >>
 
 concurrency:
@@ -58,11 +90,9 @@ jobs:
     env:
       WORKFLOW_RUN: integration
     steps:
-<<- if $wrun >>
-      - if: ${{ github.event_name == 'workflow_dispatch' }}
-        id: conclusion
-<<- else >>
       - id: conclusion
+<<- if $wrun >>
+        if: ${{ github.event_name == 'workflow_dispatch' }}
 <<- end >>
         uses: actions/github-script@v7
         with:
@@ -212,10 +242,12 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-<<- if and (not .CI.Release.Auto) (or .IsHelmPublishAuto .IsDeploymentAuto) >>
-    if: ${{ github.event_name == 'workflow_dispatch' && github.ref_protected }}
+<<- if .CI.Release.Auto >>
+    if: ${{ github.ref_protected && (github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && inputs.release != 'none')) }}
+<<- else if $wrun >>
+    if: ${{ github.ref_protected && github.event_name == 'workflow_dispatch' && inputs.release != 'none' }}
 <<- else >>
-    if: ${{ github.ref_protected }}
+    if: ${{ inputs.release != 'none' && github.ref_protected }}
 <<- end >>
 <<- if gt (len $needs) 0 >>
     needs:
@@ -261,10 +293,12 @@ jobs:
         # renovate: datasource=git-refs packageName=https://github.com/cycjimmy/semantic-release-action depName=cycjimmy/semantic-release-action versioning=docker
         uses: cycjimmy/semantic-release-action@v4
         with:
-<<- if $wrun >>
-          dry_run: ${{ github.event_name == 'workflow_dispatch' && inputs.release != 'true' }}
+<<- if .CI.Release.Auto >>
+          dry_run: ${{ github.event_name == 'workflow_dispatch' && inputs.release != 'release' }}
+<<- else if $wrun >>
+          dry_run: ${{ github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && inputs.release != 'release') }}
 <<- else >>
-          dry_run: ${{ inputs.release != 'true' }}
+          dry_run: ${{ inputs.release != 'release' }}
 <<- end >>
           # renovate: datasource=github-tags packageName=semantic-release/semantic-release versioning=docker
           semantic_version: 24

@@ -5,6 +5,16 @@ run-name: Deployment
 
 on:
   workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deployment run mode.
+        type: choice
+        options:
+          - --dry-run=client
+          - --dry-run=none
+          - --dry-run=server
+          - none
+        default: --dry-run=server
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -86,6 +96,7 @@ jobs:
   helm-deploy:
     name: Helm Deploy
     runs-on: ubuntu-latest
+    if: ${{ inputs.deploy != 'none' }}
     needs:
       - helm-lint-test
       - version
@@ -124,6 +135,7 @@ jobs:
         run: |-
           args=(--install --kube-context "$ENVIRONMENT" --version "$VERSION" -f "$HELM_CHART_DIR/values.yaml" --set "appVersion=$VERSION")
           [ -z "$HELM_ARGS" ] || args+=("$HELM_ARGS")
+          [ -z "$HELM_DRY_RUN" ] || args+=("$HELM_DRY_RUN")
 
           name="$GITHUB_REPOSITORY_NAME-$VERSION"
           [ "$ENVIRONMENT" = "review" ] || name="$GITHUB_REPOSITORY_NAME"
@@ -135,4 +147,5 @@ jobs:
           GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
           HELM_ARGS: ${{ vars.HELM_ARGS }}
           HELM_CHART_DIR: chart/
+          HELM_DRY_RUN: ${{ inputs.deploy }}
           VERSION: ${{ needs.version.outputs.version }}

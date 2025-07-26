@@ -8,13 +8,19 @@ jobs:
 <<- $path := .CI.Helm.Path | default .ProjectPath >>
 <<- $ghcr := and (eq $registry "oci://ghcr.io") (eq $path .ProjectPath) >>
 
+<<- $wrun := or .IsHelmPublishAuto .IsDeploymentAuto .IsReleaseAuto >>
+
 <<- if .HasHelmPublish >>
 
   helm-push:
     name: Helm Push
     runs-on: ubuntu-latest
-<<- if and (not .IsHelmPublishAuto) (or .IsDeploymentAuto .IsReleaseAuto) >>
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+<<- if eq .CI.Helm.Publish "auto" >>
+    if: ${{ github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && inputs.helm_push != 'none') }}
+<<- else if $wrun >>
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.helm_push != 'none' }}
+<<- else >>
+    if: ${{ inputs.helm_push != 'none' }}
 <<- end >>
     needs:
 <<- if .CI.Docker >>
@@ -39,9 +45,20 @@ jobs:
           helm plugin install https://github.com/chartmuseum/helm-push
 <<- end >>
           helm registry login "$HELM_REGISTRY" -u "$HELM_REPO_USERNAME" -p "$HELM_REPO_ACCESS_TOKEN"
-          helm << hasPrefix "oci://" $registry | ternary "push" "cm-push" >> "$HELM_CHART_PATH" "$HELM_PUBLISH_URL"
+          if [ "$HELM_DRY_RUN" = "false" ]; then
+            helm << hasPrefix "oci://" $registry | ternary "push" "cm-push" >> "$HELM_CHART_PATH" "$HELM_PUBLISH_URL"
+          else
+            echo "should push $HELM_CHART_PATH to $HELM_PUBLISH_URL"
+          fi
         env:
           HELM_CHART_PATH: ${{ github.event.repository.name }}-${{ needs.version.outputs.version }}.tgz
+<<- if eq .CI.Helm.Publish "auto" >>
+          HELM_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.helm_push != 'full' }}
+<<- else if $wrun >>
+          HELM_DRY_RUN: ${{ github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && inputs.helm_push != 'full') }}
+<<- else >>
+          HELM_DRY_RUN: ${{ inputs.helm_push != 'full' }}
+<<- end >>
           HELM_PUBLISH_URL: << $registry >>/<< trimSuffix (print "/" .ProjectName) $path >>
           HELM_REGISTRY: << trimPrefix "oci://" $registry >>
 <<- if $ghcr >>
@@ -60,8 +77,12 @@ jobs:
   helm-deploy:
     name: Helm Deploy
     runs-on: ubuntu-latest
-<<- if and (not .CI.Deployment.Auto) (or .IsHelmPublishAuto .IsReleaseAuto) >>
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+<<- if .CI.Deployment.Auto >>
+    if: ${{ github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && inputs.deploy != 'none') }}
+<<- else if $wrun >>
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy != 'none' }}
+<<- else >>
+    if: ${{ inputs.deploy != 'none' }}
 <<- end >>
     needs:
 <<- if not .HasHelmPublish >>
@@ -108,6 +129,7 @@ jobs:
         run: |-
           args=(--install --kube-context "$ENVIRONMENT" --version "$VERSION" -f "$HELM_CHART_DIR/values.yaml" --set "appVersion=$VERSION")
           [ -z "$HELM_ARGS" ] || args+=("$HELM_ARGS")
+          [ -z "$HELM_DRY_RUN" ] || args+=("$HELM_DRY_RUN")
 
           name="$GITHUB_REPOSITORY_NAME-$VERSION"
           [ "$ENVIRONMENT" = "review" ] || name="$GITHUB_REPOSITORY_NAME"
@@ -122,6 +144,7 @@ jobs:
 <<- if .HasHelmPublish >>
           HELM_CHART_URL: << $registry >>/<< $path >>
 <<- end >>
+          HELM_DRY_RUN: ${{ inputs.deploy }}
           VERSION: ${{ needs.version.outputs.version }}
 <<- end >>
 <<- end >>

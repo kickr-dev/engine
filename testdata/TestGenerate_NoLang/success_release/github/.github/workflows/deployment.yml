@@ -7,8 +7,13 @@ on:
   workflow_dispatch:
     inputs:
       release:
-        description: Run release job.
-        type: boolean
+        description: Release job run mode.
+        type: choice
+        options:
+          - dry-run
+          - none
+          - release
+        default: dry-run
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -100,7 +105,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    if: ${{ github.ref_protected }}
+    if: ${{ inputs.release != 'none' && github.ref_protected }}
     environment:
       name: release
       url: ${{ steps.environment_url.outputs.environment_url }}
@@ -116,7 +121,7 @@ jobs:
         # renovate: datasource=git-refs packageName=https://github.com/cycjimmy/semantic-release-action depName=cycjimmy/semantic-release-action versioning=docker
         uses: cycjimmy/semantic-release-action@v4
         with:
-          dry_run: ${{ inputs.release != 'true' }}
+          dry_run: ${{ inputs.release != 'release' }}
           # renovate: datasource=github-tags packageName=semantic-release/semantic-release versioning=docker
           semantic_version: 24
           extra_plugins: |-
