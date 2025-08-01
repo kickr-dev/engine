@@ -331,6 +331,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 <<- end >>
       - id: environment_url
+        if: ${{ steps.semrel_version.outputs.new_release_published == 'true' }}
         run: |-
           [ -z "$VERSION" ] || echo "environment_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/v${VERSION#v}" >> $GITHUB_OUTPUT
         env:

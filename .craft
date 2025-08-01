@@ -12,7 +12,6 @@ ci:
     - labeler
   release: {}
 exclude:
-  - chart
   - shell
 include:
   - renovate:post-upgrade
