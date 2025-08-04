@@ -73,13 +73,13 @@ netlify:
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
       variables:
-        ARGS: "--prod"
+        ARGS: --prod
         ENV: production
     - variables:
-        ARGS: "--alias $BRANCH_SHA"
+        ARGS: --alias $BRANCH_SHA
         ENV: $CI_COMMIT_REF_NAME
       when: manual
   before_script:
     - npm install -g netlify-cli
   script:
-    - netlify deploy --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN" --dir "$DIST_FOLDER" "$ARGS"
+    - netlify deploy --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN" --dir "$DIST_FOLDER" $ARGS
