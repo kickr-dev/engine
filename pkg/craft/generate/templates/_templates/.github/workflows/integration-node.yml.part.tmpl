@@ -17,11 +17,12 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: package.json
-<<- end >>
+<<- else >>
       - uses: actions/setup-node@v4
         with:
           cache: << $manager >>
           node-version: lts/*
+<<- end >>
       - run: << $manager >> audit
 
   node-lint:
