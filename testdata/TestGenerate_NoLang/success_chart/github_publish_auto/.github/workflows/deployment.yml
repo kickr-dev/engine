@@ -44,6 +44,8 @@ jobs:
       actions: read
     env:
       WORKFLOW_RUN: integration
+    outputs:
+      ref_name: ${{ steps.ref_name.outputs.ref_name }}
     steps:
       - id: conclusion
         if: ${{ github.event_name == 'workflow_dispatch' }}
@@ -68,11 +70,16 @@ jobs:
             return latest.conclusion
         env:
           WORKFLOW_NAME: ${{ env.WORKFLOW_RUN }}.yml
+      - id: ref_name
+        run: echo "ref_name=$WORKFLOW_REF_NAME" >> $GITHUB_OUTPUT
+        env:
+          WORKFLOW_REF_NAME: ${{ github.event.workflow_run.head_branch || github.ref_name }}
       - if: ${{ (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success') || (github.event_name == 'workflow_dispatch' && steps.conclusion.outputs.result != 'success') }}
         id: skip
         run: |-
-          echo "Latest '$WORKFLOW_RUN' workflow on '$GITHUB_REF_NAME' isn't in success conclusion: '$WORKFLOW_CONCLUSION'" && exit 1
+          echo "Latest '$WORKFLOW_RUN' workflow on '$WORKFLOW_REF_NAME' isn't in success conclusion: '$WORKFLOW_CONCLUSION'" && exit 1
         env:
+          WORKFLOW_REF_NAME: ${{ steps.ref_name.outputs.ref_name }}
           WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion || steps.conclusion.outputs.result }}
 
   version:
@@ -83,6 +90,8 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.run-workflow.outputs.ref_name }}
       - id: version
         run: |-
           DESCRIBE=$(git describe --tags || echo "v0.0.0")
@@ -96,11 +105,14 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && inputs.helm_push != 'none') }}
     needs:
+      - run-workflow
       - version
     permissions:
       packages: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.run-workflow.outputs.ref_name }}
       # https://github.com/marketplace/actions/helm-tool-installer
       - uses: azure/setup-helm@v4
         with:

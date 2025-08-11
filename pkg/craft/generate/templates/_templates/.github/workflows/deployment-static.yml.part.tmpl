@@ -29,6 +29,9 @@ jobs:
 <<- if $nodebuild >>
       - node-build
 <<- end >>
+<<- if $wrun >>
+      - run-workflow
+<<- end >>
     environment:
       name: netlify
       url: ${{ steps.netlify.outputs.deploy-url }}
@@ -37,14 +40,25 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+<<- if $wrun >>
+        with:
+          ref: ${{ needs.run-workflow.outputs.ref_name }}
+<<- end >>
       - uses: actions/download-artifact@v4
         with:
           name: build
           path: dist
       # https://github.com/marketplace/actions/netlify-actions
       - id: branch_sha
+<<- if $wrun >>
+        run: |-
+          echo "branch_sha=$(echo "${WORKFLOW_REF_NAME}" | sha256sum | cut -c -8)" >> $GITHUB_OUTPUT
+        env:
+          WORKFLOW_REF_NAME: ${{ needs.run-workflow.outputs.ref_name }}
+<<- else >>
         run: |-
           echo "branch_sha=$(echo "${GITHUB_REF_NAME}" | sha256sum | cut -c -8)" >> $GITHUB_OUTPUT
+<<- end >>
       - id: config
         run: |-
           [ ! -f netlify.toml ] || echo "path=netlify.toml" >> $GITHUB_OUTPUT
@@ -52,7 +66,7 @@ jobs:
         uses: nwtgck/actions-netlify@v3
         with:
           alias: ${{ steps.branch_sha.outputs.branch_sha }}
-          deploy-message: ${{ github.ref_name }}
+          deploy-message: ${{ << $wrun | ternary "needs.run-workflow.outputs.ref_name" "github.ref_name" >> }}
           enable-commit-comment: false
           enable-commit-status: false
           github-deployment-environment: netlify
@@ -84,6 +98,9 @@ jobs:
 <<- if $nodebuild >>
       - node-build
 <<- end >>
+<<- if $wrun >>
+      - run-workflow
+<<- end >>
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -96,6 +113,6 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: github-pages
-          preview: ${{ github.ref_name != github.event.repository.default_branch }}
+          preview: ${{ << $wrun | ternary "needs.run-workflow.outputs.ref_name" "github.ref_name" >> != github.event.repository.default_branch }}
 <<- end >>
 <<- end >>
