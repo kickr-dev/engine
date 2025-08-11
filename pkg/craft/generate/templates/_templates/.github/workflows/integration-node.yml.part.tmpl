@@ -24,6 +24,7 @@ jobs:
           node-version: lts/*
 <<- end >>
       - run: << $manager >> audit
+        continue-on-error: true
 
   node-lint:
     name: Node Lint

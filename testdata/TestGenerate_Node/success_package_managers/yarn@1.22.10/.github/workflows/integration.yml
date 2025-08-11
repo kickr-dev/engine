@@ -63,6 +63,7 @@ jobs:
           cache: yarn
           node-version: lts/*
       - run: yarn audit
+        continue-on-error: true
 
   node-lint:
     name: Node Lint

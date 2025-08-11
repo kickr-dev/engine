@@ -64,6 +64,7 @@ jobs:
           cache: pnpm
           node-version: lts/*
       - run: pnpm audit
+        continue-on-error: true
 
   node-lint:
     name: Node Lint
