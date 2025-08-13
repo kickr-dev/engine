@@ -117,8 +117,7 @@
         {
             // force grouping of go.mod minor versions, even for pre-1.0 versions
             "matchManagers": [ "gomod" ],
-            "matchUpdateTypes": [ "!major" ],
-            "groupBreakingChanges": true
+            "matchUpdateTypes": [ "!major" ]
         },
         {
             "enabled": false,
