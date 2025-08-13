@@ -108,10 +108,17 @@
             "matchUpdateTypes": [ "major" ]
         },
         {
+            // block all updates on "go" directive in go.mod (but not "toolchain" directive)
             "enabled": false,
             "matchDepNames": [ "go" ],
             "matchDepTypes": [ "golang" ],
             "matchManagers": [ "gomod" ]
+        },
+        {
+            // force grouping of go.mod minor versions, even for pre-1.0 versions
+            "matchManagers": [ "gomod" ],
+            "matchUpdateTypes": [ "!major" ],
+            "groupBreakingChanges": true
         },
         {
             "enabled": false,

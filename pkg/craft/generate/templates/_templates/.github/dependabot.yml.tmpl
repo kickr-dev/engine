@@ -13,7 +13,7 @@
 version: 2
 enable-beta-ecosystems: true
 updates:
-{{- if and .CI (eq .CI.Name "github") }}
+{{- if .IsCI "github" }}
 
   - package-ecosystem: github-actions
     directory: /
