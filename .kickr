@@ -7,7 +7,6 @@ ci:
   name: github
   options:
     - codecov
-    - codeql
     - labeler
   release: {}
 exclude:
