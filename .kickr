@@ -1,0 +1,18 @@
+# Kickr configuration file (https://github.com/kickr-dev/kickr)
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kickr-dev/kickr/beta/.schemas/kickr.schema.json
+bot: dependabot
+ci:
+  auth:
+    release: github-token
+  name: github
+  options:
+    - codecov
+    - codeql
+    - labeler
+  release: {}
+exclude:
+  - shell
+license: mit
+maintainers:
+  - name: kilianpaquier
+platform: github
