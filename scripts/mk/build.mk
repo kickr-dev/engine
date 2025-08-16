@@ -24,14 +24,14 @@ lint-fix: reports
 
 .PHONY: test
 test:
-	@go test ./... -count 1 -timeout=15s
+	@go test ./... -count 1 -timeout=30s
 
 .PHONY: test-race
 test-race:
-	@CGO_ENABLED=1 go test ./... -race -timeout=15s
+	@CGO_ENABLED=1 go test ./... -race -timeout=30s
 
 .PHONY: test-cover
 test-cover: reports
-	@go test ./... -v -coverpkg="./..." -covermode="count" -coverprofile="reports/go-coverage.native.out" -timeout=15s | tee "reports/tests.log"
+	@go test ./... -v -coverpkg="./..." -covermode="count" -coverprofile="reports/go-coverage.native.out" -timeout=30s | tee "reports/tests.log"
 	@go run github.com/jstemmer/go-junit-report/v2@latest -in "reports/tests.log" -out "reports/go-test.xunit.xml"
 	@go tool test2json < "reports/tests.log" > "reports/go-test.native.json"

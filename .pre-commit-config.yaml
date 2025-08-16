@@ -15,6 +15,12 @@ repos:
       - id: conventional-pre-commit
         stages: [commit-msg]
 
+  - repo: https://github.com/gitleaks/gitleaks
+    # renovate: datasource=github-tags packageName=gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     # renovate: datasource=github-tags packageName=pre-commit/pre-commit-hooks
     rev: v6.0.0
