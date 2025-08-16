@@ -15,19 +15,27 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   labeler:
     name: Labeler
     runs-on: ubuntu-latest
-    # run on branches or pull request not being draft and associated with branches not protected
     if: ${{ !github.event.pull_request.draft }}
     permissions:
       contents: read # enfore rights to specify no release, even draft, is created
       pull-requests: write
     steps:
+      # https://docs.stepsecurity.io/harden-runner/workflow-runs
+      # https://github.com/marketplace/actions/harden-runner
+      - uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+        with:
+          disable-sudo-and-containers: true
+          egress-policy: audit
       # https://github.com/marketplace/actions/release-drafter
       - id: drafter
-        uses: release-drafter/release-drafter@v6
+        uses: release-drafter/release-drafter@b1476f6e6eb133afa41ed8589daba6dc69b4d3f5 # v6.1.0
         with:
           commitish: ${{ github.base_ref }}
           config-name: labeler.yml
