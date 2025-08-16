@@ -84,7 +84,7 @@ jobs:
         with:
           check-latest: true
           go-package: ./...
-          go-version: '1.25.0'
+          go-version-input: '1.25.0'
 
   go-lint:
     name: Go Lint
