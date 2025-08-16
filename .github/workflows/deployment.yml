@@ -72,7 +72,7 @@ jobs:
       # https://github.com/marketplace/actions/action-for-semantic-release
       - id: semrel_version
         # renovate: datasource=git-refs packageName=https://github.com/cycjimmy/semantic-release-action depName=cycjimmy/semantic-release-action versioning=docker
-        uses: cycjimmy/semantic-release-action@v4 # FIXME there seems to be an issue on workflow_run since it runs on default_branch then semantic-release fucks up trying to check tags on default ...
+        uses: cycjimmy/semantic-release-action@v4
         with:
           dry_run: true
           # renovate: datasource=github-tags packageName=semantic-release/semantic-release versioning=docker
