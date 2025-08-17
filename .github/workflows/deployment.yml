@@ -100,7 +100,6 @@ jobs:
             @semantic-release/github
             @semantic-release/release-notes-generator
             conventional-changelog-conventionalcommits
-            semantic-release-license
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - id: version
@@ -156,7 +155,6 @@ jobs:
             @semantic-release/github
             @semantic-release/release-notes-generator
             conventional-changelog-conventionalcommits
-            semantic-release-license
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - id: environment_url
