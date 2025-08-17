@@ -59,9 +59,10 @@ jobs:
           WORKFLOW_ID: integration.yml
       - if: ${{ steps.conclusion.outputs.result != 'success' }}
         run: |-
-          echo "Latest '$WORKFLOW_RUN' workflow on '$GITHUB_REF_NAME' isn't in success conclusion: '$WORKFLOW_CONCLUSION'" && exit 1
+          echo "Latest '$WORKFLOW_ID' workflow on '$GITHUB_REF_NAME' isn't in success conclusion: '$WORKFLOW_CONCLUSION'" && exit 1
         env:
           WORKFLOW_CONCLUSION: ${{ steps.conclusion.outputs.result }}
+          WORKFLOW_ID: integration.yml
 
   version:
     name: Version
