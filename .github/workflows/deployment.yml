@@ -120,6 +120,8 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     if: ${{ inputs.release != 'none' && github.ref_protected }}
+    needs:
+      - version
     environment:
       name: release
       url: ${{ steps.environment_url.outputs.environment_url }}
