@@ -13,9 +13,9 @@ reports:
 
 .PHONY: lint
 lint: reports
-	@golangci-lint run -c ${GOCI_LINT_PATH} --timeout 240s --allow-parallel-runners \
-		--output.checkstyle.path "reports/go-ci-lint.checkstyle.xml" \
-		--output.text.path stdout $(ARGS) || \
+	@golangci-lint run --config=${GOCI_LINT_PATH} --timeout=240s --allow-parallel-runners \
+		--output.checkstyle.path="reports/go-ci-lint.checkstyle.xml" \
+		--output.text.path=stdout $(ARGS) || \
 		echo "golangci-lint failed, running 'make lint-fix' may fix some issues"
 
 .PHONY: lint-fix
