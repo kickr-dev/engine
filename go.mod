@@ -13,10 +13,10 @@ require (
 	github.com/go-git/go-git/v5 v5.16.2
 	github.com/go-viper/mapstructure/v2 v2.4.0
 	github.com/goccy/go-yaml v1.18.0
-	github.com/jarcoal/httpmock v1.4.0
+	github.com/jarcoal/httpmock v1.4.1
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
-	github.com/stretchr/testify v1.10.0
-	gitlab.com/gitlab-org/api/client-go v0.139.2
+	github.com/stretchr/testify v1.11.0
+	gitlab.com/gitlab-org/api/client-go v0.141.1
 	golang.org/x/mod v0.27.0
 	golang.org/x/text v0.28.0
 )
