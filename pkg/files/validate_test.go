@@ -42,7 +42,7 @@ func TestValidate(t *testing.T) {
 
 	t.Run("error_read_schema", func(t *testing.T) {
 		// Act
-		err := files.Validate(func(any) error { return errors.New("an error") }, func(v any) error { return nil })
+		err := files.Validate(func(any) error { return errors.New("an error") }, func(any) error { return nil })
 
 		// Assert
 		assert.ErrorContains(t, err, "an error")
