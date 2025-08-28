@@ -64,7 +64,7 @@ func TestToYAML(t *testing.T) {
 	})
 }
 
-func TestMustGlob(t *testing.T) {
+func TestGlob(t *testing.T) {
 	tmp := t.TempDir()
 
 	fm := engine.FuncMap(tmp)["glob"]
@@ -93,5 +93,21 @@ func TestMustGlob(t *testing.T) {
 
 		// Assert
 		assert.Equal(t, []string{target}, matches)
+	})
+}
+
+func TestCutAfter(t *testing.T) {
+	tmp := t.TempDir()
+
+	fm := engine.FuncMap(tmp)["cutAfter"]
+	cut, ok := fm.(func(in, sep string) string)
+	require.True(t, ok)
+
+	t.Run("success", func(t *testing.T) {
+		// Act
+		result := cut("something.things", ".")
+
+		// Assert
+		assert.Equal(t, result, "something")
 	})
 }
