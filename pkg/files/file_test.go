@@ -11,6 +11,30 @@ import (
 	"github.com/kickr-dev/engine/pkg/files"
 )
 
+func TestExists(t *testing.T) {
+	t.Run("error_not_exists", func(t *testing.T) {
+		// Act
+		ok := files.Exists(filepath.Join(t.TempDir(), "invalid.txt"))
+
+		// Assert
+		assert.False(t, ok)
+	})
+
+	t.Run("success_exists", func(t *testing.T) {
+		// Arrange
+		dest := filepath.Join(t.TempDir(), "file.txt")
+		file, err := os.Create(dest)
+		require.NoError(t, err)
+		require.NoError(t, file.Close())
+
+		// Act
+		ok := files.Exists(dest)
+
+		// Assert
+		assert.True(t, ok)
+	})
+}
+
 func TestGlob(t *testing.T) {
 	t.Run("no_dir", func(t *testing.T) {
 		// Act

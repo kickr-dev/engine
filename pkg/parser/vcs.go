@@ -16,19 +16,19 @@ const (
 // VCS structure contains all properties related to VCS (Version Control System).
 type VCS struct {
 	// Name is the version control system name.
-	Name string `json:"name,omitempty" yaml:"-"`
+	Name string
 
 	// Platform represents the vcs platform hosting the project.
-	Platform string `json:"-" yaml:"platform,omitempty"`
+	Platform string
 
 	// ProjectHost represents the host where the project is hosted.
-	ProjectHost string `json:"projectHost,omitempty" yaml:"-"`
+	ProjectHost string
 
 	// ProjectName is the project name being generated.
-	ProjectName string `json:"projectName,omitempty" yaml:"-"`
+	ProjectName string
 
 	// ProjectPath is the project path.
-	ProjectPath string `json:"projectPath,omitempty" yaml:"-"`
+	ProjectPath string
 }
 
 // parsePlatform returns the platform name associated to input host.

@@ -40,9 +40,11 @@ func Validate(readSchema, readFile func(v any) error) error {
 	}
 
 	compiler := jsonschema.NewCompiler()
-	_ = compiler.AddResource("schema.json", schema)
+	if err := compiler.AddResource("schema", schema); err != nil {
+		return fmt.Errorf("add resource: %w", err)
+	}
 
-	sch, err := compiler.Compile("schema.json")
+	sch, err := compiler.Compile("schema")
 	if err != nil {
 		return fmt.Errorf("compile schema: %w", err)
 	}
@@ -70,7 +72,7 @@ type ValidationError struct {
 	Property string
 }
 
-var _ error = &ValidationError{}
+var _ error = (*ValidationError)(nil) // ensure interface is implemented
 
 func (v *ValidationError) Error() string {
 	return fmt.Sprintf("- at '%s': %s", v.Property, v.Message)

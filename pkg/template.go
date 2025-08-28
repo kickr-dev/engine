@@ -48,8 +48,13 @@ func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T
 
 	// remove file in case result is asking it
 	if tmpl.Remove != nil && tmpl.Remove(config) {
-		if err := os.RemoveAll(out); err != nil && !errors.Is(err, fs.ErrNotExist) {
-			GetLogger().Warnf("failed to delete '%s': %v", filepath.Base(out), err)
+		if !files.Exists(out) {
+			return nil
+		}
+
+		GetLogger().Debugf("removing '%s'", tmpl.Out)
+		if err := os.RemoveAll(out); err != nil {
+			GetLogger().Warnf("failed to delete '%s': %v", tmpl.Out, err)
 		}
 		return nil
 	}
@@ -61,10 +66,11 @@ func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T
 	}
 	switch {
 	case !ok:
-		GetLogger().Infof("not generating '%s' since it already exists", filepath.Base(out))
+		GetLogger().Infof("not generating '%s' since it already exists (or was modified manually)", tmpl.Out)
 	case len(tmpl.Globs) == 0:
-		GetLogger().Warnf("empty template 'globs', skipping '%s' generation", filepath.Base(out))
+		GetLogger().Warnf("empty template 'globs', skipping '%s' generation", tmpl.Out)
 	default:
+		GetLogger().Debugf("generating '%s'", tmpl.Out)
 		tt, err := template.New(path.Base(tmpl.Globs[0])).
 			Funcs(sprig.FuncMap()).
 			Funcs(FuncMap(destdir)).
@@ -117,31 +123,35 @@ func ApplyPatches[T any](fsys fs.FS, destdir string, tmpl Template[T], data any)
 
 	errs := make([]error, 0, len(tmpl.Patches))
 	for _, patch := range tmpl.Patches {
-		tt, err := template.New(path.Base(patch)).
+		patchname := path.Base(patch)
+		GetLogger().Debugf("applying patch file '%s'", patchname)
+
+		tt, err := template.New(patchname).
 			Funcs(sprig.FuncMap()).
 			Funcs(FuncMap(destdir)).
 			Delims(tmpl.StartDelim, tmpl.EndDelim).
 			ParseFS(fsys, patch)
 		if err != nil {
-			errs = append(errs, fmt.Errorf("parse template patch '%s': %w", path.Base(patch), err))
+			errs = append(errs, fmt.Errorf("parse template patch '%s': %w", patchname, err))
 			continue
 		}
 
 		var buffer bytes.Buffer
 		if err := tt.Execute(&buffer, data); err != nil {
-			errs = append(errs, fmt.Errorf("template patch execution '%s': %w", path.Base(patch), err))
+			errs = append(errs, fmt.Errorf("template patch execution '%s': %w", patchname, err))
 			continue
 		}
 
 		diffs, _, err := gitdiff.Parse(&buffer)
 		if err != nil {
-			errs = append(errs, fmt.Errorf("parse git patch '%s': %w", path.Base(patch), err))
+			errs = append(errs, fmt.Errorf("parse git patch '%s': %w", patchname, err))
 			continue
 		}
 
 		for index, diff := range diffs {
+			GetLogger().Debugf("applying diff number '%d' of '%s'", index, patchname)
 			if err := apply(diff); err != nil {
-				errs = append(errs, fmt.Errorf("apply diff number '%d' of '%s': %w", index, path.Base(patch), err))
+				errs = append(errs, fmt.Errorf("apply diff number '%d' of '%s': %w", index, patchname, err))
 			}
 		}
 	}

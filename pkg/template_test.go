@@ -95,7 +95,7 @@ func TestApplyTemplate(t *testing.T) {
 
 		// Assert
 		require.NoError(t, err)
-		assert.Equal(t, buf.String(), fmt.Sprintf("not generating '%s' since it already exists", template.Out))
+		assert.Equal(t, buf.String(), fmt.Sprintf("not generating '%s' since it already exists (or was modified manually)", template.Out))
 	})
 }
 
