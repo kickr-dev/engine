@@ -71,7 +71,7 @@ func TestGlob(t *testing.T) {
 				require.NoError(t, file.Close())
 
 				// Act
-				matches := files.Glob(destdir, "*.txt")
+				matches := files.Glob(destdir, "*.txt", files.GlobExcludedDirectories(directory))
 
 				// Assert
 				assert.Empty(t, matches)

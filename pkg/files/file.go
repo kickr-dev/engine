@@ -31,12 +31,41 @@ func Exists(src string) bool {
 	return err == nil
 }
 
+// GlobOption represents a function that can be giving when calling Glob to add specific behaviors.
+type GlobOption func(o globOptions) globOptions
+
+// GlobExcludedDirectories returns a GlobOption which adds excluded directories from Glob checking.
+//
+// Excluded directories are apply to all directories levels (root and subdirectories) during checking.
+func GlobExcludedDirectories(dirs ...string) GlobOption {
+	return func(o globOptions) globOptions {
+		o.ExcludedDirectories = dirs
+		return o
+	}
+}
+
+type globOptions struct {
+	ExcludedDirectories []string
+}
+
+func newGlobOptions(opts ...GlobOption) globOptions {
+	var gopts globOptions
+	for _, opt := range opts {
+		gopts = opt(gopts)
+	}
+	return gopts
+}
+
 // Glob returns all matching files for the input glob and root (and its subdirectories).
-func Glob(root, glob string) []string {
+//
+// In case root directory doesn't exist, no matches are returned (error is silenced).
+func Glob(root, glob string, opts ...GlobOption) []string {
+	gopts := newGlobOptions(opts...)
+
 	matches, _ := filepath.Glob(filepath.Join(root, glob))
 	entries, _ := os.ReadDir(root)
 	for _, entry := range entries {
-		if !entry.IsDir() || slices.Contains([]string{"node_modules"}, entry.Name()) {
+		if !entry.IsDir() || slices.Contains(gopts.ExcludedDirectories, entry.Name()) {
 			continue
 		}
 		matches = append(matches, Glob(filepath.Join(root, entry.Name()), glob)...)
