@@ -8,7 +8,7 @@ Initialize example:
 	type config struct { ... }
 
 	func main() {
-		ctx := t.Context()
+		ctx := context.Background()
 		destdir, _ := os.Getwd()
 
 		config, err := engine.Initialize(ctx, destdir, engine.WithFormGroups(License))
@@ -41,10 +41,12 @@ Initialize example:
 
 Generate example:
 
-	type config struct { ... }
+	type config struct {
+		VCS parser.VCS
+	}
 
 	func main() {
-		ctx := t.Context()
+		ctx := context.Background()
 		destdir, _ := os.Getwd()
 
 		// run generation
