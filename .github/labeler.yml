@@ -51,7 +51,7 @@ autolabeler:
       - "**/testdata/**"
       - "**/tests/**"
 
-  - label: github_actions
+  - label: github actions
     files:
       - "action.yml"
       - "**/.github/actions/**"

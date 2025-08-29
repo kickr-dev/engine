@@ -20,4 +20,4 @@ changelog:
       labels:
         - chore
         - dependencies
-        - github_actions
+        - github actions
