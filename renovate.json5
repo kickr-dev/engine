@@ -8,6 +8,6 @@
     "extends": [
         "github>kickr-dev/renovate//configs/default.json5",
         "github>kickr-dev/renovate//configs/gomod.json5",
-        "github>kickr-dev/renovate//configs/install-tool.json5"
+        "github>kickr-dev/renovate//configs/install-tool.json5",
     ]
 }
