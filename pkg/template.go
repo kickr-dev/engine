@@ -73,7 +73,7 @@ func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T
 		GetLogger().Debugf("generating '%s'", tmpl.Out)
 		tt, err := template.New(path.Base(tmpl.Globs[0])).
 			Funcs(sprig.FuncMap()).
-			Funcs(FuncMap(destdir)).
+			Funcs(FuncMap()).
 			Delims(tmpl.StartDelim, tmpl.EndDelim).
 			ParseFS(fsys, tmpl.Globs...)
 		if err != nil {
@@ -128,7 +128,7 @@ func ApplyPatches[T any](fsys fs.FS, destdir string, tmpl Template[T], data any)
 
 		tt, err := template.New(patchname).
 			Funcs(sprig.FuncMap()).
-			Funcs(FuncMap(destdir)).
+			Funcs(FuncMap()).
 			Delims(tmpl.StartDelim, tmpl.EndDelim).
 			ParseFS(fsys, patch)
 		if err != nil {

@@ -266,7 +266,7 @@ func TestExecuteTemplate(t *testing.T) {
 		dest := filepath.Join(tmp, "template-result.txt")
 
 		// not parsing any file with template to ensure tmpl.Execute fails
-		tmpl := template.New("template.txt").Funcs(engine.FuncMap(tmp))
+		tmpl := template.New("template.txt").Funcs(engine.FuncMap())
 
 		// Act
 		err := engine.ExecuteTemplate(tmpl, nil, dest)
@@ -292,7 +292,7 @@ func TestExecuteTemplate(t *testing.T) {
 		data := map[string]string{"name": "hey ! A name"}
 
 		tmpl, err := template.New("template.txt").
-			Funcs(engine.FuncMap(tmp)).
+			Funcs(engine.FuncMap()).
 			ParseFiles(src)
 		require.NoError(t, err)
 
@@ -321,7 +321,7 @@ func TestExecuteTemplate(t *testing.T) {
 		data := map[string]string{"name": "hey ! A name"}
 
 		tmpl, err := template.New("template.txt").
-			Funcs(engine.FuncMap(tmp)).
+			Funcs(engine.FuncMap()).
 			ParseFiles(src)
 		require.NoError(t, err)
 

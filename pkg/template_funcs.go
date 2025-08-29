@@ -10,27 +10,17 @@ import (
 	"dario.cat/mergo"
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/goccy/go-yaml"
-
-	"github.com/kickr-dev/engine/pkg/files"
 )
 
 // FuncMap returns a minimal template.FuncMap.
 //
 // It can be extended with MergeMaps.
-func FuncMap(root string) template.FuncMap {
+func FuncMap() template.FuncMap {
 	return template.FuncMap{
 		"cutAfter": cutAfter,
 		"map":      mergeMaps,
-		"glob":     glob(root),
 		"toQuery":  toQuery,
 		"toYaml":   toYAML,
-	}
-}
-
-// glob returns a function checking with files.Glob if the input glob is present in root or its subdirectories.
-func glob(root string) func(glob string) []string {
-	return func(glob string) []string {
-		return files.Glob(root, glob)
 	}
 }
 

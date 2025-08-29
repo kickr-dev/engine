@@ -1,8 +1,6 @@
 package engine_test
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +10,7 @@ import (
 )
 
 func TestMergeMaps(t *testing.T) {
-	fm := engine.FuncMap("")["map"]
+	fm := engine.FuncMap()["map"]
 	mergeMap, ok := fm.(func(dest map[string]any, src ...any) map[string]any)
 	require.True(t, ok)
 
@@ -37,7 +35,7 @@ func TestMergeMaps(t *testing.T) {
 }
 
 func TestToQuery(t *testing.T) {
-	fm := engine.FuncMap("")["toQuery"]
+	fm := engine.FuncMap()["toQuery"]
 	toQuery, ok := fm.(func(in string) string)
 	require.True(t, ok)
 
@@ -51,7 +49,7 @@ func TestToQuery(t *testing.T) {
 }
 
 func TestToYAML(t *testing.T) {
-	fm := engine.FuncMap("")["toYaml"]
+	fm := engine.FuncMap()["toYaml"]
 	toYAML, ok := fm.(func(v any) string)
 	require.True(t, ok)
 
@@ -64,42 +62,8 @@ func TestToYAML(t *testing.T) {
 	})
 }
 
-func TestGlob(t *testing.T) {
-	tmp := t.TempDir()
-
-	fm := engine.FuncMap(tmp)["glob"]
-	glob, ok := fm.(func(glob string) []string)
-	require.True(t, ok)
-
-	t.Run("no_glob", func(t *testing.T) {
-		// Act
-		matches := glob("*.tmpl")
-
-		// Assert
-		assert.Empty(t, matches)
-	})
-
-	t.Run("glob", func(t *testing.T) {
-		// Arrange
-		target := filepath.Join(tmp, "template.tmpl")
-
-		file, err := os.Create(target)
-		require.NoError(t, err)
-		t.Cleanup(func() { assert.NoError(t, os.Remove(target)) }) // manual removal since t.TmpDir is invoked for the global func
-		require.NoError(t, file.Close())
-
-		// Act
-		matches := glob("*.tmpl")
-
-		// Assert
-		assert.Equal(t, []string{target}, matches)
-	})
-}
-
 func TestCutAfter(t *testing.T) {
-	tmp := t.TempDir()
-
-	fm := engine.FuncMap(tmp)["cutAfter"]
+	fm := engine.FuncMap()["cutAfter"]
 	cut, ok := fm.(func(in, sep string) string)
 	require.True(t, ok)
 
@@ -108,6 +72,6 @@ func TestCutAfter(t *testing.T) {
 		result := cut("something.things", ".")
 
 		// Assert
-		assert.Equal(t, result, "something")
+		assert.Equal(t, "something", result)
 	})
 }
