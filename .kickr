@@ -11,6 +11,8 @@ ci:
     - harden-runner
     - labeler
     - ossf-scorecard
+dependencies:
+  manager: renovate
 license: apache-2.0
 maintainers:
   - name: kilianpaquier
