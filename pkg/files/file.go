@@ -68,7 +68,7 @@ func Glob(root, glob string, opts ...GlobOption) []string {
 		if !entry.IsDir() || slices.Contains(gopts.ExcludedDirectories, entry.Name()) {
 			continue
 		}
-		matches = append(matches, Glob(filepath.Join(root, entry.Name()), glob)...)
+		matches = append(matches, Glob(filepath.Join(root, entry.Name()), glob, opts...)...)
 	}
 	return matches
 }

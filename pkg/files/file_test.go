@@ -59,24 +59,24 @@ func TestGlob(t *testing.T) {
 	})
 
 	t.Run("ignored_directories", func(t *testing.T) {
-		for _, directory := range []string{"node_modules"} {
-			t.Run(directory, func(t *testing.T) {
-				// Arrange
-				destdir := t.TempDir()
-				target := filepath.Join(destdir, directory, "file.txt")
-
-				require.NoError(t, os.MkdirAll(filepath.Dir(target), files.RwxRxRxRx))
-				file, err := os.Create(target)
-				require.NoError(t, err)
-				require.NoError(t, file.Close())
-
-				// Act
-				matches := files.Glob(destdir, "*.txt", files.GlobExcludedDirectories(directory))
-
-				// Assert
-				assert.Empty(t, matches)
-			})
+		// Arrange
+		destdir := t.TempDir()
+		targets := []string{
+			filepath.Join(destdir, "node_modules", "file.txt"),
+			filepath.Join(destdir, "subdir", "node_modules", "file.txt"),
 		}
+		for _, target := range targets {
+			require.NoError(t, os.MkdirAll(filepath.Dir(target), files.RwxRxRxRx))
+			file, err := os.Create(target)
+			require.NoError(t, err)
+			require.NoError(t, file.Close())
+		}
+
+		// Act
+		matches := files.Glob(destdir, "*.txt", files.GlobExcludedDirectories("node_modules"))
+
+		// Assert
+		assert.Empty(t, matches)
 	})
 
 	t.Run("glob", func(t *testing.T) {
