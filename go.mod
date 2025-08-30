@@ -16,7 +16,7 @@ require (
 	github.com/jarcoal/httpmock v1.4.1
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/stretchr/testify v1.11.0
-	gitlab.com/gitlab-org/api/client-go v0.142.0
+	gitlab.com/gitlab-org/api/client-go v0.142.1
 	golang.org/x/mod v0.27.0
 	golang.org/x/text v0.28.0
 )
