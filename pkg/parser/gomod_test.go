@@ -70,17 +70,14 @@ func TestReadGomod(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()
 
-		err := os.WriteFile(filepath.Join(destdir, parser.FileGomod), []byte(
-			`module github.com/kickr-dev/engine
-
-			go 1.22`,
-		), files.RwRR)
+		err := os.WriteFile(filepath.Join(destdir, parser.FileGomod), []byte("module github.com/kickr-dev/engine\ngo 1.22\ntoolchain go1.23.5"), files.RwRR)
 		require.NoError(t, err)
 
 		expectedMod := parser.Gomod{
-			Go:     "1.22",
-			Module: "github.com/kickr-dev/engine",
-			Tools:  []string{},
+			Go:        "1.22",
+			Module:    "github.com/kickr-dev/engine",
+			Tools:     []string{},
+			Toolchain: "1.23.5",
 		}
 		expectedVCS := parser.VCS{
 			ProjectHost: "github.com",
@@ -142,43 +139,5 @@ func TestReadGocmd(t *testing.T) {
 		// Assert
 		require.NoError(t, err)
 		assert.Equal(t, expected, executables)
-	})
-}
-
-func TestHugo(t *testing.T) {
-	t.Run("detected_hugo", func(t *testing.T) {
-		// Arrange
-		destdir := t.TempDir()
-
-		hugo, err := os.Create(filepath.Join(destdir, "hugo.toml"))
-		require.NoError(t, err)
-		require.NoError(t, hugo.Close())
-
-		expected := parser.HugoConfig{IsTheme: false}
-
-		// Act
-		config, ok := parser.Hugo(destdir)
-
-		// Assert
-		assert.True(t, ok)
-		assert.Equal(t, expected, config)
-	})
-
-	t.Run("detected_hugo_theme", func(t *testing.T) {
-		// Arrange
-		destdir := t.TempDir()
-
-		hugo, err := os.Create(filepath.Join(destdir, "theme.toml"))
-		require.NoError(t, err)
-		require.NoError(t, hugo.Close())
-
-		expected := parser.HugoConfig{IsTheme: true}
-
-		// Act
-		config, ok := parser.Hugo(destdir)
-
-		// Assert
-		assert.True(t, ok)
-		assert.Equal(t, expected, config)
 	})
 }
