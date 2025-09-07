@@ -127,10 +127,10 @@ func TestReadGocmd(t *testing.T) {
 		}
 
 		expected := parser.Executables{
-			Clis:    map[string]struct{}{"name": {}},
-			Crons:   map[string]struct{}{"cron-name": {}},
-			Jobs:    map[string]struct{}{"job-name": {}},
-			Workers: map[string]struct{}{"worker-name": {}},
+			Clis:    map[string]any{"name": struct{}{}},
+			Crons:   map[string]any{"cron-name": struct{}{}},
+			Jobs:    map[string]any{"job-name": struct{}{}},
+			Workers: map[string]any{"worker-name": struct{}{}},
 		}
 
 		// Act
