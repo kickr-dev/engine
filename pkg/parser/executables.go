@@ -3,16 +3,16 @@ package parser
 // Executables represents a collection of executables (clis, cronjobs, jobs, workers).
 type Executables struct {
 	// Clis is a map of CLI names without value (empty struct).
-	Clis map[string]struct{}
+	Clis map[string]any
 
 	// Crons is a map of cronjob names without value (empty struct).
-	Crons map[string]struct{}
+	Crons map[string]any
 
 	// Jobs is a map of job names without value (empty struct).
-	Jobs map[string]struct{}
+	Jobs map[string]any
 
 	// Workers is a map of workers names without value (empty struct).
-	Workers map[string]struct{}
+	Workers map[string]any
 }
 
 // Binaries returns the sum of all executables (clis, cronjobs, jobs, workers).
@@ -24,7 +24,7 @@ func (g Executables) Binaries() int {
 // In case a CLI with the name same already exists, it is replaced.
 func (g *Executables) AddCLI(name string) {
 	if g.Clis == nil {
-		g.Clis = map[string]struct{}{}
+		g.Clis = map[string]any{}
 	}
 	g.Clis[name] = struct{}{}
 }
@@ -33,7 +33,7 @@ func (g *Executables) AddCLI(name string) {
 // In case a cronjob with the name same already exists, it is replaced.
 func (g *Executables) AddCron(name string) {
 	if g.Crons == nil {
-		g.Crons = map[string]struct{}{}
+		g.Crons = map[string]any{}
 	}
 	g.Crons[name] = struct{}{}
 }
@@ -42,7 +42,7 @@ func (g *Executables) AddCron(name string) {
 // In case a job with the name same already exists, it is replaced.
 func (g *Executables) AddJob(name string) {
 	if g.Jobs == nil {
-		g.Jobs = map[string]struct{}{}
+		g.Jobs = map[string]any{}
 	}
 	g.Jobs[name] = struct{}{}
 }
@@ -51,7 +51,7 @@ func (g *Executables) AddJob(name string) {
 // In case a worker with the name same already exists, it is replaced.
 func (g *Executables) AddWorker(name string) {
 	if g.Workers == nil {
-		g.Workers = map[string]struct{}{}
+		g.Workers = map[string]any{}
 	}
 	g.Workers[name] = struct{}{}
 }
