@@ -8,7 +8,7 @@ import (
 )
 
 // ReadYAML reads the input src
-// and unmarshal it in YAML into the out configuration.
+// and unmarshal it with YAML format into the out configuration.
 func ReadYAML(src string, out any, read func(src string) ([]byte, error)) error {
 	if read == nil {
 		return ErrNilRead
