@@ -7,7 +7,7 @@ import (
 )
 
 // ReadJSON reads the input src
-// and unmarshal it in JSON format into the out configuration.
+// and unmarshal it with JSON format into the out configuration.
 func ReadJSON(src string, out any, read func(src string) ([]byte, error)) error {
 	if read == nil {
 		return ErrNilRead
