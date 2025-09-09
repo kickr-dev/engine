@@ -17,27 +17,26 @@ func TestHugo(t *testing.T) {
 		destdir := t.TempDir()
 
 		// Act
-		_, ok := parser.Hugo(destdir)
+		_, err := parser.ReadHugo(destdir)
 
 		// Assert
-		assert.False(t, ok)
+		assert.ErrorIs(t, err, parser.ErrNoHugo)
 	})
 
 	t.Run("detected_hugo", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()
 
-		hugo, err := os.Create(filepath.Join(destdir, "hugo.toml"))
+		err := os.WriteFile(filepath.Join(destdir, "hugo.toml"), []byte("title = 'Hugo Title'\nname = 'Should not be there'"), 0o644)
 		require.NoError(t, err)
-		require.NoError(t, hugo.Close())
 
-		expected := parser.HugoConfig{IsTheme: false}
+		expected := parser.HugoCompose{HugoConfig: &parser.HugoConfig{Title: "Hugo Title"}}
 
 		// Act
-		config, ok := parser.Hugo(destdir)
+		config, err := parser.ReadHugo(destdir)
 
 		// Assert
-		assert.True(t, ok)
+		require.NoError(t, err)
 		assert.Equal(t, expected, config)
 	})
 
@@ -45,17 +44,16 @@ func TestHugo(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()
 
-		hugo, err := os.Create(filepath.Join(destdir, "theme.toml"))
+		err := os.WriteFile(filepath.Join(destdir, "theme.toml"), []byte("name = 'Theme Title'\ntitle = 'Should not be there'"), 0o644)
 		require.NoError(t, err)
-		require.NoError(t, hugo.Close())
 
-		expected := parser.HugoConfig{IsTheme: true}
+		expected := parser.HugoCompose{HugoTheme: &parser.HugoTheme{Name: "Theme Title"}}
 
 		// Act
-		config, ok := parser.Hugo(destdir)
+		config, err := parser.ReadHugo(destdir)
 
 		// Assert
-		assert.True(t, ok)
+		require.NoError(t, err)
 		assert.Equal(t, expected, config)
 	})
 }

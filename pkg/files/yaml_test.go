@@ -13,8 +13,8 @@ import (
 )
 
 type testconfig struct {
-	Slice  []string `json:"slice,omitempty"  toml:"slice,omitempty"  yaml:"slice,omitempty"`
-	String string   `json:"string,omitempty" toml:"string,omitempty" yaml:"string,omitempty"`
+	Slice  []string `json:"slice,omitempty"  yaml:"slice,omitempty"  toml:"slice,omitempty"`
+	String string   `json:"string,omitempty" yaml:"string,omitempty" toml:"string,omitempty"`
 }
 
 func TestReadYAML(t *testing.T) {
