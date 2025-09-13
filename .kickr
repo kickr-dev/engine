@@ -7,7 +7,6 @@ ci:
     - codecov
     - codeql
     - harden-runner
-    - labeler
     - ossf-scorecard
   release:
     auth: github-token
