@@ -3,14 +3,14 @@
 version: 1
 ci:
   provider: github
-  release:
-    auth: github-token
   options:
     - codecov
     - codeql
     - harden-runner
     - labeler
     - ossf-scorecard
+  release:
+    auth: github-token
 dependencies:
   manager: renovate
 license: apache-2.0
