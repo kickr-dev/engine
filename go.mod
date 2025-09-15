@@ -8,7 +8,7 @@ require (
 	dario.cat/mergo v1.0.2
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/bluekeyes/go-gitdiff v0.8.1
-	github.com/charmbracelet/bubbletea v1.3.6
+	github.com/charmbracelet/bubbletea v1.3.8
 	github.com/charmbracelet/huh v0.7.0
 	github.com/go-git/go-git/v5 v5.16.2
 	github.com/go-viper/mapstructure/v2 v2.4.0
@@ -17,9 +17,9 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.4
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/stretchr/testify v1.11.1
-	gitlab.com/gitlab-org/api/client-go v0.142.6
-	golang.org/x/mod v0.27.0
-	golang.org/x/text v0.28.0
+	gitlab.com/gitlab-org/api/client-go v0.143.3
+	golang.org/x/mod v0.28.0
+	golang.org/x/text v0.29.0
 )
 
 require (
@@ -77,8 +77,7 @@ require (
 	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
-	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
 	golang.org/x/time v0.12.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
