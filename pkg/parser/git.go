@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"net/url"
 	"path"
 	"strings"
 
@@ -31,7 +32,12 @@ func Git(destdir string) (VCS, error) {
 	if err != nil {
 		return VCS{}, fmt.Errorf("git origin URL: %w", err)
 	}
+
 	host, subpath := gitParseRemote(rawRemote)
+	if host == "" || subpath == "" {
+		return VCS{}, fmt.Errorf("invalid git remote URL '%s'", rawRemote)
+	}
+
 	platform, _ := parsePlatform(host)
 	return VCS{
 		ProjectHost: host,
@@ -62,24 +68,30 @@ func gitOriginURL(destdir string) (string, error) {
 }
 
 // gitParseRemote returns the current repository host and path to repository on the given host's platform.
-func gitParseRemote(rawRemote string) (_, _ string) {
-	if rawRemote == "" {
+func gitParseRemote(rawRemote string) (host, subpath string) {
+	originURL := rawRemote
+	if originURL == "" {
 		return "", ""
 	}
 
-	originURL := strings.TrimSuffix(rawRemote, "\n")
+	originURL = strings.TrimSuffix(originURL, "\n")
 	originURL = strings.TrimSuffix(originURL, ".git")
 
-	// handle ssh remotes
-	if after, ok := strings.CutPrefix(originURL, "git@"); ok {
-		originURL := after
-		host, subpath, _ := strings.Cut(originURL, ":")
-		return host, subpath
+	// add ssh scheme to ssh based remotes
+	if strings.HasPrefix(originURL, "git@") {
+		originURL = "ssh://" + originURL
 	}
 
-	// handle web url remotes
-	originURL = strings.TrimPrefix(originURL, "http://")
-	originURL = strings.TrimPrefix(originURL, "https://")
-	host, subpath, _ := strings.Cut(originURL, "/")
-	return host, subpath
+	// try to parse originURL as a real URL, we should work in most cases (with port)
+	u, err := url.Parse(originURL)
+	if err == nil {
+		return u.Host, u.Path[1:]
+	}
+
+	// an identified case is when there's a ':' with SSH remotes (git@github.com:kickr-dev/engine)
+	// in this case we just replace ':' with a '/' and call the parsing again
+	if strings.Contains(rawRemote, ":") {
+		return gitParseRemote(strings.Replace(rawRemote, ":", "/", 1))
+	}
+	return "", ""
 }

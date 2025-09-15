@@ -70,27 +70,47 @@ func TestGitParseRemote(t *testing.T) {
 		assert.Empty(t, subpath)
 	})
 
-	t.Run("parse_ssh_remote", func(t *testing.T) {
+	t.Run("success_no_port", func(t *testing.T) {
 		// Arrange
-		rawRemote := "git@github.com:kickr-dev/engine.git"
+		remotes := []string{
+			"git@github.com:kickr-dev/engine.git",
+			"http://github.com/kickr-dev/engine.git",
+			"http://x-access-token:ghp_xxx@github.com/kickr-dev/engine.git",
+			"https://github.com/kickr-dev/engine.git",
+			"https://x-access-token:ghp_xxx@github.com/kickr-dev/engine.git",
+			"ssh://git@github.com/kickr-dev/engine.git",
+		}
+		for _, remote := range remotes {
+			t.Run(remote, func(t *testing.T) {
+				// Act
+				host, subpath := gitParseRemote(remote)
 
-		// Act
-		host, subpath := gitParseRemote(rawRemote)
-
-		// Assert
-		assert.Equal(t, "github.com", host)
-		assert.Equal(t, "kickr-dev/engine", subpath)
+				// Assert
+				assert.Equal(t, "github.com", host)
+				assert.Equal(t, "kickr-dev/engine", subpath)
+			})
+		}
 	})
 
-	t.Run("parse_http_remote", func(t *testing.T) {
+	t.Run("success_port", func(t *testing.T) {
 		// Arrange
-		rawRemote := "https://github.com/kickr-dev/engine.git"
+		remotes := []string{
+			"git@github.com:22/kickr-dev/engine.git",
+			"http://github.com:22/kickr-dev/engine.git",
+			"http://x-access-token:ghp_xxx@github.com:22/kickr-dev/engine.git",
+			"https://github.com:22/kickr-dev/engine.git",
+			"https://x-access-token:ghp_xxx@github.com:22/kickr-dev/engine.git",
+			"ssh://git@github.com:22/kickr-dev/engine.git",
+		}
+		for _, remote := range remotes {
+			t.Run(remote, func(t *testing.T) {
+				// Act
+				host, subpath := gitParseRemote(remote)
 
-		// Act
-		host, subpath := gitParseRemote(rawRemote)
-
-		// Assert
-		assert.Equal(t, "github.com", host)
-		assert.Equal(t, "kickr-dev/engine", subpath)
+				// Assert
+				assert.Equal(t, "github.com:22", host)
+				assert.Equal(t, "kickr-dev/engine", subpath)
+			})
+		}
 	})
 }
