@@ -67,24 +67,24 @@ func NewTestLogger(writer io.Writer) Logger {
 
 // Debugf implements Logger.
 func (b *testLogger) Debugf(format string, args ...any) {
-	b.print(format, args...)
+	b.printf(format, args...)
 }
 
 // Errorf implements Logger.
 func (b *testLogger) Errorf(format string, args ...any) {
-	b.print(format, args...)
+	b.printf(format, args...)
 }
 
 // Infof implements Logger.
 func (b *testLogger) Infof(format string, args ...any) {
-	b.print(format, args...)
+	b.printf(format, args...)
 }
 
 // Warnf implements Logger.
 func (b *testLogger) Warnf(format string, args ...any) {
-	b.print(format, args...)
+	b.printf(format, args...)
 }
 
-func (b *testLogger) print(format string, args ...any) {
+func (b *testLogger) printf(format string, args ...any) {
 	b.writer.Write(fmt.Appendf(nil, format, args...))
 }
