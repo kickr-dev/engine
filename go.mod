@@ -10,16 +10,16 @@ require (
 	github.com/bluekeyes/go-gitdiff v0.8.1
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/huh v0.7.0
-	github.com/go-git/go-git/v5 v5.16.2
+	github.com/go-git/go-git/v5 v5.16.3
 	github.com/go-viper/mapstructure/v2 v2.4.0
 	github.com/goccy/go-yaml v1.18.0
 	github.com/jarcoal/httpmock v1.4.1
 	github.com/pelletier/go-toml/v2 v2.2.4
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/stretchr/testify v1.11.1
-	gitlab.com/gitlab-org/api/client-go v0.148.1
-	golang.org/x/mod v0.28.0
-	golang.org/x/text v0.29.0
+	gitlab.com/gitlab-org/api/client-go v0.154.0
+	golang.org/x/mod v0.29.0
+	golang.org/x/text v0.30.0
 )
 
 require (
