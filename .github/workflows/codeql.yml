@@ -35,6 +35,7 @@ jobs:
   codeql:
     name: CodeQL (${{ matrix.language }})
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
     permissions:
       security-events: write
     strategy:
