@@ -17,3 +17,5 @@ license: apache-2.0
 maintainers:
   - name: kilianpaquier
 platform: github
+pre-commit:
+  - conventional-commits
