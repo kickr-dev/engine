@@ -29,6 +29,9 @@ type VCS struct {
 
 	// ProjectPath is the project path.
 	ProjectPath string
+
+	// Tags is the slice of repository tags.
+	Tags []string
 }
 
 // parsePlatform returns the platform name associated to input host.

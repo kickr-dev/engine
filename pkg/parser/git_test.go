@@ -4,6 +4,11 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/go-git/go-billy/v5/memfs"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -16,7 +21,7 @@ func TestGit(t *testing.T) {
 		_, err := Git(t.TempDir())
 
 		// Assert
-		assert.ErrorContains(t, err, "git origin URL")
+		assert.ErrorContains(t, err, "open repository")
 	})
 
 	t.Run("success", func(t *testing.T) {
@@ -38,25 +43,73 @@ func TestGit(t *testing.T) {
 }
 
 func TestGitOriginURL(t *testing.T) {
-	t.Run("error_no_git", func(t *testing.T) {
+	t.Run("error_no_remote", func(t *testing.T) {
 		// Arrange
-		destdir := t.TempDir()
+		repository, err := git.Init(memory.NewStorage(), memfs.New())
+		require.NoError(t, err)
 
 		// Act
-		originURL, err := gitOriginURL(destdir)
+		_, err = gitOriginURL(repository)
 
 		// Assert
-		assert.ErrorContains(t, err, "open repository")
-		assert.Empty(t, originURL)
+		assert.ErrorContains(t, err, "get remote 'origin'")
 	})
 
 	t.Run("valid_git_repository", func(t *testing.T) {
+		// Arrange
+		repository, err := git.Init(memory.NewStorage(), memfs.New())
+		require.NoError(t, err)
+		_, err = repository.CreateRemote(&config.RemoteConfig{Name: "origin", URLs: []string{"https://github.com/kickr-dev/engine"}})
+		require.NoError(t, err)
+
 		// Act
-		originURL, err := gitOriginURL(filepath.Join(testutils.Testdata(t), ".."))
+		originURL, err := gitOriginURL(repository)
 
 		// Assert
 		require.NoError(t, err)
-		assert.Contains(t, originURL, "kickr-dev/engine")
+		assert.Equal(t, "https://github.com/kickr-dev/engine", originURL)
+	})
+}
+
+func TestGitTags(t *testing.T) {
+	t.Run("no_tags", func(t *testing.T) {
+		// Arrange
+		repository, err := git.Init(memory.NewStorage(), memfs.New())
+		require.NoError(t, err)
+
+		// Act
+		tags, err := gitTags(repository)
+
+		// Assert
+		require.NoError(t, err)
+		assert.Empty(t, tags)
+	})
+
+	t.Run("has_tags", func(t *testing.T) {
+		// Arrange
+		repository, err := git.Init(memory.NewStorage(), memfs.New())
+		require.NoError(t, err)
+		worktree, err := repository.Worktree()
+		require.NoError(t, err)
+		hash, err := worktree.Commit("message", &git.CommitOptions{AllowEmptyCommits: true, Author: &object.Signature{}})
+		require.NoError(t, err)
+		_, err = repository.CreateTag("v0.1.0", hash, &git.CreateTagOptions{
+			Message: "message",
+			Tagger:  &object.Signature{},
+		})
+		require.NoError(t, err)
+		_, err = repository.CreateTag("v1.0.0", hash, &git.CreateTagOptions{
+			Message: "message",
+			Tagger:  &object.Signature{},
+		})
+		require.NoError(t, err)
+
+		// Act
+		tags, err := gitTags(repository)
+
+		// Assert
+		require.NoError(t, err)
+		assert.Equal(t, []string{"v0.1.0", "v1.0.0"}, tags)
 	})
 }
 

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 )
 
 // Git reads the input destdir directory remote.origin.url
@@ -27,8 +28,17 @@ import (
 //		// do something with vcs (e.g. update config since it's a pointer)
 //		return nil
 //	}
+//
+// Two errors may be checked with errors.Is when one is returned:
+//   - git.ErrRepositoryNotExists
+//   - git.ErrRemoteNotFound
 func Git(destdir string) (VCS, error) {
-	rawRemote, err := gitOriginURL(destdir)
+	repository, err := git.PlainOpenWithOptions(destdir, &git.PlainOpenOptions{DetectDotGit: true})
+	if err != nil {
+		return VCS{}, fmt.Errorf("open repository: %w", err)
+	}
+
+	rawRemote, err := gitOriginURL(repository)
 	if err != nil {
 		return VCS{}, fmt.Errorf("git origin URL: %w", err)
 	}
@@ -38,25 +48,23 @@ func Git(destdir string) (VCS, error) {
 		return VCS{}, fmt.Errorf("invalid git remote URL '%s'", rawRemote)
 	}
 
+	tags, err := gitTags(repository)
+	if err != nil {
+		return VCS{}, fmt.Errorf("get tags: %w", err)
+	}
+
 	platform, _ := parsePlatform(host)
 	return VCS{
 		ProjectHost: host,
 		ProjectName: path.Base(subpath),
 		ProjectPath: subpath,
 		Platform:    platform,
+		Tags:        tags,
 	}, nil
 }
 
 // gitOriginURL returns input directory remote origin by using go-git.
-//
-// Two errors may be checked with errors.Is when one is returned:
-//   - git.ErrRepositoryNotExists
-//   - git.ErrRemoteNotFound
-func gitOriginURL(destdir string) (string, error) {
-	repository, err := git.PlainOpenWithOptions(destdir, &git.PlainOpenOptions{DetectDotGit: true})
-	if err != nil {
-		return "", fmt.Errorf("open repository: %w", err)
-	}
+func gitOriginURL(repository *git.Repository) (string, error) {
 	origin, err := repository.Remote("origin")
 	if err != nil {
 		return "", fmt.Errorf("get remote 'origin': %w", err)
@@ -94,4 +102,20 @@ func gitParseRemote(rawRemote string) (host, subpath string) {
 		return gitParseRemote(strings.Replace(rawRemote, ":", "/", 1))
 	}
 	return "", ""
+}
+
+// gitTags returns the slice of known tags (locally) for the input destdir git repository.
+func gitTags(repository *git.Repository) ([]string, error) {
+	tags, err := repository.Tags()
+	if err != nil {
+		return nil, fmt.Errorf("get tags: %w", err)
+	}
+	defer tags.Close()
+
+	var rawTags []string
+	_ = tags.ForEach(func(r *plumbing.Reference) error {
+		rawTags = append(rawTags, r.Name().Short())
+		return nil
+	})
+	return rawTags, nil
 }
