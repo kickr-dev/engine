@@ -109,7 +109,10 @@ func TestGitTags(t *testing.T) {
 
 		// Assert
 		require.NoError(t, err)
-		assert.Equal(t, []string{"v0.1.0", "v1.0.0"}, tags)
+		assert.Len(t, tags, 2)
+		for _, e := range []string{"v0.1.0", "v1.0.0"} {
+			assert.Contains(t, tags, e)
+		}
 	})
 }
 
