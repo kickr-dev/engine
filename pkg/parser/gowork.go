@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"golang.org/x/mod/modfile"
 )
@@ -30,13 +31,38 @@ type Gowork struct {
 	Uses []GoworkUse
 }
 
+// Module returns the common prefix between all 'use' of current go.work.
+//
+// In case there's no 'use' at all or no common prefix can be found between them, then an empty string is returned.
+func (g Gowork) Module() string {
+	if len(g.Uses) == 0 {
+		return ""
+	}
+
+	prefixes := strings.Split(g.Uses[0].Gomod.Module, "/")
+	for _, use := range g.Uses[1:] {
+		parts := strings.Split(use.Gomod.Module, "/")
+
+		var i int
+		for i < len(prefixes) && i < len(parts) && prefixes[i] == parts[i] {
+			i++
+		}
+
+		prefixes = prefixes[:i]
+		if len(prefixes) == 0 {
+			return ""
+		}
+	}
+	return strings.Join(prefixes, "/")
+}
+
 // GoworkUse is one use of a go.work file.
 // It contains its valid parsed go.mod and it's use path.
 type GoworkUse struct {
 	// Gomod is the parsed go.mod of current go.work use element.
 	Gomod Gomod
 
-	// Module path in the comment.
+	// Module path in the go.work.
 	ModulePath string
 
 	// Use path of module.

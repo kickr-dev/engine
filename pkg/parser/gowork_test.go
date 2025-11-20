@@ -131,3 +131,71 @@ func TestReadGowork(t *testing.T) {
 		assert.Equal(t, expectedMod, mod)
 	})
 }
+
+func TestGoworkModule(t *testing.T) {
+	t.Run("empty_use", func(t *testing.T) {
+		// Arrange
+		gowork := parser.Gowork{}
+
+		// Act
+		module := gowork.Module()
+
+		// Assert
+		assert.Empty(t, module)
+	})
+
+	t.Run("all_modules_differents", func(t *testing.T) {
+		// Arrange
+		gowork := parser.Gowork{
+			Uses: []parser.GoworkUse{
+				{Gomod: parser.Gomod{Module: "lib1"}},
+				{Gomod: parser.Gomod{Module: "lib2"}},
+			},
+		}
+
+		// Act
+		module := gowork.Module()
+
+		// Assert
+		assert.Empty(t, module)
+	})
+
+	t.Run("some_modules_differents", func(t *testing.T) {
+		// Arrange
+		gowork := parser.Gowork{
+			Uses: []parser.GoworkUse{
+				{Gomod: parser.Gomod{Module: "lib1"}},
+				{Gomod: parser.Gomod{Module: "lib2/sub1"}},
+				{Gomod: parser.Gomod{Module: "lib2/sub2"}},
+			},
+		}
+
+		// Act
+		module := gowork.Module()
+
+		// Assert
+		assert.Empty(t, module)
+	})
+
+	t.Run("modules_with_same_prefix", func(t *testing.T) {
+		// Arrange
+		prefixes := []string{"github.com", "gitlab.com", "github.com/kickr-dev", "gitlab.com/kickr-dev"}
+		for _, prefix := range prefixes {
+			// Arrange
+			gowork := parser.Gowork{
+				Uses: []parser.GoworkUse{
+					{Gomod: parser.Gomod{Module: prefix + "/action-setup"}},
+					{Gomod: parser.Gomod{Module: prefix + "/brand"}},
+					{Gomod: parser.Gomod{Module: prefix + "/engine"}},
+					{Gomod: parser.Gomod{Module: prefix + "/kickr"}},
+				},
+			}
+
+			// Act
+			module := gowork.Module()
+
+			// Assert
+			assert.Equal(t, prefix, module)
+		}
+	})
+}
