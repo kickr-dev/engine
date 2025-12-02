@@ -18,7 +18,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.4
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/stretchr/testify v1.11.1
-	gitlab.com/gitlab-org/api/client-go v1.0.1
+	gitlab.com/gitlab-org/api/client-go v1.1.0
 	golang.org/x/mod v0.30.0
 	golang.org/x/text v0.31.0
 )
@@ -76,9 +76,9 @@ require (
 	golang.org/x/crypto v0.45.0 // indirect
 	golang.org/x/exp v0.0.0-20250813145105-42675adae3e6 // indirect
 	golang.org/x/net v0.47.0 // indirect
-	golang.org/x/oauth2 v0.30.0 // indirect
+	golang.org/x/oauth2 v0.33.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/time v0.12.0 // indirect
+	golang.org/x/time v0.14.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
