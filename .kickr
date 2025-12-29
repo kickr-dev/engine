@@ -11,6 +11,6 @@ dependencies:
 license: apache-2.0
 maintainers:
   - name: kilianpaquier
-platform: github
+platform: gitlab
 pre-commit:
   - conventional-commits
