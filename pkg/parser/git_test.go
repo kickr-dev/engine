@@ -27,10 +27,10 @@ func TestGit(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// Arrange
 		expected := VCS{
-			ProjectHost: "github.com",
+			ProjectHost: "gitlab.com",
 			ProjectName: "engine",
 			ProjectPath: "kickr-dev/engine",
-			Platform:    GitHub,
+			Platform:    GitLab,
 		}
 
 		// Act
