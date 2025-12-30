@@ -20,8 +20,8 @@ func TestApplyTemplate(t *testing.T) {
 		t.Helper()
 
 		initial := engine.GetLogger()
-		engine.SetLogger(l)
-		t.Cleanup(func() { engine.SetLogger(initial) })
+		engine.Configure(engine.WithLogger(l))
+		t.Cleanup(func() { engine.Configure(engine.WithLogger(initial)) })
 	}
 
 	t.Run("error_missing_out", func(t *testing.T) {

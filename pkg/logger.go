@@ -20,23 +20,6 @@ type Logger interface {
 	Warnf(format string, args ...any)
 }
 
-var logger Logger
-
-// SetLogger sets the global logger only if the input one is not nil.
-func SetLogger(l Logger) {
-	if l != nil {
-		logger = l
-	}
-}
-
-// GetLogger returns global logger if it exists or a noop logger.
-func GetLogger() Logger {
-	if logger != nil {
-		return logger
-	}
-	return &noopLogger{}
-}
-
 type noopLogger struct{}
 
 var _ Logger = (*noopLogger)(nil) // ensure interface is implemented
