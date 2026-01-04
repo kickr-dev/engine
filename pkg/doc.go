@@ -50,7 +50,7 @@ Generate example:
 		destdir, _ := os.Getwd()
 
 		// run generation
-		engine.SetLogger(logger)
+		engine.Configure(engine.WithLogger(logger), engine.WithForce(false))
 		config, err := engine.Generate(ctx, destdir, config,
 			[]engine.Parser[config]{ParserGit},
 			[]engine.Generator[config]{engine.GeneratorTemplates(os.DirFS("path/to/templates"), Templates())})
