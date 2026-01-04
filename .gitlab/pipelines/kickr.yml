@@ -9,6 +9,7 @@ kickr:
     - if: $CI_PIPELINE_SOURCE == 'schedule'
   variables:
     COMMIT_MESSAGE: "ci(layout): regenerate kickr layout"
+    GIT_DEPTH: "0"
     GIT_STRATEGY: clone
     MERGE_BODY: Automated kickr layout generation
     MERGE_LABELS: dependencies,kickr
