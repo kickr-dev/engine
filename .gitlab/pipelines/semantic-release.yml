@@ -19,6 +19,15 @@ variables:
   SEMREL_REQUIRED_PLUGINS_FILE: .gitlab/semrel-plugins.txt
   SEMREL_TAG_FORMAT: v$${version}
 
+# see https://gitlab.com/to-be-continuous/semantic-release/-/blob/master/templates/gitlab-ci-semrel.yml?ref_type=heads#L150
+workflow:
+  rules:
+    - !reference [.tbc-workflow-rules, default]
+    # completely disable branches pipelines
+    - if: '$CI_COMMIT_BRANCH && $CI_COMMIT_REF_PROTECTED != "true" && $CI_COMMIT_REF_NAME !~ $PROD_REF && $CI_COMMIT_REF_NAME !~ $INTEG_REF'
+      when: never
+    - when: always
+
 # override TBC adaptive pipeline in favor of disabling test jobs on schedule pipelines
 .test-policy:
   rules:
