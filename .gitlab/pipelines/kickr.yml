@@ -11,6 +11,7 @@ kickr:
     COMMIT_MESSAGE: "ci(layout): regenerate kickr layout"
     GIT_DEPTH: "0"
     GIT_STRATEGY: clone
+    GITLAB_TOKEN: $KICKR_TOKEN
     MERGE_BODY: Automated kickr layout generation
     MERGE_LABELS: dependencies,kickr
     MERGE_SOURCE_BRANCH: kickr/layout
@@ -33,7 +34,7 @@ kickr:
     - |-
       set -o pipefail
 
-      glab auth login --token $KICKR_TOKEN
+      glab auth login --token $GITLAB_TOKEN
 
       # setup git user
       user=$(glab api /user) || {
@@ -47,7 +48,7 @@ kickr:
       git commit -am "$COMMIT_MESSAGE" --signoff || {
         echo "No changes detected with $MERGE_TARGET_BRANCH" && exit 0
       }
-      git push https://oauth2:$KICKR_TOKEN@$CI_SERVER_FQDN/$CI_PROJECT_PATH.git $MERGE_SOURCE_BRANCH --force
+      git push https://oauth2:$GITLAB_TOKEN@$CI_SERVER_FQDN/$CI_PROJECT_PATH.git $MERGE_SOURCE_BRANCH --force
 
       # check opened merge requests
       merges=$(glab mr list --source-branch "$MERGE_SOURCE_BRANCH" --target-branch "$MERGE_TARGET_BRANCH" -F json) || {
@@ -57,4 +58,7 @@ kickr:
         echo "$merges" && echo "Merge request already exist, skipping creation" && exit 0
       fi
 
-      glab mr create --title "$MERGE_TITLE" --description "$MERGE_BODY" --source-branch "$MERGE_SOURCE_BRANCH" --target-branch "$MERGE_TARGET_BRANCH" --label "$MERGE_LABELS"
+      glab mr create --title "$MERGE_TITLE" --description "$MERGE_BODY" \
+        --source-branch "$MERGE_SOURCE_BRANCH" --target-branch "$MERGE_TARGET_BRANCH" --remove-source-branch \
+        --reviewer "u.kilianpaquier" \
+        --label "$MERGE_LABELS"

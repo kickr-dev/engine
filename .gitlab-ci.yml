@@ -8,10 +8,10 @@ include:
 # (define the variables below in your GitLab group/project variables)
 
 # https://gitlab.com/to-be-continuous/semantic-release
-# GITLAB_TOKEN: A GitLab 'project access token' or 'personal access token' with `api` and `write_repository` scopes.
+# RELEASE_TOKEN: A GitLab 'group access token' or 'project access token' or 'personal access token' with `api` and `write_repository` scopes and at least a `Developer` role.
 # SEMREL_GPG_SIGNKEY: Path to the GPG signkey exported with `gpg --armor --export-secret-key` (optional).
 
-# KICKR_TOKEN: A GitLab access token to allow kickr layout update (`write_repository`, `api` with a `Developer` role)
+# KICKR_TOKEN: A GitLab access token to allow kickr layout update (`write_repository` and `api` scopes with a `Developer` role).
 
 default:
   interruptible: true

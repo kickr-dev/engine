@@ -49,6 +49,7 @@ workflow:
 semantic-release-info:
   variables:
     GIT_DEPTH: "0"
+    GITLAB_TOKEN: $RELEASE_TOKEN
   after_script:
     - source "$SEMREL_CONFIG_DIR/semrel.out.env" && rm "$SEMREL_CONFIG_DIR/semrel.out.env"
     - >
@@ -69,3 +70,4 @@ semantic-release:
   interruptible: false
   variables:
     GIT_DEPTH: "0"
+    GITLAB_TOKEN: $RELEASE_TOKEN
