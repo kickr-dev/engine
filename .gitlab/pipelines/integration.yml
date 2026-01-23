@@ -12,7 +12,7 @@ include:
   # Go template
   # https://gitlab.com/to-be-continuous/golang
   - project: to-be-continuous/golang
-    ref: 13cde466644e49f8d07867d6a64efa89a61cc50c # 4.15.2
+    ref: 473da325602b2a247fc6d880bc243cf6a42dbe0f # 4.15.3
     file: templates/gitlab-ci-golang.yml
 
 variables:
