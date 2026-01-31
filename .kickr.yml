@@ -6,8 +6,6 @@ ci:
   options:
     - kickr
   release: {}
-dependencies:
-  manager: renovate
 license: apache-2.0
 maintainers:
   - name: u.kilianpaquier
