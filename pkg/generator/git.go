@@ -54,7 +54,7 @@ func DownloadGitignore(ctx context.Context, httpClient *http.Client, out string,
 	}
 
 	// fetch .gitignore
-	response, err := httpClient.Do(request)
+	response, err := httpClient.Do(request) //nolint:gosec
 	if err != nil {
 		return fmt.Errorf("get '%s': %w", url, err)
 	}
