@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"io"
+	"net/http"
 )
 
 // Logger is a simplified interface for logging purposes.
@@ -19,6 +20,23 @@ type Logger interface {
 	// Warnf logs with the WARN level.
 	Warnf(format string, args ...any)
 }
+
+type loggerURL struct {
+	initial http.RoundTripper
+}
+
+// NewLoggerURL creates an http.RoundTripper that will log request URLs.
+func NewLoggerURL(transport http.RoundTripper) http.RoundTripper {
+	return &loggerURL{transport}
+}
+
+// RoundTrip implements http.RoundTripper.
+func (l *loggerURL) RoundTrip(req *http.Request) (*http.Response, error) {
+	GetLogger().Debugf("call to '%s'", req.URL.String())
+	return l.initial.RoundTrip(req)
+}
+
+var _ http.RoundTripper = (*loggerURL)(nil)
 
 type noopLogger struct{}
 
