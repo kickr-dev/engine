@@ -75,3 +75,17 @@ func TestCutAfter(t *testing.T) {
 		assert.Equal(t, "something", result)
 	})
 }
+
+func TestSlug(t *testing.T) {
+	fm := engine.FuncMap()["toSlug"]
+	toSlug, ok := fm.(func(in string) string)
+	require.True(t, ok)
+
+	t.Run("success", func(t *testing.T) {
+		// Act
+		result := toSlug("something.things_others-and! not/none")
+
+		// Assert
+		assert.Equal(t, "something-things-others-and-not-none", result)
+	})
+}
