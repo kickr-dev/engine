@@ -185,8 +185,8 @@ github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM
 github.com/xanzy/ssh-agent v0.3.3/go.mod h1:6dzNDKs0J9rVPHPhaGCukekBHKqfl+L3KghI1Bc68Uw=
 github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e h1:JVG44RsyaB9T2KIHavMF/ppJZNG9ZpyihvCd0w101no=
 github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e/go.mod h1:RbqR21r5mrJuqunuUZ/Dhy/avygyECGrLceyNeo4LiM=
-gitlab.com/gitlab-org/api/client-go v1.34.0 h1:w/Zv3FmfrkZsVUJhzteAu0LsWsz2y7kv/XJ3pvRa+Eo=
-gitlab.com/gitlab-org/api/client-go v1.34.0/go.mod h1:nsUbXSLfne+sl+j62f7S3LFNwQ5Ey96oG9QToJT4aTM=
+gitlab.com/gitlab-org/api/client-go v1.35.0 h1:EZTgYVU+MCVGO3dEPR924GLUuHMtRVfXOAkHNvZe0Mg=
+gitlab.com/gitlab-org/api/client-go v1.35.0/go.mod h1:0r4QcFmvppZ6TqNP/2Af7T0ivxHC75a26TlWvyoyvzA=
 golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
 golang.org/x/crypto v0.45.0 h1:jMBrvKuj23MTlT0bQEOBcAE0mjg8mK9RXFhRH6nyF3Q=
 golang.org/x/crypto v0.45.0/go.mod h1:XTGrrkGJve7CYK7J8PEww4aY7gM3qMCElcJQ8n8JdX4=
