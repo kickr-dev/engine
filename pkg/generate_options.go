@@ -8,9 +8,7 @@ type OptionFunc func(*options)
 // In case the logger is nil, the logger won't be set / updated.
 func WithLogger(logger Logger) OptionFunc {
 	return func(o *options) {
-		if logger != nil {
-			o.logger = logger
-		}
+		o.logger = logger
 	}
 }
 
@@ -26,6 +24,9 @@ func WithForce(force bool) OptionFunc {
 
 // GetLogger returns global logger if it exists or a noop logger.
 func GetLogger() Logger {
+	if o.logger == nil {
+		return &noopLogger{}
+	}
 	return o.logger
 }
 
