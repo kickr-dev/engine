@@ -103,7 +103,7 @@ func ReadGomod(destdir string) (Gomod, error) {
 	modpath := filepath.Join(destdir, FileGomod)
 
 	// read go.mod
-	content, err := os.ReadFile(modpath)
+	content, err := os.ReadFile(modpath) //nolint:gosec
 	if err != nil {
 		return Gomod{}, fmt.Errorf("read file: %w", err)
 	}

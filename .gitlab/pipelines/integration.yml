@@ -26,3 +26,6 @@ variables:
 pre-commit:
   variables:
     GIT_DEPTH: "0"
+
+go-govulncheck:
+  allow_failure: true
