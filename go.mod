@@ -6,7 +6,7 @@ toolchain go1.26.1
 
 require (
 	charm.land/bubbletea/v2 v2.0.2
-	charm.land/huh/v2 v2.0.1
+	charm.land/huh/v2 v2.0.3
 	dario.cat/mergo v1.0.2
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/bluekeyes/go-gitdiff v0.8.1
