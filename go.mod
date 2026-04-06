@@ -11,7 +11,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/bluekeyes/go-gitdiff v0.8.1
 	github.com/go-git/go-billy/v5 v5.8.0
-	github.com/go-git/go-git/v5 v5.17.1
+	github.com/go-git/go-git/v5 v5.17.2
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/goccy/go-yaml v1.19.2
 	github.com/jarcoal/httpmock v1.4.1
