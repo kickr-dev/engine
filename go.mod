@@ -18,7 +18,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.3.0
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/stretchr/testify v1.11.1
-	gitlab.com/gitlab-org/api/client-go/v2 v2.11.0
+	gitlab.com/gitlab-org/api/client-go/v2 v2.13.0
 	golang.org/x/mod v0.34.0
 	golang.org/x/text v0.35.0
 )
