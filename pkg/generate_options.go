@@ -57,9 +57,6 @@ func Configure(opts ...OptionFunc) {
 	if o.logger == nil {
 		o.logger = &noopLogger{}
 	}
-	if len(o.funcs) == 0 {
-		o.funcs = template.FuncMap{}
-	}
 }
 
 var o options
