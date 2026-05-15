@@ -16,12 +16,14 @@ import (
 )
 
 func TestApplyTemplate(t *testing.T) {
-	mocklog := func(t *testing.T, l engine.Logger) {
+	configure := func(t *testing.T, l engine.Logger) {
 		t.Helper()
 
+		funcs := engine.WithFuncMap(template.FuncMap{"ping": func() string { return "pong" }})
+
 		initial := engine.GetLogger()
-		engine.Configure(engine.WithLogger(l))
-		t.Cleanup(func() { engine.Configure(engine.WithLogger(initial)) })
+		engine.Configure(engine.WithLogger(l), funcs)
+		t.Cleanup(func() { engine.Configure(engine.WithLogger(initial), funcs) })
 	}
 
 	t.Run("error_missing_out", func(t *testing.T) {
@@ -55,7 +57,7 @@ func TestApplyTemplate(t *testing.T) {
 
 		buf := strings.Builder{}
 		logger := engine.NewTestLogger(&buf)
-		mocklog(t, logger)
+		configure(t, logger)
 
 		// Act
 		err := engine.ApplyTemplate(os.DirFS(destdir), destdir, template, testconfig{})
@@ -88,7 +90,7 @@ func TestApplyTemplate(t *testing.T) {
 
 		buf := strings.Builder{}
 		logger := engine.NewTestLogger(&buf)
-		mocklog(t, logger)
+		configure(t, logger)
 
 		// Act
 		err := engine.ApplyTemplate(os.DirFS(destdir), destdir, template, testconfig{})
@@ -96,6 +98,30 @@ func TestApplyTemplate(t *testing.T) {
 		// Assert
 		require.NoError(t, err)
 		assert.Equal(t, buf.String(), fmt.Sprintf("not generating '%s' since it already exists (or was modified manually)", template.Out))
+	})
+
+	t.Run("success_custom_func", func(t *testing.T) {
+		// Arrange
+		srcdir := t.TempDir()
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			Globs: []string{"file.txt" + engine.TmplExtension},
+			Out:   "file.txt",
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(srcdir, template.Globs[0]), []byte("{{ ping }}"), files.RwRR))
+
+		buf := strings.Builder{}
+		logger := engine.NewTestLogger(&buf)
+		configure(t, logger)
+
+		// Act
+		err := engine.ApplyTemplate(os.DirFS(srcdir), destdir, template, testconfig{})
+
+		// Assert
+		require.NoError(t, err)
+		content, err := os.ReadFile(filepath.Join(destdir, template.Out))
+		require.NoError(t, err)
+		assert.Equal(t, "pong", string(content))
 	})
 }
 

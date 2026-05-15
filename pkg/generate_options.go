@@ -1,5 +1,7 @@
 package engine
 
+import "text/template"
+
 // OptionFunc is the function signature for engine options to be provided in Configure.
 type OptionFunc func(*options)
 
@@ -19,6 +21,13 @@ func WithLogger(logger Logger) OptionFunc {
 func WithForce(force bool) OptionFunc {
 	return func(o *options) {
 		o.force = force
+	}
+}
+
+// WithFuncMap adds a custom FuncMap to all templating calls.
+func WithFuncMap(funcs template.FuncMap) OptionFunc {
+	return func(o *options) {
+		o.funcs = funcs
 	}
 }
 
@@ -54,5 +63,6 @@ var o options
 
 type options struct {
 	force  bool
+	funcs  template.FuncMap
 	logger Logger
 }

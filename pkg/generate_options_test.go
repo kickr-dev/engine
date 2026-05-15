@@ -1,23 +1,22 @@
-package engine_test
+package engine //nolint:testpackage
 
 import (
 	"strings"
 	"testing"
+	"text/template"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	engine "github.com/kickr-dev/engine/pkg"
 )
 
 func TestConfigure(t *testing.T) {
 	t.Run("no_options", func(t *testing.T) {
 		// Act
-		engine.Configure()
+		Configure()
 
 		// Assert
-		assert.False(t, engine.Forced())
-		assert.NotNil(t, engine.GetLogger())
+		assert.False(t, Forced())
+		assert.NotNil(t, GetLogger())
 	})
 
 	t.Run("options", func(t *testing.T) {
@@ -25,13 +24,22 @@ func TestConfigure(t *testing.T) {
 		buf := strings.Builder{}
 
 		// Act
-		engine.Configure(engine.WithForce(true), engine.WithLogger(engine.NewTestLogger(&buf)))
+		Configure(
+			WithForce(true),
+			WithFuncMap(template.FuncMap{"hello": func() string { return "hello" }}),
+			WithLogger(NewTestLogger(&buf)))
 
 		// Assert
-		assert.True(t, engine.Forced())
-		logger := engine.GetLogger()
+		assert.True(t, Forced())
+
+		logger := GetLogger()
 		require.NotNil(t, logger)
 		logger.Infof("some text to verify")
 		assert.Equal(t, "some text to verify", buf.String())
+
+		require.NotNil(t, o.funcs)
+		f, ok := o.funcs["hello"].(func() string)
+		require.True(t, ok)
+		assert.Equal(t, "hello", f())
 	})
 }
