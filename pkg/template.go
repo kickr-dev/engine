@@ -129,6 +129,7 @@ func ApplyPatches[T any](fsys fs.FS, destdir string, tmpl Template[T], data any)
 
 		tt, err := template.New(patchname).
 			Funcs(sprig.FuncMap()).
+			Funcs(FuncMap()).
 			Funcs(o.funcs).
 			Delims(tmpl.StartDelim, tmpl.EndDelim).
 			ParseFS(fsys, patch)
