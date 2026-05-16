@@ -44,8 +44,19 @@ func GlobExcludedDirectories(dirs ...string) GlobOption {
 	}
 }
 
+// GlobExcludedFiles returns a GlobOption which adds excluded files from Glob checking.
+//
+// Excluded files are applied to all directories levels (root and subdirectories) during checking.
+func GlobExcludedFiles(files ...string) GlobOption {
+	return func(o globOptions) globOptions {
+		o.ExcludedFiles = files
+		return o
+	}
+}
+
 type globOptions struct {
 	ExcludedDirectories []string
+	ExcludedFiles       []string
 }
 
 func newGlobOptions(opts ...GlobOption) globOptions {
@@ -59,13 +70,22 @@ func newGlobOptions(opts ...GlobOption) globOptions {
 // Glob returns all matching files for the input glob and root (and its subdirectories).
 //
 // In case root directory doesn't exist, no matches are returned (error is silenced).
-func Glob(root, glob string, opts ...GlobOption) []string {
+func Glob(root, glob string, opts ...GlobOption) (matches []string) {
 	gopts := newGlobOptions(opts...)
+	if slices.Contains(gopts.ExcludedDirectories, filepath.Base(root)) {
+		return nil
+	}
 
-	matches, _ := filepath.Glob(filepath.Join(root, glob))
+	globs, _ := filepath.Glob(filepath.Join(root, glob))
+	for _, match := range globs {
+		if !slices.Contains(gopts.ExcludedFiles, filepath.Base(match)) {
+			matches = append(matches, match)
+		}
+	}
+
 	entries, _ := os.ReadDir(root)
 	for _, entry := range entries {
-		if !entry.IsDir() || slices.Contains(gopts.ExcludedDirectories, entry.Name()) {
+		if !entry.IsDir() {
 			continue
 		}
 		matches = append(matches, Glob(filepath.Join(root, entry.Name()), glob, opts...)...)
