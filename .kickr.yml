@@ -9,5 +9,3 @@ license: apache-2.0
 maintainers:
   - name: u.kilianpaquier
 platform: gitlab
-pre-commit:
-  - conventional-commits
