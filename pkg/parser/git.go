@@ -33,7 +33,10 @@ import (
 //   - git.ErrRepositoryNotExists
 //   - git.ErrRemoteNotFound
 func Git(destdir string) (VCS, error) {
-	repository, err := git.PlainOpenWithOptions(destdir, &git.PlainOpenOptions{DetectDotGit: true})
+	repository, err := git.PlainOpenWithOptions(destdir, &git.PlainOpenOptions{
+		DetectDotGit:          true,
+		EnableDotGitCommonDir: true,
+	})
 	if err != nil {
 		return VCS{}, fmt.Errorf("open repository: %w", err)
 	}
