@@ -9,7 +9,7 @@ require (
 	charm.land/huh/v2 v2.0.3
 	dario.cat/mergo v1.0.2
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/bluekeyes/go-gitdiff v0.8.1
+	github.com/bluekeyes/go-gitdiff v0.9.0
 	github.com/go-git/go-billy/v5 v5.9.0
 	github.com/go-git/go-git/v5 v5.19.1
 	github.com/go-viper/mapstructure/v2 v2.5.0
@@ -18,7 +18,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.4.3
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/stretchr/testify v1.11.1
-	gitlab.com/gitlab-org/api/client-go/v2 v2.46.0
+	gitlab.com/gitlab-org/api/client-go/v2 v2.51.0
 	golang.org/x/mod v0.38.0
 	golang.org/x/text v0.40.0
 )
