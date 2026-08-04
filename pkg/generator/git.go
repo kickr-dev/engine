@@ -39,39 +39,53 @@ var (
 //
 // Note: Full list of templates is available here https://www.toptal.com/developers/gitignore/api/list.
 func DownloadGitignore(ctx context.Context, httpClient *http.Client, out string, templates ...string) error {
+	body, err := FetchGitignore(ctx, httpClient, templates...)
+	if err != nil {
+		return fmt.Errorf("fetch gitignore: %w", err)
+	}
+
+	if err := os.WriteFile(out, body, files.RwRR); err != nil {
+		return fmt.Errorf("write file: %w", err)
+	}
+	return nil
+}
+
+// FetchGitignore fetches a combined .gitignore with the help of https://docs.gitignore.io/use/api
+// and returns the obtained result without writing it anywhere.
+//
+// It's meant for cases where the result must be templatized or combined
+// before being written, DownloadGitignore being the shortcut when it can be written as is.
+//
+// Note: Full list of templates is available here https://www.toptal.com/developers/gitignore/api/list.
+func FetchGitignore(ctx context.Context, httpClient *http.Client, templates ...string) ([]byte, error) {
 	if httpClient == nil {
-		return ErrNoClient
+		return nil, ErrNoClient
 	}
 	if len(templates) == 0 {
-		return ErrNoTemplates
+		return nil, ErrNoTemplates
 	}
 
 	// create request
 	url := "https://www.toptal.com/developers/gitignore/api/" + strings.Join(templates, ",")
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return fmt.Errorf("create request: %w", err)
+		return nil, fmt.Errorf("create request: %w", err)
 	}
 
 	// fetch .gitignore
 	response, err := httpClient.Do(request)
 	if err != nil {
-		return fmt.Errorf("get '%s': %w", url, err)
+		return nil, fmt.Errorf("get '%s': %w", url, err)
 	}
 	defer response.Body.Close()
 
 	// read and validate body response
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return fmt.Errorf("read all: %w", err)
+		return nil, fmt.Errorf("read all: %w", err)
 	}
 	if response.StatusCode/100 != 2 {
-		return fmt.Errorf("invalid response from '%s': %s: %w", url, string(body), ErrInvalidResponse)
+		return nil, fmt.Errorf("invalid response from '%s': %s: %w", url, string(body), ErrInvalidResponse)
 	}
-
-	// write .gitignore file
-	if err := os.WriteFile(out, body, files.RwRR); err != nil {
-		return fmt.Errorf("write file: %w", err)
-	}
-	return nil
+	return body, nil
 }
