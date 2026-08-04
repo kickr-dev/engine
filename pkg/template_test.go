@@ -125,6 +125,113 @@ func TestApplyTemplate(t *testing.T) {
 	})
 }
 
+type testmodule struct {
+	directory string
+}
+
+func (m testmodule) Dir() string { return m.directory }
+
+func TestGeneratorModules(t *testing.T) {
+	ctx := t.Context()
+
+	modules := func(config []testmodule) []testmodule { return config }
+
+	t.Run("error_parse_template_globs", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+		generator := engine.GeneratorModules(os.DirFS(destdir), modules,
+			[]engine.Template[testmodule]{
+				{Globs: []string{"invalid.txt"}, Out: "file.txt"},
+			})
+
+		// Act
+		err := generator(ctx, destdir, []testmodule{{directory: "."}})
+
+		// Assert
+		assert.ErrorIs(t, err, engine.ErrFailedGeneration)
+	})
+
+	t.Run("success_no_module", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+		generator := engine.GeneratorModules(os.DirFS(destdir), modules,
+			[]engine.Template[testmodule]{
+				{Globs: []string{"invalid.txt"}, Out: "file.txt"},
+			})
+
+		// Act
+		err := generator(ctx, destdir, nil)
+
+		// Assert
+		require.NoError(t, err)
+		assert.NoFileExists(t, filepath.Join(destdir, "file.txt"))
+	})
+
+	t.Run("success_root_module", func(t *testing.T) {
+		// Arrange
+		srcdir := t.TempDir()
+		destdir := t.TempDir()
+		require.NoError(t, os.WriteFile(filepath.Join(srcdir, "file.txt"+engine.TmplExtension), []byte("{{ .Dir }}"), files.RwRR))
+
+		generator := engine.GeneratorModules(os.DirFS(srcdir), modules,
+			[]engine.Template[testmodule]{
+				{Globs: []string{"file.txt" + engine.TmplExtension}, Out: "file.txt"},
+			})
+
+		// Act
+		err := generator(ctx, destdir, []testmodule{{directory: "."}})
+
+		// Assert
+		require.NoError(t, err)
+		content, err := os.ReadFile(filepath.Join(destdir, "file.txt"))
+		require.NoError(t, err)
+		assert.Equal(t, ".", string(content))
+	})
+
+	t.Run("success_multiple_modules", func(t *testing.T) {
+		// Arrange
+		srcdir := t.TempDir()
+		destdir := t.TempDir()
+		require.NoError(t, os.WriteFile(filepath.Join(srcdir, "file.txt"+engine.TmplExtension), []byte("{{ .Dir }}"), files.RwRR))
+
+		generator := engine.GeneratorModules(os.DirFS(srcdir), modules,
+			[]engine.Template[testmodule]{
+				{Globs: []string{"file.txt" + engine.TmplExtension}, Out: "file.txt"},
+			})
+
+		// Act
+		err := generator(ctx, destdir, []testmodule{{directory: "."}, {directory: "apps/api"}})
+
+		// Assert
+		require.NoError(t, err)
+		for _, dir := range []string{".", "apps/api"} {
+			content, err := os.ReadFile(filepath.Join(destdir, dir, "file.txt"))
+			require.NoError(t, err)
+			assert.Equal(t, dir, string(content))
+		}
+	})
+
+	t.Run("success_remove_in_module", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+		out := filepath.Join(destdir, "apps", "api", "file.txt")
+		require.NoError(t, os.MkdirAll(filepath.Dir(out), files.RwxRxRxRx))
+		require.NoError(t, os.WriteFile(out, []byte("some not empty file"), files.RwRR))
+
+		generator := engine.GeneratorModules(os.DirFS(destdir), modules,
+			[]engine.Template[testmodule]{
+				{Out: "file.txt", Remove: func(testmodule) bool { return true }},
+			})
+
+		// Act
+		err := generator(ctx, destdir, []testmodule{{directory: "apps/api"}})
+
+		// Assert
+		require.NoError(t, err)
+		assert.NoFileExists(t, out)
+	})
+}
+
 func TestApplyPatches(t *testing.T) {
 	t.Run("error_missing_out", func(t *testing.T) {
 		// Arrange

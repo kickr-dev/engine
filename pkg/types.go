@@ -22,6 +22,15 @@ type Parser[T any] func(ctx context.Context, destdir string, config *T) error
 // this may be used when an error must be returned by Generate but is already logged by the generator itself.
 type Generator[T any] func(ctx context.Context, destdir string, config T) error
 
+// Module is implemented by any per-directory configuration a monorepository is composed of.
+//
+// It's the input type of GeneratorModules, which generates a slice of templates
+// inside each module directory instead of the repository root.
+type Module interface {
+	// Dir returns the module location, relative to the generation destination directory, with slashes as separators.
+	Dir() string
+}
+
 // Template represents a template file to be parsed and generated.
 type Template[T any] struct {
 	// Delimiters is the pair of delimiters used to parse template file(s).

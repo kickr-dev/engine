@@ -37,6 +37,32 @@ func GeneratorTemplates[T any](fsys fs.FS, templates []Template[T]) Generator[T]
 	}
 }
 
+// GeneratorModules is a generator applying all input templates inside each module directory.
+//
+// The modules function extracts the modules slice from the parsed configuration.
+//
+// Each Template.Out is relative to each module where it will be generated
+// and Template.Remove is up to the characteristics of a given module.
+//
+// Errors encountered during templates generation are logged, in that case a final error being ErrFailedGeneration is returned.
+func GeneratorModules[T any, M Module](fsys fs.FS, modules func(config T) []M, templates []Template[M]) Generator[T] {
+	generator := GeneratorTemplates(fsys, templates)
+
+	return func(ctx context.Context, destdir string, config T) error {
+		var errcount int
+		for _, module := range modules(config) {
+			if err := generator(ctx, filepath.Join(destdir, module.Dir()), module); err != nil {
+				errcount++
+				GetLogger().Errorf("failed to generate '%s': %v", module.Dir(), err)
+			}
+		}
+		if errcount > 0 {
+			return ErrFailedGeneration
+		}
+		return nil
+	}
+}
+
 // ApplyTemplate writes or deletes an input Template with associated data.
 func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T) error {
 	// force out localization since generation is always done on current fs
