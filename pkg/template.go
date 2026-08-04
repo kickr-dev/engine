@@ -9,7 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"slices"
+	"regexp"
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
@@ -106,7 +106,7 @@ func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T
 		if err != nil {
 			return fmt.Errorf("parse template file(s): %w", err)
 		}
-		if err := ExecuteTemplate(tt, config, out); err != nil {
+		if err := ExecuteTemplate(tt, config, out, tmpl.EmptyPolicy); err != nil {
 			return fmt.Errorf("template execute: %w", err)
 		}
 	}
@@ -186,17 +186,38 @@ func ApplyPatches[T any](fsys fs.FS, destdir string, tmpl Template[T], data any)
 	return errors.Join(errs...)
 }
 
+// exeRegex matches file extensions requiring the executable bit: any *sh extension (.sh, .bash, .zsh, ...) and .ps1.
+var exeRegex = regexp.MustCompile(`^\.(\w*sh|ps1)$`)
+
 // ExecuteTemplate runs tmpl.ExecuteTemplate with input data and write result into given out.
 //
 // When ExecuteTemplate is called, it truncates out in case it already exists and reevaluate its rights (specific to linux).
-func ExecuteTemplate(tmpl *template.Template, data any, out string) error {
+func ExecuteTemplate(tmpl *template.Template, data any, out string, policy EmptyPolicy) error {
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return fmt.Errorf("template execution: %w", err)
+	}
+
+	if ok := IsEmpty(buf.Bytes(), policy); ok {
+		base := filepath.Base(out)
+		if !files.Exists(out) {
+			GetLogger().Debugf("not generating '%s' since it would be empty", base)
+			return nil
+		}
+		GetLogger().Debugf("removing '%s' since it's empty", base)
+		if err := os.RemoveAll(out); err != nil {
+			GetLogger().Warnf("failed to delete '%s': %v", base, err)
+		}
+		return nil
+	}
+
 	if err := os.MkdirAll(filepath.Dir(out), files.RwxRxRxRx); err != nil && !errors.Is(err, fs.ErrExist) {
 		return fmt.Errorf("mkdir: %w", err)
 	}
 
 	// affect the right rights to out file
 	mode := files.RwRR
-	if slices.Contains([]string{".sh"}, filepath.Ext(out)) {
+	if exeRegex.MatchString(filepath.Ext(out)) {
 		mode = files.RwxRxRxRx
 	}
 
@@ -206,8 +227,8 @@ func ExecuteTemplate(tmpl *template.Template, data any, out string) error {
 	}
 	defer file.Close()
 
-	if err := tmpl.Execute(file, data); err != nil {
-		return fmt.Errorf("template execution: %w", err)
+	if _, err := file.Write(buf.Bytes()); err != nil {
+		return fmt.Errorf("write file: %w", err)
 	}
 
 	// force refresh rights

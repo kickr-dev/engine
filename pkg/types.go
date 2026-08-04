@@ -36,8 +36,11 @@ type Template[T any] struct {
 	// Delimiters is the pair of delimiters used to parse template file(s).
 	Delimiters
 
+	// EmptyPolicy is the policy to apply when the generated file is empty.
+	EmptyPolicy EmptyPolicy
+
 	// GeneratePolicy is the generation policy of the current file.
-	GeneratePolicy Policy
+	GeneratePolicy GeneratePolicy
 
 	// Globs is the slice of globs or specific files to parse during go templating.
 	//
