@@ -20,7 +20,7 @@ func FuncMap() template.FuncMap {
 	return template.FuncMap{
 		"cutAfter": cutAfter,
 		"map":      mergeMaps,
-		"toSlug":   toSlug,
+		"toSlug":   ToSlug,
 		"toQuery":  toQuery,
 		"toYaml":   toYAML,
 	}
@@ -69,9 +69,9 @@ func toYAML(v any) string {
 
 var slugRegexp = regexp.MustCompile("[^a-zA-Z0-9]+")
 
-// toSlug transforms an input string into its toSlug representation,
+// ToSlug transforms an input string into its slug representation,
 // keeping only letters and numbers and replacing everything else by the dash '-'.
-func toSlug(in string) string {
+func ToSlug(in string) string {
 	spaced := strings.TrimSpace(slugRegexp.ReplaceAllString(in, " "))
 	return strings.ToLower(strings.ReplaceAll(spaced, " ", "-"))
 }
