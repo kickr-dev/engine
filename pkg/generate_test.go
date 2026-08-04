@@ -25,7 +25,7 @@ func TestGenerate(t *testing.T) {
 		parser := func(context.Context, string, *testconfig) error { return errors.New("some error") }
 
 		// Act
-		_, err := engine.Generate(ctx, destdir, testconfig{}, []engine.Parser[testconfig]{parser}, nil)
+		err := engine.Generate(ctx, destdir, testconfig{}, []engine.Parser[testconfig]{parser}, nil)
 
 		// Assert
 		assert.ErrorContains(t, err, "some error")
@@ -38,7 +38,7 @@ func TestGenerate(t *testing.T) {
 		require.NoError(t, os.Mkdir(filepath.Join(destdir, template.Out), files.RwxRxRxRx))
 
 		// Act
-		_, err := engine.Generate(ctx, destdir, testconfig{},
+		err := engine.Generate(ctx, destdir, testconfig{},
 			[]engine.Parser[testconfig]{nooparser},
 			[]engine.Generator[testconfig]{engine.GeneratorTemplates(os.DirFS(destdir), []engine.Template[testconfig]{template})})
 
@@ -55,7 +55,7 @@ func TestGenerate(t *testing.T) {
 		}
 
 		// Act
-		_, err := engine.Generate(ctx, destdir, testconfig{},
+		err := engine.Generate(ctx, destdir, testconfig{},
 			[]engine.Parser[testconfig]{nooparser},
 			[]engine.Generator[testconfig]{engine.GeneratorTemplates(os.DirFS(destdir), []engine.Template[testconfig]{template})})
 
@@ -80,7 +80,7 @@ func TestGenerate(t *testing.T) {
 		require.NoError(t, file.Close())
 
 		// Act
-		_, err = engine.Generate(ctx, destdir, testconfig{},
+		err = engine.Generate(ctx, destdir, testconfig{},
 			[]engine.Parser[testconfig]{nooparser},
 			[]engine.Generator[testconfig]{engine.GeneratorTemplates(os.DirFS(destdir), []engine.Template[testconfig]{template})})
 

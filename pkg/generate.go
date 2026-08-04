@@ -15,14 +15,14 @@ var ErrFailedGeneration = errors.New("some error(s) occurred during generation")
 //
 // It executes all parsers given in options (or default ones)
 // and then iterates over provided templates to apply or remove those.
-func Generate[T any](ctx context.Context, destdir string, config T, parsers []Parser[T], generators []Generator[T]) (T, error) {
+func Generate[T any](ctx context.Context, destdir string, config T, parsers []Parser[T], generators []Generator[T]) error {
 	// parse repository
 	errs := make([]error, 0, len(parsers))
 	for _, parser := range parsers {
 		errs = append(errs, parser(ctx, destdir, &config))
 	}
 	if err := errors.Join(errs...); err != nil {
-		return config, err
+		return err
 	}
 
 	// execute generators
@@ -36,7 +36,7 @@ func Generate[T any](ctx context.Context, destdir string, config T, parsers []Pa
 		}
 	}
 	if errcount > 0 {
-		return config, ErrFailedGeneration
+		return ErrFailedGeneration
 	}
-	return config, nil
+	return nil
 }
