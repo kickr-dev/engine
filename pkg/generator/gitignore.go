@@ -15,6 +15,9 @@ import (
 // FileGitignore is the filename representation for .gitignore.
 const FileGitignore = ".gitignore"
 
+// ErrNoClient is returned when input HTTP client is nil.
+var ErrNoClient = errors.New("no client provided")
+
 var (
 	// ErrInvalidResponse is returned when an HTTP request response status isn't 2XX.
 	//
