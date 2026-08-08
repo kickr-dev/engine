@@ -90,4 +90,30 @@ func TestParsePlatform(t *testing.T) {
 		assert.True(t, ok)
 		assert.Equal(t, GitLab, platform)
 	})
+
+	t.Run("not_found_short_alias_dropped", func(t *testing.T) {
+		// Arrange: "gh"/"gl"/"bb" used to match here but were dropped as too ambiguous
+		// (substrings of unrelated hostnames), see parsePlatform.
+		host := "gh.entreprise.com"
+
+		// Act
+		platform, ok := parsePlatform(host)
+
+		// Assert
+		assert.False(t, ok)
+		assert.Empty(t, platform)
+	})
+
+	t.Run("found_bitbucket_stash_no_ambiguity", func(t *testing.T) {
+		// Arrange: both candidates map to the same platform, so this isn't ambiguous,
+		// just a sanity check that overlapping candidates still resolve deterministically.
+		host := "stash-bitbucket.example.com"
+
+		// Act
+		platform, ok := parsePlatform(host)
+
+		// Assert
+		assert.True(t, ok)
+		assert.Equal(t, Bitbucket, platform)
+	})
 }
