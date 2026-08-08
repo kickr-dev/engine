@@ -19,6 +19,10 @@ type VCS struct {
 	Name string
 
 	// Platform represents the vcs platform hosting the project.
+	//
+	// Self-hosted or aliased hosts that don't contain 'bitbucket', 'gitea', 'github', 'gitlab' or 'stash'
+	// won't have their platform detected.
+	// In such cases, override manually the attribute.
 	Platform string
 
 	// ProjectHost represents the host where the project is hosted.
@@ -36,17 +40,19 @@ type VCS struct {
 
 // parsePlatform returns the platform name associated to input host.
 func parsePlatform(host string) (string, bool) {
-	matchers := map[string][]string{
-		Bitbucket: {"bb", Bitbucket, "stash"},
-		Gitea:     {Gitea},
-		GitHub:    {GitHub, "gh"},
-		GitLab:    {GitLab, "gl"},
+	matchers := []struct {
+		platform   string
+		candidates []string
+	}{
+		{GitHub, []string{GitHub}},
+		{GitLab, []string{GitLab}},
+		{Gitea, []string{Gitea}},
+		{Bitbucket, []string{Bitbucket, "stash"}},
 	}
-
-	for platform, candidates := range matchers {
-		for _, candidate := range candidates {
+	for _, m := range matchers {
+		for _, candidate := range m.candidates {
 			if strings.Contains(host, candidate) {
-				return platform, true
+				return m.platform, true
 			}
 		}
 	}
