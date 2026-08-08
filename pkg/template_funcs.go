@@ -2,9 +2,10 @@ package engine
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"net/url"
 	"regexp"
-	"strconv"
 	"strings"
 	"text/template"
 
@@ -33,20 +34,21 @@ func cutAfter(in, sep string) string {
 	return out
 }
 
-// mergeMaps mergs all src maps (an error is added to result map if those aren't maps) into dst map.
-func mergeMaps(dst map[string]any, src ...any) map[string]any {
+// mergeMaps merges all src maps into dst map,
+// returning a joined error if any src isn't a map or fails to merge.
+func mergeMaps(dst map[string]any, src ...any) (map[string]any, error) {
+	errs := make([]error, 0, len(src))
 	for i, in := range src {
 		var cast map[string]any
 		if err := mapstructure.Decode(in, &cast); err != nil {
-			dst[strconv.Itoa(i)+"_decode_error"] = err.Error()
+			errs = append(errs, fmt.Errorf("decode src %d: %w", i, err))
 			continue
 		}
-		if err := mergo.Merge(&dst, cast); err != nil {
-			dst[strconv.Itoa(i)+"_merge_error"] = err.Error()
-			continue
+		if err := mergo.Merge(&dst, cast, mergo.WithOverride); err != nil {
+			errs = append(errs, fmt.Errorf("merge src %d: %w", i, err))
 		}
 	}
-	return dst
+	return dst, errors.Join(errs...)
 }
 
 // toQuery transforms a specific into its query parameter format.
