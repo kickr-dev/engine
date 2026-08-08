@@ -1,20 +1,20 @@
 /*
 Package generator exposes a bunch of functions to be wrapped with generate.Generator function signature.
 
-Examples:
+# Example
 
 	type config struct { ... }
 
-	func GeneratorGitignore(ctx context.Context, destdir string, c config) error {
-		return generator.DownloadGitignore(ctx, cleanhttp.DefaultClient(), filepath.Join(destdir, generator.FileGitignore), "java", "linux")
+	func CustomGenerator(ctx context.Context, destdir string, c config) error {
+		...
 	}
 
-	var _ generate.Generator[config] = GeneratorGitignore // ensure interface is implemented
+	var _ generate.Generator[config] = CustomGenerator // ensure interface is implemented
 
 	// single generator call
 	func main() {
 		var c config
-		err := generator.GeneratorGitignore(ctx, "path/to/dir", c)
+		err := CustomGenerator(ctx, "path/to/dir", c)
 		// handle err
 	}
 
@@ -23,7 +23,7 @@ Examples:
 		destdir, _ := os.Getwd()
 
 		var c config
-		err := engine.Generate(ctx, destdir, c, ..., []engine.Generator[config]{GeneratorGitignore})
+		err := engine.Generate(ctx, destdir, c, ..., []engine.Generator[config]{CustomGenerator})
 		// handle err
 	}
 */
