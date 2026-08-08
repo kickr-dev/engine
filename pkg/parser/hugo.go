@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"path/filepath"
 
 	"github.com/kickr-dev/engine/pkg/files"
 )
@@ -68,9 +67,11 @@ var ErrNoHugo = errors.New("no hugo or hugo theme configuration found")
 //		return nil
 //	}
 func ReadHugo(destdir string) (HugoCompose, error) {
+	fsys := os.DirFS(destdir)
+
 	type read struct {
 		Name string
-		Read func(src string, out any, read func(src string) ([]byte, error)) error
+		Read func(fsys fs.FS, src string, out any) error
 	}
 
 	// read themes
@@ -81,7 +82,7 @@ func ReadHugo(destdir string) (HugoCompose, error) {
 	}
 	for _, file := range themes {
 		var config HugoTheme
-		if err := file.Read(filepath.Join(destdir, file.Name), &config, os.ReadFile); err != nil {
+		if err := file.Read(fsys, file.Name, &config); err != nil {
 			if errors.Is(err, fs.ErrNotExist) {
 				continue
 			}
@@ -98,7 +99,7 @@ func ReadHugo(destdir string) (HugoCompose, error) {
 	}
 	for _, file := range configs {
 		var config HugoConfig
-		if err := file.Read(filepath.Join(destdir, file.Name), &config, os.ReadFile); err != nil {
+		if err := file.Read(fsys, file.Name, &config); err != nil {
 			if errors.Is(err, fs.ErrNotExist) {
 				continue
 			}

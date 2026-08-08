@@ -18,21 +18,13 @@ type testconfig struct {
 }
 
 func TestReadYAML(t *testing.T) {
-	t.Run("error_nil_read", func(t *testing.T) {
-		// Act
-		err := files.ReadYAML("", "", nil)
-
-		// Assert
-		assert.ErrorIs(t, err, files.ErrNilRead)
-	})
-
 	t.Run("error_not_found", func(t *testing.T) {
 		// Arrange
-		src := filepath.Join(t.TempDir(), "file.yaml")
+		dir := t.TempDir()
 
 		// Act
 		var c testconfig
-		err := files.ReadYAML(src, &c, os.ReadFile)
+		err := files.ReadYAML(os.DirFS(dir), "file.yaml", &c)
 
 		// Assert
 		assert.ErrorIs(t, err, fs.ErrNotExist)
@@ -40,12 +32,12 @@ func TestReadYAML(t *testing.T) {
 
 	t.Run("error_read", func(t *testing.T) {
 		// Arrange
-		src := filepath.Join(t.TempDir(), "file.yaml")
-		require.NoError(t, os.Mkdir(src, files.RwxRxRxRx))
+		dir := t.TempDir()
+		require.NoError(t, os.Mkdir(filepath.Join(dir, "file.yaml"), files.RwxRxRxRx))
 
 		// Act
 		var c testconfig
-		err := files.ReadYAML(filepath.Dir(src), &c, os.ReadFile)
+		err := files.ReadYAML(os.DirFS(dir), "file.yaml", &c)
 
 		// Assert
 		assert.ErrorContains(t, err, "read file")
@@ -53,12 +45,12 @@ func TestReadYAML(t *testing.T) {
 
 	t.Run("error_unmarshal", func(t *testing.T) {
 		// Arrange
-		src := filepath.Join(t.TempDir(), "file.yaml")
-		require.NoError(t, os.WriteFile(src, []byte(`{ "string":>> "value" }`), files.RwRR))
+		dir := t.TempDir()
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "file.yaml"), []byte(`{ "string":>> "value" }`), files.RwRR))
 
 		// Act
 		var c testconfig
-		err := files.ReadYAML(src, &c, os.ReadFile)
+		err := files.ReadYAML(os.DirFS(dir), "file.yaml", &c)
 
 		// Assert
 		assert.ErrorContains(t, err, "unmarshal")
@@ -67,7 +59,8 @@ func TestReadYAML(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		// Arrange
-		src := filepath.Join(t.TempDir(), "file.yaml")
+		dir := t.TempDir()
+		src := filepath.Join(dir, "file.yaml")
 		expected := testconfig{
 			Slice:  []string{"value"},
 			String: "value",
@@ -76,7 +69,28 @@ func TestReadYAML(t *testing.T) {
 
 		// Act
 		var actual testconfig
-		err := files.ReadYAML(src, &actual, os.ReadFile)
+		err := files.ReadYAML(os.DirFS(dir), "file.yaml", &actual)
+
+		// Assert
+		require.NoError(t, err)
+		assert.Equal(t, expected, actual)
+	})
+}
+
+func TestReadYAMLFunc(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// Arrange
+		dir := t.TempDir()
+		src := filepath.Join(dir, "file.yaml")
+		expected := testconfig{
+			Slice:  []string{"value"},
+			String: "value",
+		}
+		require.NoError(t, files.WriteYAML(src, expected))
+
+		// Act
+		var actual testconfig
+		err := files.ReadYAMLFunc(os.DirFS(dir), "file.yaml")(&actual)
 
 		// Assert
 		require.NoError(t, err)
@@ -99,7 +113,7 @@ func TestWriteYAML(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		// Arrange
-		src := filepath.Join(t.TempDir(), "file.yaml")
+		src := filepath.Join(t.TempDir(), "dir", "file.yaml")
 		expected := testconfig{
 			Slice:  []string{"value"},
 			String: "value",
@@ -110,7 +124,7 @@ func TestWriteYAML(t *testing.T) {
 
 		// Assert
 		var actual testconfig
-		err := files.ReadYAML(src, &actual, os.ReadFile)
+		err := files.ReadYAML(os.DirFS(filepath.Dir(src)), filepath.Base(src), &actual)
 		require.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})

@@ -23,13 +23,11 @@ var ErrNilRead = errors.New("read function is nil")
 // Example:
 //
 //	func main() {
-//		err := files.Validate(
-//			func(out any) error { return files.ReadJSON("path/to/schema", out, os.ReadFile) },
-//			func(out any) error { return files.ReadYAML("path/to/file/to/validate", out, os.ReadFile) },
-//		)
+//		fsys := os.DirFS(".")
+//		err := files.Validate(files.ReadJSONFunc(fsys, "path/to/schema"), files.ReadYAMLFunc(fsys, "path/to/file/to/validate"))
 //		// handle err
 //	}
-func Validate(readSchema, readFile func(v any) error) error {
+func Validate(readSchema, readFile func(out any) error) error {
 	if readSchema == nil || readFile == nil {
 		return ErrNilRead
 	}

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 
 	"dario.cat/mergo"
 
@@ -57,7 +58,7 @@ func MergeValues(in any, filepaths ...string) (map[string]any, error) {
 
 	for _, path := range filepaths {
 		var overrides map[string]any
-		if err := files.ReadYAML(path, &overrides, os.ReadFile); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		if err := files.ReadYAML(os.DirFS(filepath.Dir(path)), filepath.Base(path), &overrides); err != nil && !errors.Is(err, fs.ErrNotExist) {
 			return nil, fmt.Errorf("read yaml: %w", err)
 		}
 		if err := mergo.Merge(&out, overrides, mergo.WithOverride); err != nil {

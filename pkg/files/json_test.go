@@ -13,21 +13,13 @@ import (
 )
 
 func TestReadJSON(t *testing.T) {
-	t.Run("error_nil_read", func(t *testing.T) {
-		// Act
-		err := files.ReadJSON("", "", nil)
-
-		// Assert
-		assert.ErrorIs(t, err, files.ErrNilRead)
-	})
-
 	t.Run("error_not_found", func(t *testing.T) {
 		// Arrange
-		src := filepath.Join(t.TempDir(), "file.json")
+		dir := t.TempDir()
 
 		// Act
 		var c testconfig
-		err := files.ReadJSON(src, &c, os.ReadFile)
+		err := files.ReadJSON(os.DirFS(dir), "file.json", &c)
 
 		// Assert
 		assert.ErrorIs(t, err, fs.ErrNotExist)
@@ -35,12 +27,12 @@ func TestReadJSON(t *testing.T) {
 
 	t.Run("error_read", func(t *testing.T) {
 		// Arrange
-		src := filepath.Join(t.TempDir(), "file.json")
-		require.NoError(t, os.Mkdir(src, files.RwxRxRxRx))
+		dir := t.TempDir()
+		require.NoError(t, os.Mkdir(filepath.Join(dir, "file.json"), files.RwxRxRxRx))
 
 		// Act
 		var c testconfig
-		err := files.ReadJSON(filepath.Dir(src), &c, os.ReadFile)
+		err := files.ReadJSON(os.DirFS(dir), "file.json", &c)
 
 		// Assert
 		assert.ErrorContains(t, err, "read file")
@@ -48,12 +40,12 @@ func TestReadJSON(t *testing.T) {
 
 	t.Run("error_unmarshal", func(t *testing.T) {
 		// Arrange
-		src := filepath.Join(t.TempDir(), "file.json")
-		require.NoError(t, os.WriteFile(src, []byte(`{ "key":: "value" }`), files.RwRR))
+		dir := t.TempDir()
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "file.json"), []byte(`{ "key":: "value" }`), files.RwRR))
 
 		// Act
 		var c testconfig
-		err := files.ReadJSON(src, &c, os.ReadFile)
+		err := files.ReadJSON(os.DirFS(dir), "file.json", &c)
 
 		// Assert
 		assert.ErrorContains(t, err, "unmarshal")
@@ -61,7 +53,8 @@ func TestReadJSON(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		// Arrange
-		src := filepath.Join(t.TempDir(), "file.json")
+		dir := t.TempDir()
+		src := filepath.Join(dir, "file.json")
 		expected := testconfig{
 			Slice:  []string{"value"},
 			String: "value",
@@ -70,7 +63,28 @@ func TestReadJSON(t *testing.T) {
 
 		// Act
 		var actual testconfig
-		err := files.ReadJSON(src, &actual, os.ReadFile)
+		err := files.ReadJSON(os.DirFS(dir), "file.json", &actual)
+
+		// Assert
+		require.NoError(t, err)
+		assert.Equal(t, expected, actual)
+	})
+}
+
+func TestReadJSONFunc(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// Arrange
+		dir := t.TempDir()
+		src := filepath.Join(dir, "file.json")
+		expected := testconfig{
+			Slice:  []string{"value"},
+			String: "value",
+		}
+		require.NoError(t, files.WriteJSON(src, expected))
+
+		// Act
+		var actual testconfig
+		err := files.ReadJSONFunc(os.DirFS(dir), "file.json")(&actual)
 
 		// Assert
 		require.NoError(t, err)
@@ -93,7 +107,7 @@ func TestWriteJSON(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		// Arrange
-		src := filepath.Join(t.TempDir(), "file.json")
+		src := filepath.Join(t.TempDir(), "dir", "file.json")
 		expected := testconfig{
 			Slice:  []string{"value"},
 			String: "value",
@@ -104,7 +118,7 @@ func TestWriteJSON(t *testing.T) {
 
 		// Assert
 		var actual testconfig
-		err := files.ReadJSON(src, &actual, os.ReadFile)
+		err := files.ReadJSON(os.DirFS(filepath.Dir(src)), filepath.Base(src), &actual)
 		require.NoError(t, err)
 		assert.Equal(t, expected, actual)
 	})
