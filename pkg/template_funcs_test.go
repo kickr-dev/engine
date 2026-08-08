@@ -11,26 +11,46 @@ import (
 
 func TestMergeMaps(t *testing.T) {
 	fm := engine.FuncMap()["map"]
-	mergeMap, ok := fm.(func(dest map[string]any, src ...any) map[string]any)
+	mergeMap, ok := fm.(func(dest map[string]any, src ...any) (map[string]any, error))
 	require.True(t, ok)
 
 	t.Run("error_decode", func(t *testing.T) {
 		// Act
-		m := mergeMap(map[string]any{}, "hey !")
+		m, err := mergeMap(map[string]any{}, "hey !")
 
 		// Assert
-		assert.Equal(t, map[string]any{"0_decode_error": "'' expected type 'map[string]interface {}', got unconvertible type 'string'"}, m)
+		assert.ErrorContains(t, err, "decode src 0")
+		assert.Equal(t, map[string]any{}, m)
+	})
+
+	t.Run("error_decode_accumulates_all_sources", func(t *testing.T) {
+		// Act
+		_, err := mergeMap(map[string]any{}, "hey !", "ho !")
+
+		// Assert
+		assert.ErrorContains(t, err, "decode src 0")
+		assert.ErrorContains(t, err, "decode src 1")
 	})
 
 	t.Run("success", func(t *testing.T) {
 		// Act
-		m := mergeMap(map[string]any{"key": "value"}, map[string]any{"key_one": "value"})
+		m, err := mergeMap(map[string]any{"key": "value"}, map[string]any{"key_one": "value"})
 
 		// Assert
+		require.NoError(t, err)
 		assert.Equal(t, map[string]any{
 			"key":     "value",
 			"key_one": "value",
 		}, m)
+	})
+
+	t.Run("success_src_overrides_dst", func(t *testing.T) {
+		// Act
+		m, err := mergeMap(map[string]any{"key": "original"}, map[string]any{"key": "overridden"})
+
+		// Assert
+		require.NoError(t, err)
+		assert.Equal(t, map[string]any{"key": "overridden"}, m)
 	})
 }
 
