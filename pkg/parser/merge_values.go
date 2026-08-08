@@ -52,8 +52,13 @@ import (
 func MergeValues(in any, filepaths ...string) (map[string]any, error) {
 	out := map[string]any{}
 	if in != nil {
-		bytes, _ := json.Marshal(in)
-		_ = json.Unmarshal(bytes, &out)
+		bytes, err := json.Marshal(in)
+		if err != nil {
+			return nil, fmt.Errorf("marshal base values: %w", err)
+		}
+		if err := json.Unmarshal(bytes, &out); err != nil {
+			return nil, fmt.Errorf("unmarshal base values: %w", err)
+		}
 	}
 
 	for _, path := range filepaths {

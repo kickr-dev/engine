@@ -127,7 +127,7 @@ func ReadGomod(destdir string) (Gomod, error) {
 	}
 	gomod.Go = file.Go.Version
 	if file.Toolchain != nil {
-		gomod.Toolchain = file.Toolchain.Name[2:]
+		gomod.Toolchain = strings.TrimPrefix(file.Toolchain.Name, "go")
 	}
 
 	// populate tools to add behaviors on it if necessary

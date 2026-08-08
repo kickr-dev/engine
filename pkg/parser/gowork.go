@@ -130,7 +130,7 @@ func ReadGowork(destdir string) (Gowork, error) {
 	}
 	gowork.Go = file.Go.Version
 	if file.Toolchain != nil {
-		gowork.Toolchain = file.Toolchain.Name[2:]
+		gowork.Toolchain = strings.TrimPrefix(file.Toolchain.Name, "go")
 	}
 
 	var (
