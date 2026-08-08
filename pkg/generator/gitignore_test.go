@@ -13,7 +13,7 @@ import (
 	"github.com/kickr-dev/engine/pkg/generator"
 )
 
-func TestGitignore(t *testing.T) {
+func TestDownloadGitignore(t *testing.T) {
 	ctx := t.Context()
 
 	httpmock.Activate()
