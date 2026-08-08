@@ -2,6 +2,7 @@ package engine //nolint:testpackage
 
 import (
 	"strings"
+	"sync"
 	"testing"
 	"text/template"
 
@@ -37,9 +38,24 @@ func TestConfigure(t *testing.T) {
 		logger.Infof("some text to verify")
 		assert.Equal(t, "some text to verify", buf.String())
 
-		require.NotNil(t, o.funcs)
-		f, ok := o.funcs["hello"].(func() string)
+		require.NotNil(t, funcs())
+		f, ok := funcs()["hello"].(func() string)
 		require.True(t, ok)
 		assert.Equal(t, "hello", f())
+	})
+
+	t.Run("concurrent_configure_and_reads", func(_ *testing.T) {
+		// Arrange
+		var wg sync.WaitGroup
+
+		// Act
+		for i := range 20 {
+			wg.Go(func() { Configure(WithForce(i%2 == 0)) })
+			wg.Go(func() { GetLogger() })
+			wg.Go(func() { Forced() })
+		}
+		wg.Wait()
+
+		// Assert: no data race (run with -race), no panic
 	})
 }
