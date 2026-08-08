@@ -9,7 +9,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"regexp"
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
@@ -80,7 +79,7 @@ func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T
 
 		GetLogger().Debugf("removing '%s'", tmpl.Out)
 		if err := os.RemoveAll(out); err != nil {
-			GetLogger().Warnf("failed to delete '%s': %v", tmpl.Out, err)
+			return fmt.Errorf("remove '%s': %w", tmpl.Out, err)
 		}
 		return nil
 	}
@@ -106,7 +105,7 @@ func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T
 		if err != nil {
 			return fmt.Errorf("parse template file(s): %w", err)
 		}
-		if err := ExecuteTemplate(tt, config, out, tmpl.EmptyPolicy); err != nil {
+		if err := ExecuteTemplate(tt, config, out, tmpl.EmptyPolicy, tmpl.Mode); err != nil {
 			return fmt.Errorf("template execute: %w", err)
 		}
 	}
@@ -142,7 +141,11 @@ func ApplyPatches[T any](fsys fs.FS, destdir string, tmpl Template[T], data any)
 			return fmt.Errorf("apply diff: %w", err)
 		}
 
-		if _, err := file.Write(output.Bytes()); err != nil {
+		// truncate manually (instead of os.O_TRUNC) and after apply because patching needs the initial content
+		if err := file.Truncate(int64(output.Len())); err != nil {
+			return fmt.Errorf("truncate file: %w", err)
+		}
+		if _, err := file.WriteAt(output.Bytes(), 0); err != nil {
 			return fmt.Errorf("write file: %w", err)
 		}
 		return nil
@@ -186,13 +189,15 @@ func ApplyPatches[T any](fsys fs.FS, destdir string, tmpl Template[T], data any)
 	return errors.Join(errs...)
 }
 
-// exeRegex matches file extensions requiring the executable bit: any *sh extension (.sh, .bash, .zsh, ...) and .ps1.
-var exeRegex = regexp.MustCompile(`^\.(\w*sh|ps1)$`)
-
 // ExecuteTemplate runs tmpl.ExecuteTemplate with input data and write result into given out.
 //
-// When ExecuteTemplate is called, it truncates out in case it already exists and reevaluate its rights (specific to linux).
-func ExecuteTemplate(tmpl *template.Template, data any, out string, policy EmptyPolicy) error {
+// When ExecuteTemplate is called, it truncates out in case it already exists and reevaluate its rights.
+//
+// The input mode sets the requested file mode for the generated file (e.g. files.RwRR, files.RwxRxRxRx),
+// defaulting to files.RwRR when not provided.
+//
+// The system umask (see files.Umask) is always applied on top (mode &^ umask, no-op on non-compatible platforms).
+func ExecuteTemplate(tmpl *template.Template, data any, out string, policy EmptyPolicy, mode os.FileMode) error {
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, data); err != nil {
 		return fmt.Errorf("template execution: %w", err)
@@ -206,7 +211,7 @@ func ExecuteTemplate(tmpl *template.Template, data any, out string, policy Empty
 		}
 		GetLogger().Debugf("removing '%s' since it's empty", base)
 		if err := os.RemoveAll(out); err != nil {
-			GetLogger().Warnf("failed to delete '%s': %v", base, err)
+			return fmt.Errorf("remove '%s': %w", base, err)
 		}
 		return nil
 	}
@@ -215,13 +220,14 @@ func ExecuteTemplate(tmpl *template.Template, data any, out string, policy Empty
 		return fmt.Errorf("mkdir: %w", err)
 	}
 
-	// affect the right rights to out file
-	mode := files.RwRR
-	if exeRegex.MatchString(filepath.Ext(out)) {
-		mode = files.RwxRxRxRx
+	// affect the right rights to out file, honoring the system umask
+	requested := mode
+	if requested == 0 {
+		requested = files.RwRR
 	}
+	requested &^= files.Umask()
 
-	file, err := os.OpenFile(out, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, mode)
+	file, err := os.OpenFile(out, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, requested)
 	if err != nil {
 		return fmt.Errorf("open file: %w", err)
 	}
@@ -232,7 +238,7 @@ func ExecuteTemplate(tmpl *template.Template, data any, out string, policy Empty
 	}
 
 	// force refresh rights
-	if err := file.Chmod(mode); err != nil {
+	if err := file.Chmod(requested); err != nil {
 		return fmt.Errorf("chmod: %w", err)
 	}
 	return nil

@@ -100,6 +100,28 @@ func TestApplyTemplate(t *testing.T) {
 		assert.Equal(t, buf.String(), fmt.Sprintf("not generating '%s' since it already exists (or was modified manually)", template.Out))
 	})
 
+	t.Run("error_remove", func(t *testing.T) {
+		if os.Geteuid() == 0 {
+			t.Skip("running as root bypasses permission checks")
+		}
+
+		// Arrange
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			Out:    "file.txt",
+			Remove: func(testconfig) bool { return true },
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Out), []byte("content"), files.RwRR))
+		require.NoError(t, os.Chmod(destdir, 0o500))
+		t.Cleanup(func() { _ = os.Chmod(destdir, files.RwxRxRxRx) })
+
+		// Act
+		err := engine.ApplyTemplate(os.DirFS(destdir), destdir, template, testconfig{})
+
+		// Assert
+		assert.ErrorContains(t, err, "remove")
+	})
+
 	t.Run("success_custom_func", func(t *testing.T) {
 		// Arrange
 		srcdir := t.TempDir()
@@ -344,6 +366,35 @@ index 332d5ce..39af8aa 100644
 		assert.Equal(t, "value", string(content))
 	})
 
+	t.Run("success_update_shorter", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			Out:     "file.txt",
+			Patches: []string{"file.patch"},
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Out), []byte("some replaced value in non empty file"), files.RwRR))
+		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Patches[0]), []byte(`
+diff --git a/file.txt b/file.txt
+index 332d5ce..39af8aa 100644
+--- a/file.txt
++++ b/file.txt
+@@ -1 +1 @@
+-some replaced value in non empty file
+\ No newline at end of file
++some not empty file
+\ No newline at end of file`), files.RwRR))
+
+		// Act
+		err := engine.ApplyPatches(os.DirFS(destdir), destdir, template, testconfig{})
+
+		// Assert
+		require.NoError(t, err)
+		content, err := os.ReadFile(filepath.Join(destdir, template.Out))
+		require.NoError(t, err)
+		assert.Equal(t, "some not empty file", string(content))
+	})
+
 	t.Run("success_update", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()
@@ -390,7 +441,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, nil, dest, engine.PolicyRemove)
+		err = engine.ExecuteTemplate(tmpl, nil, dest, engine.PolicyRemove, 0)
 
 		// Assert
 		assert.ErrorContains(t, err, "mkdir")
@@ -405,7 +456,7 @@ func TestExecuteTemplate(t *testing.T) {
 		tmpl := template.New("template.txt").Funcs(engine.FuncMap())
 
 		// Act
-		err := engine.ExecuteTemplate(tmpl, nil, dest, engine.PolicyRemove)
+		err := engine.ExecuteTemplate(tmpl, nil, dest, engine.PolicyRemove, 0)
 
 		// Assert
 		assert.ErrorContains(t, err, "template execution")
@@ -432,7 +483,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, data, filepath.Dir(dest), engine.PolicyRemove)
+		err = engine.ExecuteTemplate(tmpl, data, filepath.Dir(dest), engine.PolicyRemove, 0)
 
 		// Assert
 		assert.ErrorContains(t, err, "open file")
@@ -460,7 +511,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, data, dest, engine.PolicyRemove)
+		err = engine.ExecuteTemplate(tmpl, data, dest, engine.PolicyRemove, 0)
 
 		// Assert
 		require.NoError(t, err)
@@ -469,33 +520,52 @@ func TestExecuteTemplate(t *testing.T) {
 		assert.Equal(t, "hey ! A name", string(content))
 	})
 
-	t.Run("success_exec", func(t *testing.T) {
-		for _, ext := range []string{".sh", ".bash", ".zsh", ".ps1"} {
-			t.Run(ext, func(t *testing.T) {
-				// Arrange
-				tmp := t.TempDir()
+	t.Run("success_mode_default", func(t *testing.T) {
+		// Arrange
+		tmp := t.TempDir()
 
-				src := filepath.Join(tmp, "template"+ext)
-				err := os.WriteFile(src, []byte("#!/bin/...\necho 'hey'"), files.RwRR)
-				require.NoError(t, err)
+		src := filepath.Join(tmp, "template.txt")
+		require.NoError(t, os.WriteFile(src, []byte("content"), files.RwRR))
 
-				dest := filepath.Join(tmp, "script"+ext)
+		dest := filepath.Join(tmp, "result.txt")
 
-				tmpl, err := template.New("template" + ext).
-					Funcs(engine.FuncMap()).
-					ParseFiles(src)
-				require.NoError(t, err)
+		tmpl, err := template.New("template.txt").
+			Funcs(engine.FuncMap()).
+			ParseFiles(src)
+		require.NoError(t, err)
 
-				// Act
-				err = engine.ExecuteTemplate(tmpl, map[string]any{}, dest, engine.PolicyRemove)
+		// Act
+		err = engine.ExecuteTemplate(tmpl, nil, dest, engine.PolicyRemove, 0)
 
-				// Assert
-				require.NoError(t, err)
-				info, err := os.Stat(dest)
-				require.NoError(t, err)
-				assert.Equal(t, files.RwxRxRxRx, info.Mode())
-			})
-		}
+		// Assert
+		require.NoError(t, err)
+		info, err := os.Stat(dest)
+		require.NoError(t, err)
+		assert.Equal(t, files.RwRR&^files.Umask(), info.Mode())
+	})
+
+	t.Run("success_mode_explicit", func(t *testing.T) {
+		// Arrange
+		tmp := t.TempDir()
+
+		src := filepath.Join(tmp, "template.sh")
+		require.NoError(t, os.WriteFile(src, []byte("#!/bin/..."), files.RwRR))
+
+		dest := filepath.Join(tmp, "script.sh")
+
+		tmpl, err := template.New("template.sh").
+			Funcs(engine.FuncMap()).
+			ParseFiles(src)
+		require.NoError(t, err)
+
+		// Act
+		err = engine.ExecuteTemplate(tmpl, map[string]any{}, dest, engine.PolicyKeep, files.RwxRxRxRx)
+
+		// Assert
+		require.NoError(t, err)
+		info, err := os.Stat(dest)
+		require.NoError(t, err)
+		assert.Equal(t, files.RwxRxRxRx&^files.Umask(), info.Mode())
 	})
 
 	t.Run("success_skip_empty", func(t *testing.T) {
@@ -513,7 +583,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, nil, dest, engine.PolicyRemove)
+		err = engine.ExecuteTemplate(tmpl, nil, dest, engine.PolicyRemove, 0)
 
 		// Assert
 		require.NoError(t, err)
@@ -537,13 +607,43 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, nil, dest, engine.PolicyKeep)
+		err = engine.ExecuteTemplate(tmpl, nil, dest, engine.PolicyKeep, 0)
 
 		// Assert
 		require.NoError(t, err)
 		content, err := os.ReadFile(dest)
 		require.NoError(t, err)
 		assert.Empty(t, content)
+	})
+
+	t.Run("error_remove_existing_empty", func(t *testing.T) {
+		if os.Geteuid() == 0 {
+			t.Skip("running as root bypasses permission checks")
+		}
+
+		// Arrange
+		tmp := t.TempDir()
+
+		src := filepath.Join(tmp, "template.txt")
+		require.NoError(t, os.WriteFile(src, nil, files.RwRR))
+
+		destdir := filepath.Join(tmp, "destdir")
+		require.NoError(t, os.Mkdir(destdir, files.RwxRxRxRx))
+		dest := filepath.Join(destdir, "template-result.txt")
+		require.NoError(t, os.WriteFile(dest, []byte("some not empty file"), files.RwRR))
+		require.NoError(t, os.Chmod(destdir, 0o500))
+		t.Cleanup(func() { _ = os.Chmod(destdir, files.RwxRxRxRx) })
+
+		tmpl, err := template.New("template.txt").
+			Funcs(engine.FuncMap()).
+			ParseFiles(src)
+		require.NoError(t, err)
+
+		// Act
+		err = engine.ExecuteTemplate(tmpl, nil, dest, engine.PolicyRemove, 0)
+
+		// Assert
+		assert.ErrorContains(t, err, "remove")
 	})
 
 	t.Run("success_remove_existing_empty", func(t *testing.T) {
@@ -562,7 +662,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, nil, dest, engine.PolicyRemove)
+		err = engine.ExecuteTemplate(tmpl, nil, dest, engine.PolicyRemove, 0)
 
 		// Assert
 		require.NoError(t, err)

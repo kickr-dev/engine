@@ -3,6 +3,7 @@ package engine
 import (
 	"context"
 	"fmt"
+	"os"
 	"path"
 	"strings"
 )
@@ -52,6 +53,14 @@ type Template[T any] struct {
 	// Example:
 	// 	[]string{"path/to/file.yml.tmpl", "path/to/file-*.part.tmpl"}
 	Globs []string
+
+	// Mode sets the requested file mode for the generated file (e.g. files.RwRR, files.RwxRxRxRx),
+	// defaulting to files.RwRR when not provided.
+	//
+	// The system umask is always applied on top (mode &^ umask, no-op on non-compatible platforms),
+	// matching standard POSIX file-creation semantics, meaning the effective mode may be more
+	// restrictive than requested depending on the running user's umask.
+	Mode os.FileMode
 
 	// Out is the output file path.
 	//
