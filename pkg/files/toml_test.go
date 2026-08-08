@@ -77,3 +77,35 @@ func TestReadTOML(t *testing.T) {
 		assert.Equal(t, expected, actual)
 	})
 }
+
+func TestWriteTOML(t *testing.T) {
+	t.Run("error_open_file", func(t *testing.T) {
+		// Arrange
+		src := filepath.Join(t.TempDir(), "file.toml")
+		require.NoError(t, os.Mkdir(src, files.RwxRxRxRx))
+
+		// Act
+		err := files.WriteTOML(src, testconfig{})
+
+		// Assert
+		assert.ErrorContains(t, err, "write file")
+	})
+
+	t.Run("success", func(t *testing.T) {
+		// Arrange
+		src := filepath.Join(t.TempDir(), "file.toml")
+		expected := testconfig{
+			Slice:  []string{"value"},
+			String: "value",
+		}
+
+		// Act
+		require.NoError(t, files.WriteTOML(src, expected))
+
+		// Assert
+		var actual testconfig
+		err := files.ReadTOML(src, &actual, os.ReadFile)
+		require.NoError(t, err)
+		assert.Equal(t, expected, actual)
+	})
+}
