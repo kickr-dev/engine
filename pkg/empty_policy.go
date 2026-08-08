@@ -33,6 +33,9 @@ const (
 //   - it's empty
 //   - it contains only the generated notice
 //   - the policy is set to Keep
+//
+// Note: lines with the generated notice are completely stripped.
+// In case of additional comments, keep them out of the generated notice line.
 func IsEmpty(content []byte, policy EmptyPolicy) bool {
 	if policy == PolicyKeep {
 		return false
