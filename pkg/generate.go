@@ -30,7 +30,7 @@ func Generate[T any](ctx context.Context, destdir string, config T, parsers []Pa
 	for _, generator := range generators {
 		if err := generator(ctx, destdir, config); err != nil {
 			if !errors.Is(err, ErrFailedGeneration) {
-				GetLogger().Errorf(err.Error())
+				GetLogger().Errorf("%s", err.Error())
 			}
 			errcount++
 		}
