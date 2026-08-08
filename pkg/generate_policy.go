@@ -46,5 +46,7 @@ func ShouldGenerate(out string, policy GeneratePolicy) (bool, error) {
 		}
 		return false, err
 	}
+
+	// no reuse of IsEmpty: ShouldGenerate regenerates as soon as the notice appears anywhere in the file
 	return len(content) == 0 || generated.Match(content), nil
 }
