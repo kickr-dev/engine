@@ -93,9 +93,12 @@ func gitParseRemote(rawRemote string) (host, subpath string) {
 		originURL = "ssh://" + originURL
 	}
 
-	// try to parse originURL as a real URL, we should work in most cases (with port)
+	// try to parse originURL as a real URL, should work in most cases (with port)
 	u, err := url.Parse(originURL)
 	if err == nil {
+		if u.Path == "" {
+			return u.Host, ""
+		}
 		return u.Host, u.Path[1:]
 	}
 

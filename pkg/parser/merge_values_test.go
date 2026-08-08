@@ -26,6 +26,19 @@ func TestMergeValues(t *testing.T) {
 		assert.ErrorContains(t, err, "read yaml")
 	})
 
+	t.Run("error_unmarshalable_in", func(t *testing.T) {
+		// Arrange
+		in := struct {
+			C chan int
+		}{C: make(chan int)}
+
+		// Act
+		_, err := parser.MergeValues(in)
+
+		// Assert
+		assert.ErrorContains(t, err, "marshal base values")
+	})
+
 	t.Run("success_nil_in", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()

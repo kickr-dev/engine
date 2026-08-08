@@ -148,6 +148,15 @@ func TestGitParseRemote(t *testing.T) {
 		}
 	})
 
+	t.Run("path_less_remote", func(t *testing.T) {
+		// Act
+		host, subpath := gitParseRemote("https://github.com")
+
+		// Assert
+		assert.Equal(t, "github.com", host)
+		assert.Empty(t, subpath)
+	})
+
 	t.Run("success_port", func(t *testing.T) {
 		// Arrange
 		remotes := []string{
