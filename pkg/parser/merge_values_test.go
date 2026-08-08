@@ -26,6 +26,26 @@ func TestMergeValues(t *testing.T) {
 		assert.ErrorContains(t, err, "read yaml")
 	})
 
+	t.Run("success_nil_in", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+		chartdir := filepath.Join(destdir, "chart")
+		require.NoError(t, os.MkdirAll(chartdir, files.RwxRxRxRx))
+
+		custom := filepath.Join(chartdir, "values.custom.yaml")
+		err := os.WriteFile(custom, []byte("description: some description for testing purposes"), files.RwRR)
+		require.NoError(t, err)
+
+		expected := map[string]any{"description": "some description for testing purposes"}
+
+		// Act
+		values, err := parser.MergeValues(nil, custom)
+
+		// Assert
+		require.NoError(t, err)
+		assert.Equal(t, expected, values)
+	})
+
 	t.Run("success_merge_overrides", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()

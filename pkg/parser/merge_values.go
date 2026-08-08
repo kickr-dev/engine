@@ -14,7 +14,7 @@ import (
 
 // MergeValues merges all input values files into one and only map.
 //
-// It also takes an input values struct / map that could have been read beforehand
+// It can also takes an input values struct / map that could have been read beforehand
 // and marshals it with JSON as base values.
 //
 // All successive merges are made with override strategy,
@@ -48,19 +48,21 @@ import (
 //		// do something with values (e.g. update config since it's a pointer)
 //		return nil
 //	}
-func MergeValues(values any, filepaths ...string) (map[string]any, error) {
-	var chart map[string]any
-	bytes, _ := json.Marshal(values)
-	_ = json.Unmarshal(bytes, &chart)
+func MergeValues(in any, filepaths ...string) (map[string]any, error) {
+	out := map[string]any{}
+	if in != nil {
+		bytes, _ := json.Marshal(in)
+		_ = json.Unmarshal(bytes, &out)
+	}
 
 	for _, path := range filepaths {
 		var overrides map[string]any
 		if err := files.ReadYAML(path, &overrides, os.ReadFile); err != nil && !errors.Is(err, fs.ErrNotExist) {
 			return nil, fmt.Errorf("read yaml: %w", err)
 		}
-		if err := mergo.Merge(&chart, overrides, mergo.WithOverride); err != nil {
+		if err := mergo.Merge(&out, overrides, mergo.WithOverride); err != nil {
 			return nil, fmt.Errorf("merge '%s': %w", path, err)
 		}
 	}
-	return chart, nil
+	return out, nil
 }
