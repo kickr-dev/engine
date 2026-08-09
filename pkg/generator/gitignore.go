@@ -6,14 +6,16 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
+	"net/url"
 	"strings"
-
-	"github.com/kickr-dev/engine/pkg/files"
 )
 
-// FileGitignore is the filename representation for .gitignore.
-const FileGitignore = ".gitignore"
+const (
+	// FileGitignore is the filename representation for .gitignore.
+	FileGitignore = ".gitignore"
+	// GitignoreBaseURL is the toptal base URL to retrieves .gitignore templates.
+	GitignoreBaseURL = "https://www.toptal.com/developers/gitignore/api"
+)
 
 // ErrNoClient is returned when input HTTP client is nil.
 var ErrNoClient = errors.New("no client provided")
@@ -28,38 +30,24 @@ var (
 	ErrNoTemplates = errors.New("no templates provided")
 )
 
-// DownloadGitignore downloads a combined .gitginore with the help of https://docs.gitignore.io/use/api
-// and writes into input out obtained result.
-//
-// It can be used as a simple function, calling it directly,
-// but can also be used as its expected usage with engine.Generate:
-//
-//	type config struct { ... }
-//
-//	func GeneratorGitignore(ctx context.Context, destdir string, c config) error {
-//		return generator.DownloadGitignore(ctx, cleanhttp.DefaultClient(), filepath.Join(destdir, generator.FileGitignore), "java", "linux")
-//	}
-//
-// Note: Full list of templates is available here https://www.toptal.com/developers/gitignore/api/list.
-func DownloadGitignore(ctx context.Context, httpClient *http.Client, out string, templates ...string) error {
-	body, err := FetchGitignore(ctx, httpClient, templates...)
-	if err != nil {
-		return fmt.Errorf("fetch gitignore: %w", err)
-	}
-
-	if err := os.WriteFile(out, body, files.RwRR); err != nil {
-		return fmt.Errorf("write file: %w", err)
-	}
-	return nil
-}
-
-// FetchGitignore fetches a combined .gitignore with the help of https://docs.gitignore.io/use/api
+// FetchGitignore fetches a combined .gitignore using the [Gitignore API]
 // and returns the obtained result without writing it anywhere.
 //
 // It's meant for cases where the result must be templatized or combined
 // before being written, DownloadGitignore being the shortcut when it can be written as is.
 //
-// Note: Full list of templates is available here https://www.toptal.com/developers/gitignore/api/list.
+//	type config struct { ... }
+//
+//	func GeneratorGitignore(ctx context.Context, destdir string, c config) error {
+//		content, err := generator.FetchGitignore(ctx, cleanhttp.DefaultClient(), "java", "linux")
+//		// handle err
+//		...
+//	}
+//
+// Note: Full list of templates is available on [Gitignore listing].
+//
+// [Gitignore API]: https://docs.gitignore.io/use/api
+// [Gitignore listing]: https://www.toptal.com/developers/gitignore/api/list
 func FetchGitignore(ctx context.Context, httpClient *http.Client, templates ...string) ([]byte, error) {
 	if httpClient == nil {
 		return nil, ErrNoClient
@@ -68,27 +56,28 @@ func FetchGitignore(ctx context.Context, httpClient *http.Client, templates ...s
 		return nil, ErrNoTemplates
 	}
 
-	// create request
-	url := "https://www.toptal.com/developers/gitignore/api/" + strings.Join(templates, ",")
-	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	u, err := url.JoinPath(GitignoreBaseURL, strings.Join(templates, ","))
+	if err != nil {
+		return nil, fmt.Errorf("build gitignore url: %w", err)
+	}
+
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
 
-	// fetch .gitignore
 	response, err := httpClient.Do(request)
 	if err != nil {
-		return nil, fmt.Errorf("get '%s': %w", url, err)
+		return nil, fmt.Errorf("get '%s': %w", u, err)
 	}
 	defer response.Body.Close()
 
-	// read and validate body response
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, fmt.Errorf("read all: %w", err)
 	}
 	if response.StatusCode/100 != 2 {
-		return nil, fmt.Errorf("invalid response from '%s': %s: %w", url, string(body), ErrInvalidResponse)
+		return nil, fmt.Errorf("invalid response from '%s': %s: %w", u, string(body), ErrInvalidResponse)
 	}
 	return body, nil
 }
