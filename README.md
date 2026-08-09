@@ -113,11 +113,11 @@ flowchart TB
 
 ### Constants
 
-- `PolicyKeep` / `PolicyRemove`: `EmptyPolicy` values controlling whether an empty generated file is kept or removed (default `PolicyRemove`)
-- `PolicyAlways` / `PolicyNone`: `GeneratePolicy` values controlling whether a file is always generated or only per default behavior (default `PolicyNone`)
-- `TmplExtension` (`.tmpl`): extension for template files
 - `PartExtension` (`.part`): extension for template subparts, expected to be used with `TmplExtension`
 - `PatchExtension` (`.patch`): extension for template file patches
+- `PolicyAlways` / `PolicyNone`: `GeneratePolicy` values controlling whether a file is always generated or only per default behavior (default `PolicyNone`)
+- `PolicyKeep` / `PolicyRemove`: `EmptyPolicy` values controlling whether an empty generated file is kept or removed (default `PolicyRemove`)
+- `TmplExtension` (`.tmpl`): extension for template files
 
 ## Helpers
 
@@ -158,12 +158,14 @@ Fetch and download scaffolding content from external sources.
 #### Reference
 
 - `FetchGitignore`: fetches a `.gitignore` from [**toptal**](https://www.toptal.com/developers/gitignore)
-- `DownloadGitignore`: uses `FetchGitignore` to retrieve a `.gitignore` and saves it on disk
+- `FetchCodeOfConduct`: fetches the [**Contributor Covenant 3.0**](https://www.contributor-covenant.org/version/3/0/code_of_conduct/) markdown
 
 #### Constants
 
-- `FileGitignore` (`.gitignore`): default gitignore output filename
+- `CodeOfConductURL`: Contributor Covenant 3.0 markdown source used by `FetchCodeOfConduct`
 - `ErrNoClient`, `ErrInvalidResponse`, `ErrNoTemplates`: errors returned on invalid client, HTTP response or missing templates
+- `FileCodeOfConduct` (`CODE_OF_CONDUCT.md`): default code of conduct output filename
+- `FileGitignore` (`.gitignore`): default gitignore output filename
 
 ### Parsers ([pkg.go.dev](https://pkg.go.dev/github.com/kickr-dev/engine/pkg/parser))
 
@@ -187,13 +189,13 @@ Detect and parse a repository's languages, tooling and configuration files.
 
 #### Constants
 
-- `FolderCMD` (`cmd`): conventional Go commands folder name
-- `FileGomod` (`go.mod`): Go module file name
-- `FileMain` (`main.go`): Go main file name
-- `FileGowork` (`go.work`): Go workspace file name
-- `FilePackageJSON` (`package.json`): npm package manifest file name
 - `Bitbucket`, `Gitea`, `GitHub`, `GitLab`: recognized VCS platform identifiers
 - `ErrMissingModuleStatement`, `ErrMissingGoStatement`: errors returned on invalid `go.mod`/`go.work` files
 - `ErrMissingPackageName`, `ErrInvalidPackageManager`: errors returned on invalid `package.json` files
 - `ErrNoGowork`: returned by `ReadGowork` when no `go.work` file is found
 - `ErrNoHugo`: returned by `ReadHugo` when no Hugo configuration is found
+- `FileGomod` (`go.mod`): Go module file name
+- `FileGowork` (`go.work`): Go workspace file name
+- `FileMain` (`main.go`): Go main file name
+- `FilePackageJSON` (`package.json`): npm package manifest file name
+- `FolderCMD` (`cmd`): conventional Go commands folder name
