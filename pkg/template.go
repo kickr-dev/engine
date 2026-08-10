@@ -48,14 +48,14 @@ func GeneratorModules[T any, M Module](fsys fs.FS, modules func(config T) []M, t
 	generator := GeneratorTemplates(fsys, templates)
 
 	return func(ctx context.Context, destdir string, config T) error {
-		var errcount int
+		var failed bool
 		for _, module := range modules(config) {
 			if err := generator(ctx, filepath.Join(destdir, module.Dir()), module); err != nil {
-				errcount++
+				failed = true
 				GetLogger().Errorf("failed to generate '%s': %v", module.Dir(), err)
 			}
 		}
-		if errcount > 0 {
+		if failed {
 			return ErrFailedGeneration
 		}
 		return nil

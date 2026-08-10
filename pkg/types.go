@@ -10,17 +10,20 @@ import (
 
 // Parser is the function to parse a specific part of target repository.
 //
-// Parsers are the first functions to be executed during generation process
-// to get as much information as possible into the configuration (that's why it's a pointer).
+// Parsers run first, sequentially in their input order, and each receives the configuration
+// as a pointer so it can accumulate detected information for later parsers and generators to use.
 type Parser[T any] func(ctx context.Context, destdir string, config *T) error
 
 // Generator is the function to generate a specific part of target repository.
 //
-// Generators are called after all parsers were called with an aggregated configuration.
+// Generators are called once all parsers finished (parsers run sequentially, in their input order), with the resulting aggregated configuration.
 //
-// Returned error by generators is only logged to avoid a big aggregated error at the end of Generate.
-// In case returned error is ErrFailedGeneration, then the error isn't logged,
-// this may be used when an error must be returned by Generate but is already logged by the generator itself.
+// All generators given to Generate run concurrently with one another (bounded to runtime.GOMAXPROCS(0)).
+// An implementation must not assume any run order relative to other generators
+// and must be safe for concurrent use, since it may be invoked alongside other Generator[T] from the same Generate call.
+//
+// A returned error is only logged, to avoid one big aggregated error at the end of Generate.
+// A returned ErrFailedGeneration is not logged, since it signals the generator already logged its own error.
 type Generator[T any] func(ctx context.Context, destdir string, config T) error
 
 // Module is implemented by any per-directory configuration a monorepository is composed of.
