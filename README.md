@@ -157,7 +157,7 @@ Fetch and download scaffolding content from external sources.
 
 #### Reference
 
-- `FetchGitignore`: fetches a `.gitignore` from [**toptal**](https://www.toptal.com/developers/gitignore)
+- `FetchGitignore`: fetches a `.gitignore` from [**Toptal**](https://www.toptal.com/developers/gitignore)
 - `FetchCodeOfConduct`: fetches the [**Contributor Covenant 3.0**](https://www.contributor-covenant.org/version/3/0/code_of_conduct/) markdown
 
 #### Constants

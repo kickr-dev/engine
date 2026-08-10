@@ -13,7 +13,7 @@ import (
 const (
 	// FileGitignore is the filename representation for .gitignore.
 	FileGitignore = ".gitignore"
-	// GitignoreBaseURL is the toptal base URL to retrieves .gitignore templates.
+	// GitignoreBaseURL is the Toptal base URL to retrieves .gitignore templates.
 	GitignoreBaseURL = "https://www.toptal.com/developers/gitignore/api"
 )
 

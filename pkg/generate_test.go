@@ -90,4 +90,30 @@ func TestGenerate(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "value  is empty, since no parser updated it", string(content))
 	})
+
+	t.Run("success_concurrent_generators", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+		one := func(_ context.Context, destdir string, _ testconfig) error {
+			return os.WriteFile(filepath.Join(destdir, "one.txt"), []byte("one"), files.RwRR)
+		}
+		two := func(_ context.Context, destdir string, _ testconfig) error {
+			return os.WriteFile(filepath.Join(destdir, "two.txt"), []byte("two"), files.RwRR)
+		}
+		failing := func(context.Context, string, testconfig) error { return errors.New("some error") }
+
+		// Act
+		err := engine.Generate(ctx, destdir, testconfig{},
+			[]engine.Parser[testconfig]{nooparser},
+			[]engine.Generator[testconfig]{one, two, failing})
+
+		// Assert
+		assert.ErrorIs(t, err, engine.ErrFailedGeneration)
+		oneContent, err := os.ReadFile(filepath.Join(destdir, "one.txt"))
+		require.NoError(t, err)
+		assert.Equal(t, "one", string(oneContent))
+		twoContent, err := os.ReadFile(filepath.Join(destdir, "two.txt"))
+		require.NoError(t, err)
+		assert.Equal(t, "two", string(twoContent))
+	})
 }

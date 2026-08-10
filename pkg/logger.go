@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sync"
 )
 
 // Logger is a simplified interface for logging purposes.
+//
+// Implementations must be safe for concurrent use, since Generate calls generators (and therefore the logger) from multiple goroutines.
 type Logger interface {
 	// Debugf logs with the DEBUG level.
 	Debugf(format string, args ...any)
@@ -54,7 +57,10 @@ func (*noopLogger) Infof(string, ...any) {}
 // Warnf does nothing.
 func (*noopLogger) Warnf(string, ...any) {}
 
-type testLogger struct{ writer io.Writer }
+type testLogger struct {
+	mu     sync.Mutex
+	writer io.Writer
+}
 
 var _ Logger = (*testLogger)(nil) // ensure interface is implemented
 
@@ -87,5 +93,7 @@ func (b *testLogger) Warnf(format string, args ...any) {
 }
 
 func (b *testLogger) printf(format string, args ...any) {
+	b.mu.Lock()
 	b.writer.Write(fmt.Appendf(nil, format, args...))
+	b.mu.Unlock()
 }
