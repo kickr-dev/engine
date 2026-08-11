@@ -34,13 +34,13 @@ go get -u github.com/kickr-dev/engine@latest
 
 ## Initialize ([pkg.go.dev](https://pkg.go.dev/github.com/kickr-dev/engine/pkg))
 
-Run an interactive form with [**huh**](https://github.com/charmbracelet/huh)
-and alter the created configuration gradually with each `huh.Group`.
+Runs an interactive form with [**huh**](https://github.com/charmbracelet/huh)
+and alters the created configuration gradually with each `huh.Group`.
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph Groups["Form pages (each a set of related questions)"]
-        direction LR
+        direction TB
         G1["Page 1"] --> G2["Page 2"] --> Gn["Page N"]
     end
 
@@ -151,7 +151,7 @@ Read, write, validate and locate files across a directory tree.
 
 ### Generators ([pkg.go.dev](https://pkg.go.dev/github.com/kickr-dev/engine/pkg/generator))
 
-Fetch and download scaffolding content from external sources.
+Fetches and downloads scaffolding content from external sources.
 
 **Examples**: see the package documentation.
 
@@ -169,7 +169,7 @@ Fetch and download scaffolding content from external sources.
 
 ### Parsers ([pkg.go.dev](https://pkg.go.dev/github.com/kickr-dev/engine/pkg/parser))
 
-Detect and parse a repository's languages, tooling and configuration files.
+Detects and parses a repository's languages, tooling and configuration files.
 
 **Examples**: see the package documentation.
 
