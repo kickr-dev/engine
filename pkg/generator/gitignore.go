@@ -26,15 +26,12 @@ var (
 	// When this error is returned, the body is returned alongside it.
 	ErrInvalidResponse = errors.New("invalid response from api")
 
-	// ErrNoTemplates is returned when templates slice input in DownloadGitignore function is empty.
+	// ErrNoTemplates is returned when templates slice input in FetchGitignore function is empty.
 	ErrNoTemplates = errors.New("no templates provided")
 )
 
 // FetchGitignore fetches a combined .gitignore using the [Gitignore API]
 // and returns the obtained result without writing it anywhere.
-//
-// It's meant for cases where the result must be templatized or combined
-// before being written, DownloadGitignore being the shortcut when it can be written as is.
 //
 //	type config struct { ... }
 //
