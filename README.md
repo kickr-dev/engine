@@ -166,7 +166,7 @@ Fetches and downloads scaffolding content from external sources.
 - `ErrNoClient`, `ErrInvalidResponse`, `ErrNoTemplates`: errors returned on invalid client, HTTP response or missing templates
 - `FileCodeOfConduct` (`CODE_OF_CONDUCT.md`): default code of conduct output filename
 - `FileGitignore` (`.gitignore`): default gitignore output filename
-- `GitignoreBaseURL`: Base URL to fetch Gitignores from
+- `GitignoreBaseURL`: Base URL to fetch gitignores from
 
 ### Parsers ([pkg.go.dev](https://pkg.go.dev/github.com/kickr-dev/engine/pkg/parser))
 
