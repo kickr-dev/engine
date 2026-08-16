@@ -20,7 +20,10 @@ var packageManagerRegexp = regexp.MustCompile(`^(npm|pnpm|yarn|bun)@\d+\.\d+\.\d
 
 // PackageJSON represents the node package json file.
 type PackageJSON struct {
-	Author         *string  `json:"author,omitempty"`
+	Author *string `json:"author,omitempty"`
+	Config struct {
+		BuildDir string `json:"buildDir,omitempty"`
+	} `json:"config,omitzero"`
 	Description    *string  `json:"description,omitempty"`
 	Files          []string `json:"files,omitempty"`
 	Keywords       []string `json:"keywords,omitempty"`

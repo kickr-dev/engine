@@ -40,6 +40,23 @@ func TestHugo(t *testing.T) {
 		assert.Equal(t, expected, config)
 	})
 
+	t.Run("detected_hugo_publish_dir", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+
+		err := os.WriteFile(filepath.Join(destdir, "hugo.toml"), []byte("publishDir = 'build'"), 0o644)
+		require.NoError(t, err)
+
+		expected := parser.HugoCompose{HugoConfig: &parser.HugoConfig{PublishDir: "build"}}
+
+		// Act
+		config, err := parser.ReadHugo(destdir)
+
+		// Assert
+		require.NoError(t, err)
+		assert.Equal(t, expected, config)
+	})
+
 	t.Run("detected_hugo_theme", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()
