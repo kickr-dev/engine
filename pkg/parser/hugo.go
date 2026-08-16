@@ -20,9 +20,10 @@ type HugoCompose struct {
 
 // HugoConfig is the representation of a hugo.(toml|yaml|yml) configuration file.
 type HugoConfig struct {
-	BaseURL   string `yaml:"baseURL,omitempty"   toml:"baseurl,omitempty"`
-	Copyright string `yaml:"copyright,omitempty" toml:"copyright,omitempty"`
-	Title     string `yaml:"title,omitempty"     toml:"title,omitempty"`
+	BaseURL    string `yaml:"baseURL,omitempty"    toml:"baseurl,omitempty"`
+	Copyright  string `yaml:"copyright,omitempty"  toml:"copyright,omitempty"`
+	PublishDir string `yaml:"publishDir,omitempty" toml:"publishdir,omitempty"`
+	Title      string `yaml:"title,omitempty"      toml:"title,omitempty"`
 }
 
 // HugoTheme is the representation of a theme.(toml|yaml|yml) hugo theme configuration file.
