@@ -2,7 +2,7 @@ module github.com/kickr-dev/engine
 
 go 1.25.8
 
-toolchain go1.26.5
+toolchain go1.26.6
 
 require (
 	charm.land/bubbletea/v2 v2.0.8
