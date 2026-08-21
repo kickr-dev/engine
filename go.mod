@@ -17,8 +17,8 @@ require (
 	github.com/jarcoal/httpmock v1.4.2
 	github.com/pelletier/go-toml/v2 v2.4.3
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3
-	github.com/stretchr/testify v1.11.1
-	golang.org/x/mod v0.39.0
+	github.com/stretchr/testify v1.12.0
+	golang.org/x/mod v0.40.0
 	golang.org/x/sync v0.22.0
 	golang.org/x/text v0.41.0
 )
@@ -62,7 +62,6 @@ require (
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/onsi/gomega v1.35.1 // indirect
 	github.com/pjbgf/sha1cd v0.6.0 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
