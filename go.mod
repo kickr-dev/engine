@@ -1,6 +1,6 @@
 module github.com/kickr-dev/engine
 
-go 1.25.8
+go 1.26.0
 
 toolchain go1.27.1
 
@@ -18,8 +18,8 @@ require (
 	github.com/pelletier/go-toml/v2 v2.4.3
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3
 	github.com/stretchr/testify v1.12.1
-	golang.org/x/mod v0.40.0
-	golang.org/x/sync v0.22.0
+	golang.org/x/mod v0.41.0
+	golang.org/x/sync v0.23.0
 	golang.org/x/text v0.41.0
 )
 
