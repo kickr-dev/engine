@@ -7,7 +7,7 @@ import (
 
 var (
 	delimiterOnlyLine = regexp.MustCompile(`(?m)^\s*(?:/\*|\*/|<!--|-->|#!.*)\s*$\n?`)
-	generatedLine     = regexp.MustCompile(`(?m)^.*` + generated.String() + `.*$\n?`)
+	generatedLine     = regexp.MustCompile(`(?m)^.*` + notice + `.*$\n?`)
 )
 
 // EmptyPolicy defines the policy to apply when a generated file is empty.
