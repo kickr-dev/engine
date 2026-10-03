@@ -38,7 +38,6 @@ include:
 # or a 'fine-grained personal access token' with the following permissions on this project and its parent groups:
 #   - Approval configuration: Read
 #   - Approval rule: Read
-#   - Badge: Create, Read, Update
 #   - Branch: Read
 #   - Commit: Read
 #   - Group: Read
