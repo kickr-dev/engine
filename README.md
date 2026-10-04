@@ -172,6 +172,7 @@ Fetches and downloads scaffolding content from external sources.
 
 - `FetchGitignore`: fetches a `.gitignore` from [**Toptal**](https://www.toptal.com/developers/gitignore)
 - `FetchCodeOfConduct`: fetches the [**Contributor Covenant 3.0**](https://www.contributor-covenant.org/version/3/0/code_of_conduct/) markdown
+- `FetchContainerImage`: resolves a container image tag from its registry and returns the reference pinned by digest
 
 #### Constants
 
@@ -200,6 +201,7 @@ Detects and parses a repository's languages, tooling and configuration files.
 - `Gowork.Module`: returns the workspace's module path
 - `Executables.AddCLI` / `AddCron` / `AddJob` / `AddWorker`: registers a detected executable by kind
 - `Executables.Binaries`: returns the total count of registered executables
+- `HugoCompose.Module`: returns the `module` section of the detected Hugo theme or configuration
 
 #### Constants
 

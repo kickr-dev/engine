@@ -19,6 +19,10 @@ var ErrNoGowork = errors.New("no go.work file")
 
 // Gowork represents the parsed struct for go.work file.
 type Gowork struct {
+	// ContainerImage is the container image to build the site with,
+	// a placeholder to be filled with generator.FetchContainerImage.
+	ContainerImage string
+
 	// Go is the go statement,
 	// i.e. "go 1.23.4" without "go" (and space) part.
 	Go string
