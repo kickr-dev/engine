@@ -37,6 +37,10 @@ var versionRegexp = regexp.MustCompile("^v[0-9]+$")
 
 // Gomod represents the parsed struct for go.mod file.
 type Gomod struct {
+	// ContainerImage is the container image to build the site with,
+	// a placeholder to be filled with generator.FetchContainerImage.
+	ContainerImage string
+
 	// Go is the go statement,
 	// i.e. "go 1.23.4" without "go" (and space) part.
 	Go string

@@ -58,7 +58,7 @@ func TestReadTOML(t *testing.T) {
 			Slice:  []string{"value"},
 			String: "value",
 		}
-		require.NoError(t, os.WriteFile(filepath.Join(dir, "file.toml"), []byte("slice = [ 'value' ]\nstring = 'value'"), 0o644))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "file.toml"), []byte("slice = [ 'value' ]\nstring = 'value'"), files.RwRR))
 
 		// Act
 		var actual testconfig
@@ -78,7 +78,7 @@ func TestReadTOMLFunc(t *testing.T) {
 			Slice:  []string{"value"},
 			String: "value",
 		}
-		require.NoError(t, os.WriteFile(filepath.Join(dir, "file.toml"), []byte("slice = [ 'value' ]\nstring = 'value'"), 0o644))
+		require.NoError(t, os.WriteFile(filepath.Join(dir, "file.toml"), []byte("slice = [ 'value' ]\nstring = 'value'"), files.RwRR))
 
 		// Act
 		var actual testconfig

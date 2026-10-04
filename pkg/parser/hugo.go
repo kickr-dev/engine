@@ -16,23 +16,59 @@ import (
 type HugoCompose struct {
 	*HugoTheme
 	*HugoConfig
+
+	// ContainerImage is the container image to build the site with,
+	// a placeholder to be filled with generator.FetchContainerImage.
+	ContainerImage string
 }
 
-// HugoConfig is the representation of a hugo.(toml|yaml|yml) configuration file.
+// Module returns the [module] section of the detected theme or configuration.
+//
+// [module]: https://gohugo.io/configuration/module/
+func (h HugoCompose) Module() HugoModule {
+	if h.HugoTheme != nil {
+		return h.HugoTheme.Module
+	}
+	if h.HugoConfig != nil {
+		return h.HugoConfig.Module
+	}
+	return HugoModule{}
+}
+
+// HugoConfig is the representation of a [hugo.(toml|yaml|yml)] configuration file.
+//
+// [hugo.(toml|yaml|yml)]: https://gohugo.io/configuration/all/
 type HugoConfig struct {
-	BaseURL    string `yaml:"baseURL,omitempty"    toml:"baseurl,omitempty"`
-	Copyright  string `yaml:"copyright,omitempty"  toml:"copyright,omitempty"`
-	PublishDir string `yaml:"publishDir,omitempty" toml:"publishdir,omitempty"`
-	Title      string `yaml:"title,omitempty"      toml:"title,omitempty"`
+	BaseURL    string     `yaml:"baseURL,omitempty"    toml:"baseurl,omitempty"`
+	Copyright  string     `yaml:"copyright,omitempty"  toml:"copyright,omitempty"`
+	Module     HugoModule `yaml:"module,omitempty"     toml:"module,omitempty"`
+	PublishDir string     `yaml:"publishDir,omitempty" toml:"publishdir,omitempty"`
+	Title      string     `yaml:"title,omitempty"      toml:"title,omitempty"`
 }
 
-// HugoTheme is the representation of a theme.(toml|yaml|yml) hugo theme configuration file.
+// HugoTheme is the representation of a [theme.(toml|yaml|yml)] hugo theme configuration file.
+//
+// [theme.(toml|yaml|yml)]: https://github.com/gohugoio/hugoThemes#themetoml
 type HugoTheme struct {
-	DemoSite    string `yaml:"demosite,omitempty"    toml:"demosite,omitempty"`
-	Description string `yaml:"description,omitempty" toml:"description,omitempty"`
-	HomePage    string `yaml:"homepage,omitempty"    toml:"homepage,omitempty"`
-	License     string `yaml:"license,omitempty"     toml:"license,omitempty"`
-	Name        string `yaml:"name,omitempty"        toml:"name,omitempty"`
+	DemoSite    string     `yaml:"demosite,omitempty"    toml:"demosite,omitempty"`
+	Description string     `yaml:"description,omitempty" toml:"description,omitempty"`
+	HomePage    string     `yaml:"homepage,omitempty"    toml:"homepage,omitempty"`
+	License     string     `yaml:"license,omitempty"     toml:"license,omitempty"`
+	Module      HugoModule `yaml:"module,omitempty"      toml:"module,omitempty"`
+	Name        string     `yaml:"name,omitempty"        toml:"name,omitempty"`
+}
+
+// HugoModule is the [module] section of hugo configuration files.
+//
+// [module]: https://gohugo.io/configuration/module/
+type HugoModule struct {
+	HugoVersion HugoVersion `yaml:"hugoVersion,omitempty" toml:"hugoversion,omitempty"`
+}
+
+// HugoVersion is the hugo version constraints of a hugo module.
+type HugoVersion struct {
+	Max string `yaml:"max,omitempty" toml:"max,omitempty"`
+	Min string `yaml:"min,omitempty" toml:"min,omitempty"`
 }
 
 // ErrNoHugo is returned by ReadHugo when neither a hugo.(toml|yaml|yml) configuration file
