@@ -30,10 +30,18 @@ include:
       mr_comment: false
       score_point: true
       score_push: true
-      stage: build
+
+go-build-test:
+  needs: []
+
+go-ci-lint:
+  needs: []
 
 go-govulncheck:
   allow_failure: true
+
+go-mod-outdated:
+  rules: [when: never]
 
 plumber:
   rules:
