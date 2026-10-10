@@ -41,9 +41,9 @@ func TestReadGowork(t *testing.T) {
 	t.Run("missing_go_statement", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()
-
-		err := os.WriteFile(filepath.Join(destdir, parser.FileGowork), []byte(""), files.RwRR)
+		file, err := os.Create(filepath.Join(destdir, parser.FileGowork))
 		require.NoError(t, err)
+		require.NoError(t, file.Close())
 
 		// Act
 		_, err = parser.ReadGowork(destdir)
@@ -144,7 +144,7 @@ func TestGoworkModule(t *testing.T) {
 		assert.Empty(t, module)
 	})
 
-	t.Run("all_modules_differents", func(t *testing.T) {
+	t.Run("all_modules_different", func(t *testing.T) {
 		// Arrange
 		gowork := parser.Gowork{
 			Uses: []parser.GoworkUse{
@@ -160,7 +160,7 @@ func TestGoworkModule(t *testing.T) {
 		assert.Empty(t, module)
 	})
 
-	t.Run("some_modules_differents", func(t *testing.T) {
+	t.Run("some_modules_different", func(t *testing.T) {
 		// Arrange
 		gowork := parser.Gowork{
 			Uses: []parser.GoworkUse{
