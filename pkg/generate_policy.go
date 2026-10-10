@@ -1,7 +1,9 @@
 package engine
 
 import (
+	"bufio"
 	"errors"
+	"io"
 	"io/fs"
 	"os"
 	"regexp"
@@ -42,13 +44,27 @@ func ShouldGenerate(out string, policy GeneratePolicy) (bool, error) {
 		return true, nil
 	}
 
-	content, err := os.ReadFile(out)
+	file, err := os.Open(out)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
 			return true, nil
 		}
 		return false, err
 	}
+	defer file.Close()
 
-	return len(content) == 0 || generated.Match(content), nil
+	// only the first 3 lines can hold the generated notice
+	reader := bufio.NewReader(file)
+	var head []byte
+	for range 3 {
+		line, err := reader.ReadBytes('\n')
+		head = append(head, line...) // line is returned together with io.EOF in some cases
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return false, err
+		}
+	}
+	return len(head) == 0 || generated.Match(head), nil
 }
