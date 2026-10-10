@@ -55,6 +55,19 @@ func TestFetchGitignore(t *testing.T) {
 		assert.ErrorContains(t, err, "some error")
 	})
 
+	t.Run("error_body_too_large", func(t *testing.T) {
+		// Arrange
+		httpmock.RegisterResponder(http.MethodGet, mockURL(t, "go"),
+			httpmock.NewStringResponder(http.StatusOK, strings.Repeat("a", 1<<20+1)))
+
+		// Act
+		_, err := generator.FetchGitignore(ctx, http.DefaultClient, "go")
+
+		// Assert
+		assert.ErrorIs(t, err, generator.ErrInvalidResponse)
+		assert.ErrorContains(t, err, "exceeds")
+	})
+
 	t.Run("success", func(t *testing.T) {
 		// Arrange
 		httpmock.RegisterResponder(http.MethodGet, mockURL(t, "java", "linux"),

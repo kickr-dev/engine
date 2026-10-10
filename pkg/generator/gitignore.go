@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -17,18 +16,8 @@ const (
 	GitignoreBaseURL = "https://www.toptal.com/developers/gitignore/api"
 )
 
-// ErrNoClient is returned when input HTTP client is nil.
-var ErrNoClient = errors.New("no client provided")
-
-var (
-	// ErrInvalidResponse is returned when an HTTP request response status isn't 2XX.
-	//
-	// When this error is returned, the response body is included in the error message.
-	ErrInvalidResponse = errors.New("invalid response from api")
-
-	// ErrNoTemplates is returned when templates slice input in FetchGitignore function is empty.
-	ErrNoTemplates = errors.New("no templates provided")
-)
+// ErrNoTemplates is returned when templates slice input in FetchGitignore function is empty.
+var ErrNoTemplates = errors.New("no templates provided")
 
 // FetchGitignore fetches a combined .gitignore using the [Gitignore API]
 // and returns the obtained result without writing it anywhere.
@@ -68,13 +57,5 @@ func FetchGitignore(ctx context.Context, httpClient *http.Client, templates ...s
 		return nil, fmt.Errorf("get '%s': %w", u, err)
 	}
 	defer response.Body.Close()
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, fmt.Errorf("read all: %w", err)
-	}
-	if response.StatusCode/100 != 2 {
-		return nil, fmt.Errorf("invalid response from '%s': %s: %w", u, string(body), ErrInvalidResponse)
-	}
-	return body, nil
+	return readBody(response, u)
 }

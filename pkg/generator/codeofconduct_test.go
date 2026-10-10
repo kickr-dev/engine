@@ -2,6 +2,7 @@ package generator_test
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/jarcoal/httpmock"
@@ -36,6 +37,19 @@ func TestFetchCodeOfConduct(t *testing.T) {
 		// Assert
 		assert.ErrorIs(t, err, generator.ErrInvalidResponse)
 		assert.ErrorContains(t, err, "some error")
+	})
+
+	t.Run("error_body_too_large", func(t *testing.T) {
+		// Arrange
+		httpmock.RegisterResponder(http.MethodGet, generator.CodeOfConductURL,
+			httpmock.NewStringResponder(http.StatusOK, strings.Repeat("a", 1<<20+1)))
+
+		// Act
+		_, err := generator.FetchCodeOfConduct(ctx, http.DefaultClient)
+
+		// Assert
+		assert.ErrorIs(t, err, generator.ErrInvalidResponse)
+		assert.ErrorContains(t, err, "exceeds")
 	})
 
 	t.Run("success", func(t *testing.T) {
