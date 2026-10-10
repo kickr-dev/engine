@@ -143,12 +143,12 @@ func ExecuteTemplate(tmpl *template.Template, data any, out string, policy Empty
 
 // baseTemplate holds Sprig and engine default funcs, validated once for the process' lifetime and cloned by newTemplate.
 var baseTemplate = sync.OnceValue(func() *template.Template {
-	return template.New("").Funcs(sprig.FuncMap()).Funcs(FuncMap())
+	return template.New("").Funcs(sprig.HermeticTxtFuncMap()).Funcs(FuncMap())
 })
 
 // newTemplate creates a new template.Template with the provided delimiters
 // and all funcs coming from the following places:
-//   - Sprig
+//   - Sprig hermetic ones (no environment, network, date or random funcs)
 //   - Engine default ones
 //   - Engine provided ones with Configure
 func newTemplate(name string, delims Delimiters) (*template.Template, error) {
