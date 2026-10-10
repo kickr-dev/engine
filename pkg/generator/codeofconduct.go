@@ -3,7 +3,6 @@ package generator
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 )
 
@@ -44,13 +43,5 @@ func FetchCodeOfConduct(ctx context.Context, httpClient *http.Client) ([]byte, e
 		return nil, fmt.Errorf("get '%s': %w", CodeOfConductURL, err)
 	}
 	defer response.Body.Close()
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, fmt.Errorf("read all: %w", err)
-	}
-	if response.StatusCode/100 != 2 {
-		return nil, fmt.Errorf("invalid response from '%s': %s: %w", CodeOfConductURL, string(body), ErrInvalidResponse)
-	}
-	return body, nil
+	return readBody(response, CodeOfConductURL)
 }
