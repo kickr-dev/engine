@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -132,6 +133,35 @@ func TestApplySections(t *testing.T) {
 		require.NoError(t, err)
 		// only sections are rendered to avoid template injection
 		assert.Equal(t, `head {{ .Head }}<!-- BEGIN_FIRST -->value<!-- END_FIRST -->middle {{ .Middle }}<!-- BEGIN_SECOND -->value<!-- END_SECOND -->tail {{ .Tail }}`, string(content))
+	})
+
+	t.Run("success_unchanged_out", func(t *testing.T) {
+		// Arrange
+		srcdir := t.TempDir()
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			Globs:    []string{"file.txt" + engine.TmplExtension},
+			Out:      "file.txt",
+			Sections: sections,
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(srcdir, template.Globs[0]),
+			[]byte(`<!-- BEGIN_FIRST -->{{ .Str }}<!-- END_FIRST --><!-- BEGIN_SECOND -->{{ .Str }}<!-- END_SECOND -->`),
+			files.RwRR))
+		dest := filepath.Join(destdir, template.Out)
+		require.NoError(t, os.WriteFile(dest,
+			[]byte(`head<!-- BEGIN_FIRST -->value<!-- END_FIRST -->middle<!-- BEGIN_SECOND -->value<!-- END_SECOND -->tail`),
+			files.RwRR))
+		mtime := time.Now().Add(-time.Hour).Truncate(time.Second)
+		require.NoError(t, os.Chtimes(dest, mtime, mtime))
+
+		// Act
+		err := engine.ApplySections(os.DirFS(srcdir), destdir, template, testconfig{Str: "value"})
+
+		// Assert
+		require.NoError(t, err)
+		info, err := os.Stat(dest)
+		require.NoError(t, err)
+		assert.Equal(t, mtime, info.ModTime())
 	})
 
 	t.Run("success_partial_markers", func(t *testing.T) {
