@@ -111,7 +111,7 @@ func TestReadGomod(t *testing.T) {
 	})
 }
 
-func TestReadGocmd(t *testing.T) {
+func TestReadGoCmd(t *testing.T) {
 	t.Run("not_detected_no_main", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()
