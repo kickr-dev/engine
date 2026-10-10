@@ -9,7 +9,7 @@ import (
 )
 
 // ReadJSON reads the input src from fsys
-// and unmarshal it with JSON format into the out configuration.
+// and unmarshals it with JSON format into the out configuration.
 //
 // Input src path must be relative to fsys (see io/fs.FS and io/fs.ValidPath), not absolute.
 func ReadJSON(fsys fs.FS, src string, out any) error {

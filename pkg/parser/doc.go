@@ -1,5 +1,5 @@
 /*
-Package parser provides a bunch of functions to be wrapped with generate.Parser function signature.
+Package parser provides a bunch of functions to be wrapped with engine.Parser function signature.
 
 # Example
 
@@ -9,7 +9,7 @@ Package parser provides a bunch of functions to be wrapped with generate.Parser 
 		...
 	}
 
-	var _ generate.Parser[config] = CustomParser // ensure interface is implemented
+	var _ engine.Parser[config] = CustomParser // ensure interface is implemented
 
 	// single parser call
 	func main() {

@@ -64,7 +64,7 @@ func Validate(readSchema, readFile func(out any) error) error {
 
 // ValidationError represents a simplified view of jsonschema.ValidationError.
 //
-// It it used to override specific error messages (like kind.FalseSchema "false schema") in kickr validation context.
+// It is used to override specific error messages (like kind.FalseSchema "false schema") in kickr validation context.
 type ValidationError struct {
 	Message  string
 	Property string

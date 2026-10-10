@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	// FolderCMD represents the cmd folder where go main.go should be placed according to go layout.
+	// FolderCMD represents the cmd folder where main.go files should be placed according to the Go layout.
 	FolderCMD = "cmd"
 
 	// FileGomod represents the go.mod filename.
@@ -37,7 +37,7 @@ var versionRegexp = regexp.MustCompile("^v[0-9]+$")
 
 // Gomod represents the parsed struct for go.mod file.
 type Gomod struct {
-	// ContainerImage is the container image to build the site with,
+	// ContainerImage is the container image to build the module with,
 	// a placeholder to be filled with generator.FetchContainerImage.
 	ContainerImage string
 
@@ -58,11 +58,11 @@ type Gomod struct {
 	Tools []string
 }
 
-// AsVCS returns the vcs configuration associated to module statement in go.mod.
+// AsVCS returns the vcs configuration associated with module statement in go.mod.
 func (g Gomod) AsVCS() VCS {
 	sections := strings.Split(g.Module, "/")
 	projectPath := func() string {
-		// retrieve all sections but the last element in case module is a suffixed by a major version,
+		// retrieve all sections but the last element in case module is suffixed by a major version,
 		// i.e. github.com/kickr-dev/engine/v2
 		if versionRegexp.MatchString(sections[len(sections)-1]) {
 			return strings.Join(sections[1:len(sections)-1], "/")
@@ -87,7 +87,7 @@ func (g Gomod) AsVCS() VCS {
 //   - go statement
 //
 // It can be used as a simple function, calling it directly,
-// but can also be used as its expected usage with engine.Generate:
+// but its expected usage is with engine.Generate:
 //
 //	type config struct { ... }
 //
@@ -112,7 +112,7 @@ func ReadGomod(destdir string) (Gomod, error) {
 		return Gomod{}, fmt.Errorf("read file: %w", err)
 	}
 
-	// parse go.mod into it's modfile representation
+	// parse go.mod into its modfile representation
 	file, err := modfile.Parse(FileGomod, content, nil)
 	if err != nil {
 		return Gomod{}, fmt.Errorf("parse modfile: %w", err)
@@ -160,7 +160,7 @@ func ReadGomod(destdir string) (Gomod, error) {
 //   - worker-<name> for worker executables
 //
 // It can be used as a simple function, calling it directly,
-// but can also be used as its expected usage with engine.Generate:
+// but its expected usage is with engine.Generate:
 //
 //	type config struct { ... }
 //

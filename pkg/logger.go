@@ -67,7 +67,7 @@ var _ Logger = (*testLogger)(nil) // ensure interface is implemented
 // NewTestLogger creates a new logger with the input writer.
 //
 // This logger is expected to be used in tests.
-// In no way it should be used in production since it's unoptimized.
+// In no way should it be used in production since it's unoptimized.
 func NewTestLogger(writer io.Writer) Logger {
 	return &testLogger{writer: writer}
 }

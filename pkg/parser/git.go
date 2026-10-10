@@ -14,7 +14,7 @@ import (
 // to retrieve various project information (git host, project name, etc.).
 //
 // It can be used as a simple function, calling it directly,
-// but can also be used as its expected usage with engine.Generate:
+// but its expected usage is with engine.Generate:
 //
 //	type config struct { ... }
 //
@@ -66,14 +66,14 @@ func Git(destdir string) (VCS, error) {
 	}, nil
 }
 
-// gitOriginURL returns input directory remote origin by using go-git.
+// gitOriginURL returns the remote origin URL of the input repository by using go-git.
 func gitOriginURL(repository *git.Repository) (string, error) {
 	origin, err := repository.Remote("origin")
 	if err != nil {
 		return "", fmt.Errorf("get remote 'origin': %w", err)
 	}
 	if len(origin.Config().URLs) == 0 {
-		return "", fmt.Errorf("no URL associated to remote: %w", git.ErrRemoteNotFound)
+		return "", fmt.Errorf("no URL associated with remote: %w", git.ErrRemoteNotFound)
 	}
 	return origin.Config().URLs[0], nil
 }
@@ -110,7 +110,7 @@ func gitParseRemote(rawRemote string) (host, subpath string) {
 	return "", ""
 }
 
-// gitTags returns the slice of known tags (locally) for the input destdir git repository.
+// gitTags returns the slice of known tags (locally) for the input git repository.
 func gitTags(repository *git.Repository) ([]string, error) {
 	tags, err := repository.Tags()
 	if err != nil {

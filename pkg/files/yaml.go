@@ -10,7 +10,7 @@ import (
 )
 
 // ReadYAML reads the input src from fsys
-// and unmarshal it with YAML format into the out configuration.
+// and unmarshals it with YAML format into the out configuration.
 //
 // Input src path must be relative to fsys (see io/fs.FS and io/fs.ValidPath), not absolute.
 func ReadYAML(fsys fs.FS, src string, out any) error {

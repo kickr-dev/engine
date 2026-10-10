@@ -31,12 +31,12 @@ func Exists(src string) bool {
 	return err == nil
 }
 
-// GlobOption represents a function that can be giving when calling Glob to add specific behaviors.
+// GlobOption represents a function that can be given when calling Glob to add specific behaviors.
 type GlobOption func(o globOptions) globOptions
 
 // GlobExcludedDirectories returns a GlobOption which adds excluded directories from Glob checking.
 //
-// Excluded directories are apply to all directories levels (root and subdirectories) during checking.
+// Excluded directories are applied to all directory levels (root and subdirectories) during checking.
 func GlobExcludedDirectories(dirs ...string) GlobOption {
 	return func(o globOptions) globOptions {
 		o.ExcludedDirectories = dirs
@@ -46,7 +46,7 @@ func GlobExcludedDirectories(dirs ...string) GlobOption {
 
 // GlobExcludedFiles returns a GlobOption which adds excluded files from Glob checking.
 //
-// Excluded files are applied to all directories levels (root and subdirectories) during checking.
+// Excluded files are applied to all directory levels (root and subdirectories) during checking.
 func GlobExcludedFiles(files ...string) GlobOption {
 	return func(o globOptions) globOptions {
 		o.ExcludedFiles = files

@@ -14,10 +14,10 @@ import (
 // Every generation error is logged during processing to avoid a big aggregated error at the end.
 var ErrFailedGeneration = errors.New("some error(s) occurred during generation")
 
-// Generate is the main function from generate package.
-// It takes a configuration and various options.
+// Generate is the main function of the engine package.
+// It takes a configuration, parsers and generators.
 //
-// It executes all parsers given in options (or default ones), in order,
+// It executes all given parsers, in order,
 // and then runs all provided generators concurrently (bounded to runtime.GOMAXPROCS(0)) to apply or remove templates.
 func Generate[T any](ctx context.Context, destdir string, config T, parsers []Parser[T], generators []Generator[T]) error {
 	// parse repository
