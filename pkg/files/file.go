@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 )
 
 const (
@@ -70,25 +71,35 @@ func newGlobOptions(opts ...GlobOption) globOptions {
 // Glob returns all matching files for the input glob and root (and its subdirectories).
 //
 // In case root directory doesn't exist, no matches are returned (error is silenced).
-func Glob(root, glob string, opts ...GlobOption) (matches []string) {
+func Glob(root, glob string, opts ...GlobOption) []string {
 	gopts := newGlobOptions(opts...)
 	if slices.Contains(gopts.ExcludedDirectories, filepath.Base(root)) {
 		return nil
 	}
+	entries, _ := os.ReadDir(root)
 
-	globs, _ := filepath.Glob(filepath.Join(root, glob))
-	for _, match := range globs {
-		if !slices.Contains(gopts.ExcludedFiles, filepath.Base(match)) {
-			matches = append(matches, match)
+	var matches []string
+	// filepath.Glob handles globs with a path separator (e.g. "sub/*.tmpl") since a file name never contains one.
+	if strings.ContainsAny(glob, "/"+string(filepath.Separator)) {
+		globs, _ := filepath.Glob(filepath.Join(root, glob))
+		for _, match := range globs {
+			if !slices.Contains(gopts.ExcludedFiles, filepath.Base(match)) {
+				matches = append(matches, match)
+			}
+		}
+	} else {
+		// other globs are compared to the names already listed above, without reading the directory again.
+		for _, entry := range entries {
+			if ok, _ := filepath.Match(glob, entry.Name()); ok && !slices.Contains(gopts.ExcludedFiles, entry.Name()) {
+				matches = append(matches, filepath.Join(root, entry.Name()))
+			}
 		}
 	}
 
-	entries, _ := os.ReadDir(root)
 	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
+		if entry.IsDir() {
+			matches = append(matches, Glob(filepath.Join(root, entry.Name()), glob, opts...)...)
 		}
-		matches = append(matches, Glob(filepath.Join(root, entry.Name()), glob, opts...)...)
 	}
 	return matches
 }
