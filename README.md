@@ -15,7 +15,7 @@
 
 ---
 
-- [How to use ?](#how-to-use-)
+- [How to use?](#how-to-use)
 - [Initialize (pkg.go.dev)](#initialize-pkggodev)
   - [Reference](#reference)
 - [Generate (pkg.go.dev)](#generate-pkggodev)
@@ -31,7 +31,7 @@ A Go library to build projects scaffolding CLIs on three main features:
 - [**Parsing**](#parsers-pkggodev): repository languages parsing
 - [**Generation**](#generate-pkggodev): repository scaffolding with files generation based on Go template
 
-## How to use ?
+## How to use?
 
 ```sh
 go get -u github.com/kickr-dev/engine@latest
@@ -59,13 +59,13 @@ flowchart LR
 
 - `Initialize`: runs the interactive form and returns the filled configuration
 - `WithFormGroups`: ordered list of **huh** groups to gradually fill the created configuration
-- `WithTeaOptions`: options to tune the TUI (Terminal User Interface), native [**bubbletea**](github.com/charmbracelet/bubbletea) options, underlying framework of **huh**
+- `WithTeaOptions`: options to tune the TUI (Terminal User Interface), native [**bubbletea**](https://github.com/charmbracelet/bubbletea) options, underlying framework of **huh**
 - `ErrRequiredField`: specific error to return during groups validation to force user input
 
 ## Generate ([pkg.go.dev](https://pkg.go.dev/github.com/kickr-dev/engine/pkg))
 
 Parses a repository with all its configured parsers
-and then run all generators to create the appropriate files regarding the repository configuration, technologies, languages, etc.
+and then runs all generators to create the appropriate files regarding the repository configuration, technologies, languages, etc.
 
 ```mermaid
 flowchart TB
@@ -98,6 +98,7 @@ flowchart TB
 - `Configure`: applies `OptionFunc` options (`WithLogger`, `WithForce`, `WithFuncMap`) globally before calling `Generate`
 - `ApplyTemplate`: applies a single `Template` (used internally by `GeneratorTemplates` / `GeneratorModules`)
 - `ApplyPatches`: applies a `Template`'s `Patches` on an already generated file
+- `ApplySections`: regenerates a `Template`'s `Sections` in an already existing file, keeping the rest as is
 - `ExecuteTemplate`: executes a parsed Go template and writes it to `out`, honoring the given `EmptyPolicy`
 - `FuncMap`: returns the default `template.FuncMap` used during Go templating
 - `ToSlug`: slugifies an input string
@@ -109,7 +110,7 @@ flowchart TB
 - `WithForce`: forces generation of all defined `Template` (useful when projects removed the generated notice)
 - `WithFuncMap`: enriches default `template.FuncMap` provided during Go templating
 - `GetLogger`: gets configured `logger` option at any point in the workflow
-- `Forced`: gets configured `force` option at any point in the worflow
+- `Forced`: gets configured `force` option at any point in the workflow
 - `ShouldGenerate`: returns whether a file should be generated according to its `GeneratePolicy` (existence, emptiness, generated notice, `PolicyAlways`, `Forced`)
 - `IsEmpty`: returns whether a given content is considered empty according to an `EmptyPolicy`
 - `GeneratorTemplates`: returns a `Generator` taking a slice of `Template` to generate from the base of the repository (real path depends on each template `Out` attribute)
@@ -172,7 +173,7 @@ Fetches and downloads scaffolding content from external sources.
 - `ErrNoClient`, `ErrInvalidResponse`, `ErrNoTemplates`: errors returned on invalid client, HTTP response or missing templates
 - `FileCodeOfConduct` (`CODE_OF_CONDUCT.md`): default code of conduct output filename
 - `FileGitignore` (`.gitignore`): default gitignore output filename
-- `GitignoreBaseURL`: Base URL to fetch gitignores from
+- `GitignoreBaseURL`: base URL to fetch gitignores from
 
 ### Parsers ([pkg.go.dev](https://pkg.go.dev/github.com/kickr-dev/engine/pkg/parser))
 
@@ -184,7 +185,7 @@ Detects and parses a repository's languages, tooling and configuration files.
 
 - `Git`: detects a Git repository by parsing its configuration (remote, platform, host, repository path, repository name and tags), returning a `VCS` struct
 - `ReadGomod`: detects a Golang repository by parsing its `go.mod`, returning a `Gomod` struct
-- `ReadGowork`: detects a Golang repository by parsing its `go.work` and all its `uses` `go.mod`
+- `ReadGowork`: detects a Golang repository by parsing its `go.work` and the `go.mod` of each `use` directive
 - `ReadHugo`: detects a Hugo site by parsing its `hugo.*` configurations
 - `MergeValues`: merges multiple `yaml` files together into the input `values`
 - `PackageJSON.Validate`: validates a `package.json` (package manager requirement)

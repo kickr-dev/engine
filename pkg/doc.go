@@ -1,7 +1,7 @@
 /*
 Package engine provides functions to create and generate a project layout.
 
-It contains two main functions, Initialize and Generate which split project initialization and project generation in two parts.
+It contains two main functions, Initialize and Generate, which split project initialization and project generation into two parts.
 
 # Initialization
 
@@ -9,9 +9,8 @@ It contains two main functions, Initialize and Generate which split project init
 
 	func main() {
 		ctx := context.Background()
-		destdir, _ := os.Getwd()
 
-		config, err := engine.Initialize(ctx, destdir, engine.WithFormGroups(License))
+		config, err := engine.Initialize(ctx, engine.WithFormGroups(License))
 		// handle err
 	}
 
@@ -19,11 +18,11 @@ It contains two main functions, Initialize and Generate which split project init
 		var license bool
 		return huh.NewGroup(
 			huh.NewConfirm().
-				Title("Would you like to specify a license (optional) ?").
+				Title("Would you like to specify a license (optional)?").
 				Value(&license),
 
 			huh.NewSelect[string]().
-				Title("Which one ?").
+				Title("Which one?").
 				OptionsFunc(func() []huh.Option[string] {
 					if !license {
 						return nil
@@ -32,7 +31,7 @@ It contains two main functions, Initialize and Generate which split project init
 				}, &license).
 				Validate(func(s string) error {
 					if s != "" {
-						config.License = &s
+						c.License = &s
 					}
 					return nil
 				}),
@@ -83,7 +82,9 @@ It contains two main functions, Initialize and Generate which split project init
 				// Patches applies further transformations to the generated file after it's written
 				Patches: []string{"path/to/file.patch"},
 				// Remove can be given to remove a specific file in some specific case instead of generating it
-				Remove: func (config) bool { return false },
+				Remove: func(config) bool { return false },
+				// Sections regenerates only delimited parts of an existing file instead of skipping it
+				Sections: []engine.Section{{Begin: "# BEGIN_SECTION", End: "# END_SECTION"}},
 			},
 		}
 	}

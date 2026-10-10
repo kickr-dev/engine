@@ -2,7 +2,6 @@ package engine
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -12,55 +11,9 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
-	"github.com/bluekeyes/go-gitdiff/gitdiff"
 
 	"github.com/kickr-dev/engine/pkg/files"
 )
-
-// GeneratorTemplates is a simple generator taking as input a filesystem and all templates to apply.
-//
-// Errors encountered during templates generation are logged, in that case a final error being ErrFailedGeneration is returned.
-func GeneratorTemplates[T any](fsys fs.FS, templates []Template[T]) Generator[T] {
-	return func(_ context.Context, destdir string, config T) error {
-		var errcount int
-		for _, tmpl := range templates {
-			if err := ApplyTemplate(fsys, destdir, tmpl, config); err != nil {
-				errcount++
-				GetLogger().Errorf("failed to generate '%s': %v", path.Base(tmpl.Out), err)
-			}
-		}
-		if errcount > 0 {
-			return ErrFailedGeneration
-		}
-		return nil
-	}
-}
-
-// GeneratorModules is a generator applying all input templates inside each module directory.
-//
-// The modules function extracts the modules slice from the parsed configuration.
-//
-// Each Template.Out is relative to each module where it will be generated
-// and Template.Remove is up to the characteristics of a given module.
-//
-// Errors encountered during templates generation are logged, in that case a final error being ErrFailedGeneration is returned.
-func GeneratorModules[T any, M Module](fsys fs.FS, modules func(config T) []M, templates []Template[M]) Generator[T] {
-	generator := GeneratorTemplates(fsys, templates)
-
-	return func(ctx context.Context, destdir string, config T) error {
-		var failed bool
-		for _, module := range modules(config) {
-			if err := generator(ctx, filepath.Join(destdir, module.Dir()), module); err != nil {
-				failed = true
-				GetLogger().Errorf("failed to generate '%s': %v", module.Dir(), err)
-			}
-		}
-		if failed {
-			return ErrFailedGeneration
-		}
-		return nil
-	}
-}
 
 // ApplyTemplate writes or deletes an input Template with associated data.
 func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T) error {
@@ -71,7 +24,7 @@ func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T
 	}
 	out = filepath.Join(destdir, out)
 
-	// remove file in case result is asking it
+	// remove file when tmpl.Remove asks for it
 	if tmpl.Remove != nil && tmpl.Remove(config) {
 		if !files.Exists(out) {
 			return nil
@@ -96,12 +49,7 @@ func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T
 		GetLogger().Warnf("empty template 'globs', skipping '%s' generation", tmpl.Out)
 	default:
 		GetLogger().Debugf("generating '%s'", tmpl.Out)
-		tt, err := template.New(path.Base(tmpl.Globs[0])).
-			Funcs(sprig.FuncMap()).
-			Funcs(FuncMap()).
-			Funcs(funcs()).
-			Delims(tmpl.StartDelim, tmpl.EndDelim).
-			ParseFS(fsys, tmpl.Globs...)
+		tt, err := newTemplate(path.Base(tmpl.Globs[0]), tmpl.Delimiters).ParseFS(fsys, tmpl.Globs...)
 		if err != nil {
 			return fmt.Errorf("parse template file(s): %w", err)
 		}
@@ -110,88 +58,25 @@ func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T
 		}
 	}
 
+	if !ok && len(tmpl.Globs) > 0 && len(tmpl.Sections) > 0 {
+		GetLogger().Infof("applying sections on '%s'", tmpl.Out)
+		if err := ApplySections(fsys, destdir, tmpl, config); err != nil {
+			return fmt.Errorf("apply sections: %w", err)
+		}
+	}
+
 	if len(tmpl.Patches) > 0 {
 		GetLogger().Infof("applying patches on '%s'", path.Base(out))
-		return ApplyPatches(fsys, destdir, tmpl, config)
+		if err := ApplyPatches(fsys, destdir, tmpl, config); err != nil {
+			return fmt.Errorf("apply patches: %w", err)
+		}
 	}
 	return nil
 }
 
-// ApplyPatches apply patches defined in input tmpl.
-// Each patch is templatized using Go template and then patched on provided tmpl file.
+// ExecuteTemplate runs tmpl.Execute with input data and writes the result into given out.
 //
-// It's the continuance function of ApplyTemplate (which only generates - if necessary - the initial template).
-func ApplyPatches[T any](fsys fs.FS, destdir string, tmpl Template[T], data any) error {
-	// force out localization since generation is always done on current fs
-	out, err := filepath.Localize(tmpl.Out)
-	if err != nil {
-		return fmt.Errorf("localize path: %w", err)
-	}
-	out = filepath.Join(destdir, out)
-
-	apply := func(diff *gitdiff.File) error {
-		file, err := os.OpenFile(out, os.O_RDWR|os.O_CREATE, files.RwRR)
-		if err != nil {
-			return fmt.Errorf("open file: %w", err)
-		}
-		defer file.Close()
-
-		var output bytes.Buffer
-		if err := gitdiff.Apply(&output, file, diff); err != nil {
-			return fmt.Errorf("apply diff: %w", err)
-		}
-
-		// truncate manually (instead of os.O_TRUNC) and after apply because patching needs the initial content
-		if err := file.Truncate(int64(output.Len())); err != nil {
-			return fmt.Errorf("truncate file: %w", err)
-		}
-		if _, err := file.WriteAt(output.Bytes(), 0); err != nil {
-			return fmt.Errorf("write file: %w", err)
-		}
-		return nil
-	}
-
-	errs := make([]error, 0, len(tmpl.Patches))
-	for _, patch := range tmpl.Patches {
-		patchname := path.Base(patch)
-		GetLogger().Debugf("applying patch file '%s'", patchname)
-
-		tt, err := template.New(patchname).
-			Funcs(sprig.FuncMap()).
-			Funcs(FuncMap()).
-			Funcs(funcs()).
-			Delims(tmpl.StartDelim, tmpl.EndDelim).
-			ParseFS(fsys, patch)
-		if err != nil {
-			errs = append(errs, fmt.Errorf("parse template patch '%s': %w", patchname, err))
-			continue
-		}
-
-		var buffer bytes.Buffer
-		if err := tt.Execute(&buffer, data); err != nil {
-			errs = append(errs, fmt.Errorf("template patch execution '%s': %w", patchname, err))
-			continue
-		}
-
-		diffs, _, err := gitdiff.Parse(&buffer)
-		if err != nil {
-			errs = append(errs, fmt.Errorf("parse git patch '%s': %w", patchname, err))
-			continue
-		}
-
-		for index, diff := range diffs {
-			GetLogger().Debugf("applying diff number '%d' of '%s'", index, patchname)
-			if err := apply(diff); err != nil {
-				errs = append(errs, fmt.Errorf("apply diff number '%d' of '%s': %w", index, patchname, err))
-			}
-		}
-	}
-	return errors.Join(errs...)
-}
-
-// ExecuteTemplate runs tmpl.ExecuteTemplate with input data and write result into given out.
-//
-// When ExecuteTemplate is called, it truncates out in case it already exists and reevaluate its rights.
+// When ExecuteTemplate is called, it truncates out in case it already exists and reevaluates its permissions.
 //
 // The input mode sets the requested file mode for the generated file (e.g. files.RwRR, files.RwxRxRxRx),
 // defaulting to files.RwRR when not provided.
@@ -220,7 +105,7 @@ func ExecuteTemplate(tmpl *template.Template, data any, out string, policy Empty
 		return fmt.Errorf("mkdir: %w", err)
 	}
 
-	// affect the right rights to out file, honoring the system umask
+	// apply the requested permissions to out file, honoring the system umask
 	requested := mode
 	if requested == 0 {
 		requested = files.RwRR
@@ -237,9 +122,22 @@ func ExecuteTemplate(tmpl *template.Template, data any, out string, policy Empty
 		return fmt.Errorf("write file: %w", err)
 	}
 
-	// force refresh rights
+	// force refresh permissions
 	if err := file.Chmod(requested); err != nil {
 		return fmt.Errorf("chmod: %w", err)
 	}
 	return nil
+}
+
+// newTemplate creates a new template.Template with the provided delimiters
+// and all funcs coming from the following places:
+//   - Sprig
+//   - Engine default ones
+//   - Engine provided ones with Configure
+func newTemplate(name string, delims Delimiters) *template.Template {
+	return template.New(name).
+		Funcs(sprig.FuncMap()).
+		Funcs(FuncMap()).
+		Funcs(funcs()).
+		Delims(delims.StartDelim, delims.EndDelim)
 }
