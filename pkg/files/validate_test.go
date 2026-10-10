@@ -24,7 +24,7 @@ func TestValidate(t *testing.T) {
 	}
 }`)
 
-	t.Run("error_nil_read_schem", func(t *testing.T) {
+	t.Run("error_nil_read_schema", func(t *testing.T) {
 		// Act
 		err := files.Validate(nil, func(any) error { return nil })
 
