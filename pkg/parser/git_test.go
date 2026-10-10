@@ -24,6 +24,22 @@ func TestGit(t *testing.T) {
 		assert.ErrorContains(t, err, "open repository")
 	})
 
+	t.Run("error_invalid_remote_hides_credentials", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+		repository, err := git.PlainInit(destdir, false)
+		require.NoError(t, err)
+		_, err = repository.CreateRemote(&config.RemoteConfig{Name: "origin", URLs: []string{"https://oauth2:secret%zz@gitlab.com/kickr-dev/engine"}})
+		require.NoError(t, err)
+
+		// Act
+		_, err = Git(destdir)
+
+		// Assert
+		require.ErrorContains(t, err, "invalid git remote URL")
+		assert.NotContains(t, err.Error(), "secret")
+	})
+
 	t.Run("success", func(t *testing.T) {
 		// Arrange
 		expected := VCS{

@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"path"
@@ -48,7 +49,8 @@ func Git(destdir string) (VCS, error) {
 
 	host, subpath := gitParseRemote(rawRemote)
 	if host == "" || subpath == "" {
-		return VCS{}, fmt.Errorf("invalid git remote URL '%s'", rawRemote)
+		// raw remote isn't printed since it may hold credentials
+		return VCS{}, errors.New("invalid git remote URL")
 	}
 
 	tags, err := gitTags(repository)
