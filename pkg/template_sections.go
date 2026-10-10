@@ -26,14 +26,17 @@ func ApplySections[T any](fsys fs.FS, destdir string, tmpl Template[T], data any
 	}
 	out = filepath.Join(destdir, out)
 
-	content, err := os.ReadFile(out)
+	actual, err := os.ReadFile(out)
 	if err != nil { // output file should exist since ApplySections is expected to be called from ApplyTemplate or at least after
 		return fmt.Errorf("read file: %w", err)
 	}
 
 	// template the output file as if it was the first generation to get one full rendered content from which to pick all sections
-	tt, err := newTemplate(path.Base(tmpl.Globs[0]), tmpl.Delimiters).ParseFS(fsys, tmpl.Globs...)
+	tt, err := newTemplate(path.Base(tmpl.Globs[0]), tmpl.Delimiters)
 	if err != nil {
+		return fmt.Errorf("new template: %w", err)
+	}
+	if tt, err = tt.ParseFS(fsys, tmpl.Globs...); err != nil {
 		return fmt.Errorf("parse template file(s): %w", err)
 	}
 	var rendered bytes.Buffer
@@ -41,6 +44,7 @@ func ApplySections[T any](fsys fs.FS, destdir string, tmpl Template[T], data any
 		return fmt.Errorf("template execution: %w", err)
 	}
 
+	expected := actual
 	for _, section := range tmpl.Sections {
 		begin, end := []byte(section.Begin), []byte(section.End)
 
@@ -55,16 +59,20 @@ func ApplySections[T any](fsys fs.FS, destdir string, tmpl Template[T], data any
 			continue
 		}
 
-		before, rest, found := bytes.Cut(content, begin)
+		before, rest, found := bytes.Cut(expected, begin)
 		_, after, closed := bytes.Cut(rest, end)
 		if !found || !closed {
 			GetLogger().Infof("skipping section '%s' of '%s' since its markers are missing", section.Begin, filepath.Base(out))
 			continue
 		}
-		content = slices.Concat(before, begin, inner, end, after)
+		expected = slices.Concat(before, begin, inner, end, after)
 	}
 
-	if err := os.WriteFile(out, content, files.RwRR); err != nil {
+	// leave an unchanged out untouched (no disk write, mtime kept), a read failure falls writes the file as if there was changes
+	if bytes.Equal(actual, expected) {
+		return nil
+	}
+	if err := os.WriteFile(out, expected, files.RwRR); err != nil {
 		return fmt.Errorf("write file: %w", err)
 	}
 	return nil

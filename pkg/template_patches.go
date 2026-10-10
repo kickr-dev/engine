@@ -52,8 +52,12 @@ func ApplyPatches[T any](fsys fs.FS, destdir string, tmpl Template[T], data any)
 		patchname := path.Base(patch)
 		GetLogger().Debugf("applying patch file '%s'", patchname)
 
-		tt, err := newTemplate(patchname, tmpl.Delimiters).ParseFS(fsys, patch)
+		tt, err := newTemplate(patchname, tmpl.Delimiters)
 		if err != nil {
+			errs = append(errs, fmt.Errorf("new template patch '%s': %w", patchname, err))
+			continue
+		}
+		if tt, err = tt.ParseFS(fsys, patch); err != nil {
 			errs = append(errs, fmt.Errorf("parse template patch '%s': %w", patchname, err))
 			continue
 		}
