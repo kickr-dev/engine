@@ -68,7 +68,7 @@ func ApplySections[T any](fsys fs.FS, destdir string, tmpl Template[T], data any
 		expected = slices.Concat(before, begin, inner, end, after)
 	}
 
-	// leave an unchanged out untouched (no disk write, mtime kept), a read failure falls writes the file as if there was changes
+	// leave an unchanged out untouched (no disk write, mtime kept)
 	if bytes.Equal(actual, expected) {
 		return nil
 	}
