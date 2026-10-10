@@ -18,7 +18,7 @@ type Parser[T any] func(ctx context.Context, destdir string, config *T) error
 //
 // Generators are called once all parsers have finished (parsers run sequentially, in their input order), with the resulting aggregated configuration.
 //
-// All generators given to Generate run concurrently with one another (bounded to runtime.GOMAXPROCS(0)).
+// All generators given to Generate run concurrently with one another.
 // An implementation must not assume any run order relative to other generators
 // and must be safe for concurrent use, since it may be invoked alongside other Generator[T] from the same Generate call.
 //

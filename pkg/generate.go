@@ -3,7 +3,6 @@ package engine
 import (
 	"context"
 	"errors"
-	"runtime"
 	"sync/atomic"
 
 	"golang.org/x/sync/errgroup"
@@ -18,7 +17,7 @@ var ErrFailedGeneration = errors.New("some error(s) occurred during generation")
 // It takes a configuration, parsers and generators.
 //
 // It executes all given parsers, in order,
-// and then runs all provided generators concurrently (bounded to runtime.GOMAXPROCS(0)) to apply or remove templates.
+// and then runs all provided generators concurrently to apply or remove templates.
 func Generate[T any](ctx context.Context, destdir string, config T, parsers []Parser[T], generators []Generator[T]) error {
 	// parse repository
 	errs := make([]error, 0, len(parsers))
@@ -31,8 +30,6 @@ func Generate[T any](ctx context.Context, destdir string, config T, parsers []Pa
 
 	// execute generators concurrently
 	var group errgroup.Group
-	group.SetLimit(runtime.GOMAXPROCS(0))
-
 	var failed atomic.Bool
 	for _, generator := range generators {
 		group.Go(func() error {
