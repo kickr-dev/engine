@@ -16,7 +16,7 @@ type Parser[T any] func(ctx context.Context, destdir string, config *T) error
 
 // Generator is the function to generate a specific part of target repository.
 //
-// Generators are called once all parsers finished (parsers run sequentially, in their input order), with the resulting aggregated configuration.
+// Generators are called once all parsers have finished (parsers run sequentially, in their input order), with the resulting aggregated configuration.
 //
 // All generators given to Generate run concurrently with one another (bounded to runtime.GOMAXPROCS(0)).
 // An implementation must not assume any run order relative to other generators
@@ -46,10 +46,10 @@ type Template[T any] struct {
 	// GeneratePolicy is the generation policy of the current file.
 	GeneratePolicy GeneratePolicy
 
-	// Globs is the slice of globs or specific files to parse during go templating.
+	// Globs is the slice of globs or specific files to parse during Go templating.
 	//
 	// It allows the current file to be split into multiple template files
-	// with "define" go template statements to help readability (use Globs function to help generate globs easily).
+	// with "define" Go template statements to help readability (use GlobsWithPart function to help generate globs easily).
 	//
 	// Note that the first element must be the raw path to main template file.
 	//
@@ -76,7 +76,7 @@ type Template[T any] struct {
 	// Additionally, patches are also templatized with Go template.
 	//
 	// A patch should have a name of the form "path/to/file.patch.tmpl" or "path/to/file.diff.tmpl"
-	// (but it doesn't really matter since the name is given is the slice)
+	// (but it doesn't really matter since the name is given in the slice)
 	// and should be a git diff file.
 	//
 	// Example:
@@ -96,26 +96,50 @@ type Template[T any] struct {
 
 	// Remove function is run (if not nil) to verify whether the out file should be removed or not.
 	Remove func(config T) bool
+
+	// Sections is the slice of delimited parts regenerated alone when the out file isn't generated as a whole
+	// (see ShouldGenerate, it means the file exists without generated notice, generation isn't forced and the policy isn't PolicyAlways).
+	//
+	// The whole template is rendered, then the rendered part from the first Begin marker to the next End marker
+	// replaces the same part of the out file, markers included.
+	// A rendered value containing a marker shifts the section bounds.
+	//
+	// A section missing from the rendered template or with a missing marker in the out file is skipped,
+	// the rest of the file is always kept as is.
+	//
+	// Example:
+	//
+	//	[]Section{{Begin: "<!-- BEGIN_BADGES -->", End: "<!-- END_BADGES -->"}}
+	Sections []Section
+}
+
+// Section represents a delimited part of a file, regenerated alone when the whole file isn't.
+type Section struct {
+	// Begin is the marker opening the section (e.g. "<!-- BEGIN_BADGES -->").
+	Begin string
+
+	// End is the marker closing the section (e.g. "<!-- END_BADGES -->").
+	End string
 }
 
 const (
-	// TmplExtension is the extension for templates file.
+	// TmplExtension is the extension for template files.
 	TmplExtension = ".tmpl"
 
-	// PartExtension is the extension for templates files' subparts.
+	// PartExtension is the extension for template files' subparts.
 	//
 	// It must be used with TmplExtension
-	// and as such files with only templates parts (define) can be created.
+	// and as such files with only template parts (define) can be created.
 	PartExtension = ".part"
 
-	// PatchExtension is the extension for templates files patches.
+	// PatchExtension is the extension for template file patches.
 	//
-	// It will be used in the future to patch altered files by users to follow updates with less generation issues.
+	// It will be used in the future to patch files altered by users to follow updates with fewer generation issues.
 	PatchExtension = ".patch"
 )
 
 // GlobsWithPart returns a slice of two elements, one with src + TmplExtension
-// and the other with a real glob, corresponding to all part files of into src template.
+// and the other with a real glob, corresponding to all part files of the src template.
 //
 // Example:
 //
