@@ -1,24 +1,16 @@
 # engine <!-- omit in toc -->
 
 <div align="center">
-  <a href="https://gitlab.com/kickr-dev/engine/-/releases">
-    <img alt="GitLab Release" src="https://img.shields.io/gitlab/v/release/kickr-dev%2Fengine?gitlab_url=https%3A%2F%2Fgitlab.com&include_prereleases&sort=semver&style=for-the-badge">
-  </a>
-  <a href="https://gitlab.com/kickr-dev/engine/-/work_items">
-    <img alt="GitLab Issues" src="https://img.shields.io/gitlab/issues/open/kickr-dev%2Fengine?gitlab_url=https%3A%2F%2Fgitlab.com&style=for-the-badge">
-  </a>
-  <a href="https://gitlab.com/kickr-dev/engine/-/blob/HEAD/LICENSE">
-    <img alt="GitLab License" src="https://img.shields.io/gitlab/license/kickr-dev%2Fengine?gitlab_url=https%3A%2F%2Fgitlab.com&style=for-the-badge">
-  </a>
-  <a href="https://gitlab.com/kickr-dev/engine/-/pipelines?ref=main">
-    <img alt="GitLab CICD" src="https://img.shields.io/gitlab/pipeline-status/kickr-dev%2Fengine?gitlab_url=https%3A%2F%2Fgitlab.com&branch=main&style=for-the-badge">
-  </a>
-  <a href="https://gitlab.com/kickr-dev/engine/-/blob/HEAD/go.mod">
-    <img alt="Go Version" src="https://img.shields.io/gitlab/go-mod/go-version/kickr-dev/engine?style=for-the-badge">
-  </a>
-  <a href="https://score.getplumber.io/gitlab.com/kickr-dev/engine">
-    <img alt="Plumber Score" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fscore.getplumber.io%2Fgitlab.com%2Fkickr-dev%2Fengine.json&style=for-the-badge">
-  </a>
+
+<!-- BEGIN_KICKR_BADGES -->
+[![GitLab Release](https://img.shields.io/gitlab/v/release/kickr-dev%2Fengine?gitlab_url=https%3A%2F%2Fgitlab.com&include_prereleases&sort=semver&style=for-the-badge)](https://gitlab.com/kickr-dev/engine/-/releases)
+[![GitLab Issues](https://img.shields.io/gitlab/issues/open/kickr-dev%2Fengine?gitlab_url=https%3A%2F%2Fgitlab.com&style=for-the-badge)](https://gitlab.com/kickr-dev/engine/-/work_items)
+[![GitLab License](https://img.shields.io/gitlab/license/kickr-dev%2Fengine?gitlab_url=https%3A%2F%2Fgitlab.com&style=for-the-badge)](https://gitlab.com/kickr-dev/engine/-/blob/HEAD/LICENSE)
+[![GitLab CICD](https://img.shields.io/gitlab/pipeline-status/kickr-dev%2Fengine?gitlab_url=https%3A%2F%2Fgitlab.com&branch=main&style=for-the-badge)](https://gitlab.com/kickr-dev/engine/-/pipelines?ref=main)
+[![Go Version](https://img.shields.io/gitlab/go-mod/go-version/kickr-dev/engine?style=for-the-badge)](https://gitlab.com/kickr-dev/engine/-/blob/HEAD/go.mod)
+[![Plumber Score](https://img.shields.io/endpoint?url=https%3A%2F%2Fscore.getplumber.io%2Fgitlab.com%2Fkickr-dev%2Fengine.json&style=for-the-badge)](https://score.getplumber.io/gitlab.com/kickr-dev/engine)
+<!-- END_KICKR_BADGES -->
+
 </div>
 
 ---
