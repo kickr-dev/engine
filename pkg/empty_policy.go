@@ -5,10 +5,7 @@ import (
 	"regexp"
 )
 
-var (
-	delimiterOnlyLine = regexp.MustCompile(`(?m)^\s*(?:/\*|\*/|<!--|-->|#!.*)\s*$\n?`)
-	generatedLine     = regexp.MustCompile(`(?m)^.*` + notice + `.*$\n?`)
-)
+var noticeLine = regexp.MustCompile(notice)
 
 // EmptyPolicy defines the policy to apply when a generated file is empty.
 //
@@ -40,8 +37,20 @@ func IsEmpty(content []byte, policy EmptyPolicy) bool {
 	if policy == PolicyKeep {
 		return false
 	}
-	if len(content) == 0 {
-		return true
+	for line := range bytes.Lines(content) {
+		if len(bytes.TrimSpace(line)) == 0 || noticeLine.Match(line) {
+			continue
+		}
+
+		// trim only the regexp \s class, a line with a Unicode space around its delimiter isn't empty
+		trimmed := bytes.Trim(line, " \t\n\f\r")
+		switch string(trimmed) {
+		case "/*", "*/", "<!--", "-->":
+		default:
+			if !bytes.HasPrefix(trimmed, []byte("#!")) {
+				return false
+			}
+		}
 	}
-	return len(bytes.TrimSpace(delimiterOnlyLine.ReplaceAll(generatedLine.ReplaceAll(content, nil), nil))) == 0
+	return true
 }
