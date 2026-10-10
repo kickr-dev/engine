@@ -72,7 +72,7 @@ func ApplySections[T any](fsys fs.FS, destdir string, tmpl Template[T], data any
 	if bytes.Equal(actual, expected) {
 		return nil
 	}
-	if err := os.WriteFile(out, expected, files.RwRR); err != nil {
+	if err := os.WriteFile(out, expected, files.RwRR); err != nil { //nolint:gosec // out is localized and joined under destdir
 		return fmt.Errorf("write file: %w", err)
 	}
 	return nil
