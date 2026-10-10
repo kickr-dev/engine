@@ -10,7 +10,7 @@ import (
 )
 
 // ReadTOML reads the input src from fsys
-// and unmarshal with TOML format into the out configuration.
+// and unmarshals it with TOML format into the out configuration.
 //
 // Input src path must be relative to fsys (see io/fs.FS and io/fs.ValidPath), not absolute.
 func ReadTOML(fsys fs.FS, src string, out any) error {

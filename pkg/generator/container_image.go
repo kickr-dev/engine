@@ -16,7 +16,7 @@ import (
 // The repository must include its registry host (e.g. "docker.io/library/golang").
 //
 // It can be used as a simple function, calling it directly,
-// but can also be used as its expected usage with engine.Generate:
+// but its expected usage is with engine.Generate:
 //
 //	type config struct { ... }
 //
@@ -26,7 +26,7 @@ import (
 //		...
 //	}
 //
-// Note: registry credentials are read from Docker configuration ($DOCKER_CONFIG or ~/.docker/config.json, with its credentials helpers),
+// Note: registry credentials are read from Docker configuration ($DOCKER_CONFIG or ~/.docker/config.json, with its credential helpers),
 // anonymous access is used when none matches the registry.
 func FetchContainerImage(ctx context.Context, httpClient *http.Client, repository, tag string) (string, error) {
 	if httpClient == nil {

@@ -72,22 +72,22 @@ type HugoVersion struct {
 }
 
 // ErrNoHugo is returned by ReadHugo when neither a hugo.(toml|yaml|yml) configuration file
-// or a theme.(toml|yaml|yml) hugo theme configuration file is found.
+// nor a theme.(toml|yaml|yml) hugo theme configuration file is found.
 //
 // It's a convenient error to use with errors.Is.
 var ErrNoHugo = errors.New("no hugo or hugo theme configuration found")
 
-// ReadHugo detects if the project is a GoHugo project.
+// ReadHugo detects if the project is a Hugo project.
 //
 // Detection consists of reading hugo.(toml|yaml|yml)
 // or theme.(toml|yaml|yml) files in the given destdir.
 //
-// The following checking order is made and the function will return on first success match:
+// The following checking order is made and the function will return on first successful match:
 //   - theme.toml, theme.yaml, theme.yml
 //   - hugo.toml, hugo.yaml, hugo.yml
 //
 // It can be used as a simple function, calling it directly,
-// but can also be used as its expected usage with engine.Generate:
+// but its expected usage is with engine.Generate:
 //
 //	type config struct { ... }
 //

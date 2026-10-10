@@ -19,7 +19,7 @@ var ErrNoGowork = errors.New("no go.work file")
 
 // Gowork represents the parsed struct for go.work file.
 type Gowork struct {
-	// ContainerImage is the container image to build the site with,
+	// ContainerImage is the container image to build the workspace with,
 	// a placeholder to be filled with generator.FetchContainerImage.
 	ContainerImage string
 
@@ -31,7 +31,7 @@ type Gowork struct {
 	// i.e. "toolchain go1.23.4" without "toolchain go" part.
 	Toolchain string
 
-	// Uses is the slice of all use in go.work file.
+	// Uses is the slice of all 'use' directives in go.work file.
 	Uses []GoworkUse
 }
 
@@ -61,7 +61,7 @@ func (g Gowork) Module() string {
 }
 
 // GoworkUse is one use of a go.work file.
-// It contains its valid parsed go.mod and it's use path.
+// It contains its valid parsed go.mod and its use path.
 type GoworkUse struct {
 	// Gomod is the parsed go.mod of current go.work use element.
 	Gomod Gomod
@@ -79,7 +79,7 @@ type GoworkUse struct {
 // It will return an error if the go.work file is missing the 'go' statement.
 //
 // It can be used as a simple function, calling it directly,
-// but can also be used as its expected usage with engine.Generate:
+// but its expected usage is with engine.Generate:
 //
 //	type config struct { ... }
 //
@@ -90,8 +90,8 @@ type GoworkUse struct {
 //			// do something with gowork (e.g. update config since it's a pointer)
 //			return nil
 //		}
-//		// fs.ErrNotExist is also valid
-//		// however here it won't handle in case at least one 'use' go.mod file doesn't exist
+//		// fs.ErrNotExist is also valid,
+//		// however it would also match the case where at least one 'use' go.mod file doesn't exist
 //		if !errors.Is(err, parser.ErrNoGowork) {
 //			return fmt.Errorf("read go.work: %w", err)
 //		}
@@ -112,7 +112,7 @@ type GoworkUse struct {
 func ReadGowork(destdir string) (Gowork, error) {
 	workpath := filepath.Join(destdir, FileGowork)
 
-	// read go.mod
+	// read go.work
 	content, err := os.ReadFile(workpath)
 	if err != nil {
 		if errors.Is(err, fs.ErrNotExist) {
@@ -121,7 +121,7 @@ func ReadGowork(destdir string) (Gowork, error) {
 		return Gowork{}, fmt.Errorf("read file: %w", err)
 	}
 
-	// parse go.work into it's modfile representation
+	// parse go.work into its modfile representation
 	file, err := modfile.ParseWork(FileGowork, content, nil)
 	if err != nil {
 		return Gowork{}, fmt.Errorf("parse modfile: %w", err)

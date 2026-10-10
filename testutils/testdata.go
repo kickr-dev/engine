@@ -12,7 +12,7 @@ import (
 )
 
 // tdv is a OnceValues to ensure testdata path is computed only once
-// and avoid loosing time during test to compute its path (since it's absolute, once computed it can be used by any test).
+// and avoid losing time during test to compute its path (since it's absolute, once computed it can be used by any test).
 var tdv = sync.OnceValues(func() (string, error) {
 	dir, _ := os.Getwd()
 	for {
@@ -21,7 +21,7 @@ var tdv = sync.OnceValues(func() (string, error) {
 			break
 		}
 
-		// handle root directory -> VolumeName (e.g "C:") + os.PathSeparator
+		// handle root directory -> VolumeName (e.g. "C:") + os.PathSeparator
 		if dir == filepath.VolumeName(dir)+string(os.PathSeparator) {
 			return "", errors.New("no parent go.mod found")
 		}

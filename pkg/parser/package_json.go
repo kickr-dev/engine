@@ -18,7 +18,7 @@ var (
 
 var packageManagerRegexp = regexp.MustCompile(`^(npm|pnpm|yarn|bun)@\d+\.\d+\.\d+(-.+)?$`)
 
-// PackageJSON represents the node package json file.
+// PackageJSON represents the Node.js package.json file.
 type PackageJSON struct {
 	Author *string `json:"author,omitempty"`
 	Config struct {

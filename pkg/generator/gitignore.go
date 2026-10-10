@@ -13,7 +13,7 @@ import (
 const (
 	// FileGitignore is the filename representation for .gitignore.
 	FileGitignore = ".gitignore"
-	// GitignoreBaseURL is the Toptal base URL to retrieves .gitignore templates.
+	// GitignoreBaseURL is the Toptal base URL to retrieve .gitignore templates.
 	GitignoreBaseURL = "https://www.toptal.com/developers/gitignore/api"
 )
 
@@ -23,7 +23,7 @@ var ErrNoClient = errors.New("no client provided")
 var (
 	// ErrInvalidResponse is returned when an HTTP request response status isn't 2XX.
 	//
-	// When this error is returned, the body is returned alongside it.
+	// When this error is returned, the response body is included in the error message.
 	ErrInvalidResponse = errors.New("invalid response from api")
 
 	// ErrNoTemplates is returned when templates slice input in FetchGitignore function is empty.
@@ -41,7 +41,7 @@ var (
 //		...
 //	}
 //
-// Note: Full list of templates is available on [Gitignore listing].
+// Note: the full list of templates is available on [Gitignore listing].
 //
 // [Gitignore API]: https://docs.gitignore.io/use/api
 // [Gitignore listing]: https://www.toptal.com/developers/gitignore/api/list

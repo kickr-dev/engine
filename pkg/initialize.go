@@ -8,10 +8,9 @@ import (
 	"charm.land/huh/v2"
 )
 
-// Initialize initializes a new project an returns resulting configuration.
+// Initialize initializes a new project and returns the resulting configuration.
 //
-// All user inputs are configured through WithFormGroups option, by default the main maintainer
-// and chart generation will be asked.
+// All user inputs are configured through WithFormGroups option.
 func Initialize[T any](ctx context.Context, opts ...InitializeOption[T]) (T, error) {
 	ro := newInitializeOpt(opts...)
 
@@ -43,11 +42,10 @@ func WithTeaOptions[T any](opts ...tea.ProgramOption) InitializeOption[T] {
 	}
 }
 
-// FormGroup is the signature function for functions reading user inputs.
-// Inspiration can be found with ReadMaintainer and ReadChart functions.
+// FormGroup is the function signature for functions reading user inputs.
 type FormGroup[T any] func(config *T) *huh.Group
 
-// WithFormGroups sets (it overrides the previously defined functions everytime it's called) the functions reading user inputs in Initialize function.
+// WithFormGroups sets (it overrides the previously defined functions every time it's called) the functions reading user inputs in Initialize function.
 func WithFormGroups[T any](inputs ...FormGroup[T]) InitializeOption[T] {
 	return func(ro initializeOptions[T]) initializeOptions[T] {
 		ro.formGroups = inputs

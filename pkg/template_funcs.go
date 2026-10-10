@@ -16,7 +16,7 @@ import (
 
 // FuncMap returns a minimal template.FuncMap.
 //
-// It can be extended with MergeMaps.
+// It can be extended with WithFuncMap.
 func FuncMap() template.FuncMap {
 	return template.FuncMap{
 		"cutAfter": cutAfter,
@@ -51,7 +51,7 @@ func mergeMaps(dst map[string]any, src ...any) (map[string]any, error) {
 	return dst, errors.Join(errs...)
 }
 
-// toQuery transforms a specific into its query parameter format.
+// toQuery transforms an input string into its query parameter format.
 func toQuery(in string) string {
 	return url.QueryEscape(in)
 }
@@ -59,7 +59,7 @@ func toQuery(in string) string {
 // toYAML takes an interface, marshals it to yaml, and returns a string.
 // It will always return a string, even on marshal error (empty string).
 //
-// This is designed to be called from a go template.
+// This is designed to be called from a Go template.
 func toYAML(v any) string {
 	b, err := yaml.MarshalWithOptions(v, yaml.Indent(2))
 	if err != nil {

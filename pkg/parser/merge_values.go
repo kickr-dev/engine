@@ -13,25 +13,25 @@ import (
 	"github.com/kickr-dev/engine/pkg/files"
 )
 
-// MergeValues merges all input values files into one and only map.
+// MergeValues merges all input values files into a single map.
 //
-// It can also takes an input values struct / map that could have been read beforehand
+// It can also take an input values struct / map that could have been read beforehand
 // and marshals it with JSON as base values.
 //
 // All successive merges are made with override strategy,
 // meaning that a value can be overridden by the next values file.
 // See mergo.Merge for more details.
 //
-// In case of error, merges stops on the first error and returns it.
+// In case of error, merging stops on the first error and returns it.
 //
 // It can be used as a simple function, calling it directly,
-// but can also be used as its expected usage with engine.Generate:
+// but its expected usage is with engine.Generate:
 //
 //	type config struct { ... }
 //
 //	func ParserChart(ctx context.Context, destdir string, c *config) error {
 //		chartdir := filepath.Join(destdir, "chart")
-//		if config.CI != nil && config.CI.Deployment != nil && config.CI.Deployment.Helm {
+//		if c.CI != nil && c.CI.Deployment != nil && c.CI.Deployment.Helm {
 //			engine.GetLogger().Infof("skipping helm chart, configuration has 'exclude' key with 'chart' in it")
 //			if err := os.RemoveAll(chartdir); err != nil {
 //				return fmt.Errorf("remove chart dir: %w", err)

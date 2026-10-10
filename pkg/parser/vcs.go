@@ -22,7 +22,7 @@ type VCS struct {
 	//
 	// Self-hosted or aliased hosts that don't contain 'bitbucket', 'gitea', 'github', 'gitlab' or 'stash'
 	// won't have their platform detected.
-	// In such cases, override manually the attribute.
+	// In such cases, override the attribute manually.
 	Platform string
 
 	// ProjectHost represents the host where the project is hosted.
@@ -38,7 +38,7 @@ type VCS struct {
 	Tags []string
 }
 
-// parsePlatform returns the platform name associated to input host.
+// parsePlatform returns the platform name associated with input host.
 func parsePlatform(host string) (string, bool) {
 	matchers := []struct {
 		platform   string
