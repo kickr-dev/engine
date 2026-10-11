@@ -7,7 +7,6 @@ import (
 	"io/fs"
 	"os"
 	"path"
-	"path/filepath"
 
 	"github.com/bluekeyes/go-gitdiff/gitdiff"
 
@@ -17,16 +16,9 @@ import (
 // ApplyPatches applies patches defined in input tmpl.
 //
 // Each patch is templatized using Go template and then patched on provided tmpl file.
-func ApplyPatches[T any](fsys fs.FS, destdir string, tmpl Template[T], data any) error {
-	// force out localization since generation is always done on current fs
-	out, err := filepath.Localize(tmpl.Out)
-	if err != nil {
-		return fmt.Errorf("localize path: %w", err)
-	}
-	out = filepath.Join(destdir, out)
-
+func ApplyPatches[T any](fsys fs.FS, root *os.Root, tmpl Template[T], data any) error {
 	apply := func(diff *gitdiff.File) error {
-		file, err := os.OpenFile(out, os.O_RDWR|os.O_CREATE, files.RwRR)
+		file, err := root.OpenFile(tmpl.Out, os.O_RDWR|os.O_CREATE, files.RwRR)
 		if err != nil {
 			return fmt.Errorf("open file: %w", err)
 		}

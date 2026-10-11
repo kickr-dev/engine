@@ -35,6 +35,18 @@ var tdv = sync.OnceValues(func() (string, error) {
 	return filepath.Join(dir, "testdata"), nil
 })
 
+// Root opens dir as an os.Root, closed at the end of the test.
+func Root(tb testing.TB, dir string) *os.Root {
+	tb.Helper()
+
+	root, err := os.OpenRoot(dir)
+	if err != nil {
+		tb.Fatal(err)
+	}
+	tb.Cleanup(func() { _ = root.Close() })
+	return root
+}
+
 // Testdata returns the path to testdata folder based on current directory (determined with os.Getwd).
 func Testdata(tb testing.TB) string {
 	tb.Helper()

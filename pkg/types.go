@@ -24,7 +24,7 @@ type Parser[T any] func(ctx context.Context, destdir string, config *T) error
 //
 // A returned error is only logged, to avoid one big aggregated error at the end of Generate.
 // A returned ErrFailedGeneration is not logged, since it signals the generator already logged its own error.
-type Generator[T any] func(ctx context.Context, destdir string, config T) error
+type Generator[T any] func(ctx context.Context, root *os.Root, config T) error
 
 // Module is implemented by any per-directory configuration a monorepository is composed of.
 //

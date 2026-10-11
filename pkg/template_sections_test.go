@@ -12,6 +12,7 @@ import (
 
 	engine "github.com/kickr-dev/engine/pkg"
 	"github.com/kickr-dev/engine/pkg/files"
+	"github.com/kickr-dev/engine/testutils"
 )
 
 func TestApplySections(t *testing.T) {
@@ -25,10 +26,10 @@ func TestApplySections(t *testing.T) {
 		destdir := t.TempDir()
 
 		// Act
-		err := engine.ApplySections(os.DirFS(destdir), destdir, engine.Template[testconfig]{}, testconfig{})
+		err := engine.ApplySections(os.DirFS(destdir), testutils.Root(t, destdir), engine.Template[testconfig]{}, testconfig{})
 
 		// Assert
-		assert.ErrorContains(t, err, "localize path")
+		assert.ErrorContains(t, err, "read file")
 	})
 
 	t.Run("error_read_out", func(t *testing.T) {
@@ -38,7 +39,7 @@ func TestApplySections(t *testing.T) {
 		template := engine.Template[testconfig]{Out: "file.txt", Sections: sections}
 
 		// Act
-		err := engine.ApplySections(os.DirFS(srcdir), destdir, template, testconfig{})
+		err := engine.ApplySections(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "read file")
@@ -58,7 +59,7 @@ func TestApplySections(t *testing.T) {
 		require.NoError(t, file.Close())
 
 		// Act
-		err = engine.ApplySections(os.DirFS(destdir), destdir, template, testconfig{})
+		err = engine.ApplySections(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "parse template file(s)")
@@ -79,7 +80,7 @@ func TestApplySections(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(srcdir, template.Globs[0]), []byte("{{ .Str"), files.RwRR))
 
 		// Act
-		err = engine.ApplySections(os.DirFS(srcdir), destdir, template, testconfig{})
+		err = engine.ApplySections(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "parse template file(s)")
@@ -99,7 +100,7 @@ func TestApplySections(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Out), []byte(existing), files.RwRR))
 
 		// Act
-		err := engine.ApplySections(os.DirFS(srcdir), destdir, template, testconfig{})
+		err := engine.ApplySections(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "template execution")
@@ -125,7 +126,7 @@ func TestApplySections(t *testing.T) {
 			files.RwRR))
 
 		// Act
-		err := engine.ApplySections(os.DirFS(srcdir), destdir, template, testconfig{Str: "value"})
+		err := engine.ApplySections(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{Str: "value"})
 
 		// Assert
 		require.NoError(t, err)
@@ -155,7 +156,7 @@ func TestApplySections(t *testing.T) {
 		require.NoError(t, os.Chtimes(dest, mtime, mtime))
 
 		// Act
-		err := engine.ApplySections(os.DirFS(srcdir), destdir, template, testconfig{Str: "value"})
+		err := engine.ApplySections(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{Str: "value"})
 
 		// Assert
 		require.NoError(t, err)
@@ -181,7 +182,7 @@ func TestApplySections(t *testing.T) {
 			files.RwRR))
 
 		// Act
-		err := engine.ApplySections(os.DirFS(srcdir), destdir, template, testconfig{Str: "value"})
+		err := engine.ApplySections(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{Str: "value"})
 
 		// Assert
 		require.NoError(t, err)
@@ -207,7 +208,7 @@ func TestApplySections(t *testing.T) {
 			files.RwRR))
 
 		// Act
-		err := engine.ApplySections(os.DirFS(srcdir), destdir, template, testconfig{Str: "value"})
+		err := engine.ApplySections(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{Str: "value"})
 
 		// Assert
 		require.NoError(t, err)
@@ -238,7 +239,7 @@ func TestApplySections(t *testing.T) {
 		t.Cleanup(func() { engine.Configure(engine.WithLogger(initial)) })
 
 		// Act
-		err := engine.ApplySections(os.DirFS(srcdir), destdir, template, testconfig{Str: "value"})
+		err := engine.ApplySections(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{Str: "value"})
 
 		// Assert
 		require.NoError(t, err)
@@ -264,7 +265,7 @@ func TestApplySections(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Out), []byte(existing), files.RwRR))
 
 		// Act
-		err := engine.ApplySections(os.DirFS(srcdir), destdir, template, testconfig{Str: "value"})
+		err := engine.ApplySections(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{Str: "value"})
 
 		// Assert
 		require.NoError(t, err)
