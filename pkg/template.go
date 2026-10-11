@@ -17,29 +17,25 @@ import (
 )
 
 // ApplyTemplate writes or deletes an input Template with associated data.
-func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T) error {
-	// force out localization since generation is always done on current fs
-	out, err := filepath.Localize(tmpl.Out)
-	if err != nil {
-		return fmt.Errorf("localize path: %w", err)
-	}
-	out = filepath.Join(destdir, out)
-
+func ApplyTemplate[T any](fsys fs.FS, root *os.Root, tmpl Template[T], config T) error {
 	// remove file when tmpl.Remove asks for it
 	if tmpl.Remove != nil && tmpl.Remove(config) {
-		if !files.Exists(out) {
-			return nil
+		if _, err := root.Lstat(tmpl.Out); err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				return nil
+			}
+			return fmt.Errorf("lstat '%s': %w", tmpl.Out, err)
 		}
 
 		GetLogger().Debugf("removing '%s'", tmpl.Out)
-		if err := os.RemoveAll(out); err != nil {
+		if err := root.RemoveAll(tmpl.Out); err != nil {
 			return fmt.Errorf("remove '%s': %w", tmpl.Out, err)
 		}
 		return nil
 	}
 
 	// avoid generating file if it already exists or something else
-	ok, err := ShouldGenerate(out, tmpl.GeneratePolicy)
+	ok, err := ShouldGenerate(filepath.Join(root.Name(), tmpl.Out), tmpl.GeneratePolicy)
 	if err != nil {
 		return fmt.Errorf("should generate: %w", err)
 	}
@@ -57,74 +53,74 @@ func ApplyTemplate[T any](fsys fs.FS, destdir string, tmpl Template[T], config T
 		if tt, err = tt.ParseFS(fsys, tmpl.Globs...); err != nil {
 			return fmt.Errorf("parse template file(s): %w", err)
 		}
-		if err := ExecuteTemplate(tt, config, out, tmpl.EmptyPolicy, tmpl.Mode); err != nil {
+		if err := ExecuteTemplate(tt, config, root, tmpl.Out, tmpl.EmptyPolicy, tmpl.Mode); err != nil {
 			return fmt.Errorf("template execute: %w", err)
 		}
 	}
 
 	if !ok && len(tmpl.Globs) > 0 && len(tmpl.Sections) > 0 {
 		GetLogger().Infof("applying sections on '%s'", tmpl.Out)
-		if err := ApplySections(fsys, destdir, tmpl, config); err != nil {
+		if err := ApplySections(fsys, root, tmpl, config); err != nil {
 			return fmt.Errorf("apply sections: %w", err)
 		}
 	}
 
 	if len(tmpl.Patches) > 0 {
-		GetLogger().Infof("applying patches on '%s'", path.Base(out))
-		if err := ApplyPatches(fsys, destdir, tmpl, config); err != nil {
+		GetLogger().Infof("applying patches on '%s'", path.Base(tmpl.Out))
+		if err := ApplyPatches(fsys, root, tmpl, config); err != nil {
 			return fmt.Errorf("apply patches: %w", err)
 		}
 	}
 	return nil
 }
 
-// ExecuteTemplate runs tmpl.Execute with input data and writes the result into given out.
+// ExecuteTemplate runs tmpl.Execute with input data and writes the result into given name inside root.
 //
-// When ExecuteTemplate is called, it rewrites out only when its content changes and always reevaluates its permissions.
+// When ExecuteTemplate is called, it rewrites name only when its content changes and always reevaluates its permissions.
 //
 // The input mode sets the requested file mode for the generated file (e.g. files.RwRR, files.RwxRxRxRx),
 // defaulting to files.RwRR when not provided.
 //
 // The system umask (see files.Umask) is always applied on top (mode &^ umask, no-op on non-compatible platforms).
-func ExecuteTemplate(tmpl *template.Template, data any, out string, policy EmptyPolicy, mode os.FileMode) error {
+func ExecuteTemplate(tmpl *template.Template, data any, root *os.Root, name string, policy EmptyPolicy, mode os.FileMode) error {
 	var buf bytes.Buffer
 	if err := tmpl.Execute(&buf, data); err != nil {
 		return fmt.Errorf("template execution: %w", err)
 	}
 
 	if ok := IsEmpty(buf.Bytes(), policy); ok {
-		base := filepath.Base(out)
-		if !files.Exists(out) {
+		base := filepath.Base(name)
+		if _, err := root.Lstat(name); err != nil {
 			GetLogger().Debugf("not generating '%s' since it would be empty", base)
 			return nil
 		}
 		GetLogger().Debugf("removing '%s' since it's empty", base)
-		if err := os.RemoveAll(out); err != nil {
+		if err := root.RemoveAll(name); err != nil {
 			return fmt.Errorf("remove '%s': %w", base, err)
 		}
 		return nil
 	}
 
-	if err := os.MkdirAll(filepath.Dir(out), files.RwxRxRxRx); err != nil && !errors.Is(err, fs.ErrExist) {
+	if err := root.MkdirAll(filepath.Dir(name), files.RwxRxRxRx); err != nil {
 		return fmt.Errorf("mkdir: %w", err)
 	}
 
-	// apply the requested permissions to out file, honoring the system umask
+	// apply the requested permissions to name file, honoring the system umask
 	requested := mode
 	if requested == 0 {
 		requested = files.RwRR
 	}
 	requested &^= files.Umask()
 
-	// leave an unchanged out untouched (no disk write, mtime kept), a read failure falls writes the file as if there was changes
-	if existing, err := os.ReadFile(out); err == nil && bytes.Equal(existing, buf.Bytes()) {
-		if err := os.Chmod(out, requested); err != nil {
+	// leave an unchanged name untouched (no disk write, mtime kept), a read failure falls writes the file as if there was changes
+	if existing, err := root.ReadFile(name); err == nil && bytes.Equal(existing, buf.Bytes()) {
+		if err := root.Chmod(name, requested); err != nil {
 			return fmt.Errorf("chmod: %w", err)
 		}
 		return nil
 	}
 
-	file, err := os.OpenFile(out, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, requested)
+	file, err := root.OpenFile(name, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, requested)
 	if err != nil {
 		return fmt.Errorf("open file: %w", err)
 	}

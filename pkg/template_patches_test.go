@@ -10,18 +10,33 @@ import (
 
 	engine "github.com/kickr-dev/engine/pkg"
 	"github.com/kickr-dev/engine/pkg/files"
+	"github.com/kickr-dev/engine/testutils"
 )
 
 func TestApplyPatches(t *testing.T) {
-	t.Run("error_missing_out", func(t *testing.T) {
+	t.Run("error_out_outside_root", func(t *testing.T) {
 		// Arrange
-		destdir := t.TempDir()
+		tmp := t.TempDir()
+		destdir := filepath.Join(tmp, "dest")
+		require.NoError(t, os.Mkdir(destdir, files.RwxRxRxRx))
+		template := engine.Template[testconfig]{
+			Out:     "../file.txt",
+			Patches: []string{"file.patch"},
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Patches[0]), []byte(`
+diff --git a/file.txt b/file.txt
+index 332d5ce..39af8aa 100644
+--- a/file.txt
++++ b/file.txt
+@@ -1,0 +1,1 @@
++value`), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), destdir, engine.Template[testconfig]{}, testconfig{})
+		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
-		assert.ErrorContains(t, err, "localize path")
+		assert.ErrorContains(t, err, "open file")
+		assert.NoFileExists(t, filepath.Join(tmp, "file.txt"))
 	})
 
 	t.Run("error_missing_template_patch", func(t *testing.T) {
@@ -33,7 +48,7 @@ func TestApplyPatches(t *testing.T) {
 		}
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), destdir, template, testconfig{})
+		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "parse template patch")
@@ -49,7 +64,7 @@ func TestApplyPatches(t *testing.T) {
 		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Patches[0]), []byte("{{ .invalid }}"), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), destdir, template, testconfig{})
+		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "template patch execution")
@@ -71,7 +86,7 @@ index 332d5ce..39af8aa 100644
 +value`), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), destdir, template, testconfig{})
+		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "parse git patch")
@@ -93,7 +108,7 @@ index 332d5ce..39af8aa 100644
 +value`), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), destdir, template, testconfig{})
+		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "apply diff number")
@@ -115,7 +130,7 @@ index 332d5ce..39af8aa 100644
 +value`), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), destdir, template, testconfig{})
+		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		require.NoError(t, err)
@@ -144,7 +159,7 @@ index 332d5ce..39af8aa 100644
 \ No newline at end of file`), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), destdir, template, testconfig{})
+		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		require.NoError(t, err)
@@ -173,7 +188,7 @@ index 332d5ce..39af8aa 100644
 \ No newline at end of file`), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), destdir, template, testconfig{})
+		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		require.NoError(t, err)

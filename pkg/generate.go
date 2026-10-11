@@ -3,6 +3,8 @@ package engine
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os"
 	"sync/atomic"
 
 	"golang.org/x/sync/errgroup"
@@ -28,12 +30,20 @@ func Generate[T any](ctx context.Context, destdir string, config T, parsers []Pa
 		return err
 	}
 
+	root, err := os.OpenRoot(destdir)
+	if err != nil {
+		return fmt.Errorf("open root: %w", err)
+	}
+	defer root.Close()
+
 	// execute generators concurrently
-	var group errgroup.Group
-	var failed atomic.Bool
+	var (
+		failed atomic.Bool
+		group  errgroup.Group
+	)
 	for _, generator := range generators {
 		group.Go(func() error {
-			if err := generator(ctx, destdir, config); err != nil {
+			if err := generator(ctx, root, config); err != nil {
 				if !errors.Is(err, ErrFailedGeneration) {
 					GetLogger().Errorf("%s", err.Error())
 				}

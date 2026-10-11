@@ -99,7 +99,7 @@ flowchart TB
 - `ApplyTemplate`: applies a single `Template` (used internally by `GeneratorTemplates` / `GeneratorModules`)
 - `ApplyPatches`: applies a `Template`'s `Patches` on an already generated file
 - `ApplySections`: regenerates a `Template`'s `Sections` in an already existing file, keeping the rest as is
-- `ExecuteTemplate`: executes a parsed Go template and writes it to `out`, honoring the given `EmptyPolicy`
+- `ExecuteTemplate`: executes a parsed Go template and writes it to a file inside an `os.Root`, honoring the given `EmptyPolicy`
 - `FuncMap`: returns the default `template.FuncMap` used during Go templating
 - `ToSlug`: slugifies an input string
 - `GlobsWithPart`: builds glob patterns for a template name, including its `.part` subparts

@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"os"
 	"path"
-	"path/filepath"
 	"slices"
 
 	"github.com/kickr-dev/engine/pkg/files"
@@ -18,15 +17,8 @@ import (
 // user-added content outside sections is never templatized.
 //
 // The destination must already exist.
-func ApplySections[T any](fsys fs.FS, destdir string, tmpl Template[T], data any) error {
-	// force out localization since generation is always done on current fs
-	out, err := filepath.Localize(tmpl.Out)
-	if err != nil {
-		return fmt.Errorf("localize path: %w", err)
-	}
-	out = filepath.Join(destdir, out)
-
-	actual, err := os.ReadFile(out)
+func ApplySections[T any](fsys fs.FS, root *os.Root, tmpl Template[T], data any) error {
+	actual, err := root.ReadFile(tmpl.Out)
 	if err != nil { // output file should exist since ApplySections is expected to be called from ApplyTemplate or at least after
 		return fmt.Errorf("read file: %w", err)
 	}
@@ -51,18 +43,18 @@ func ApplySections[T any](fsys fs.FS, destdir string, tmpl Template[T], data any
 		_, rest, found := bytes.Cut(rendered.Bytes(), begin)
 		inner, _, closed := bytes.Cut(rest, end)
 		if !found {
-			GetLogger().Debugf("skipping section '%s' of '%s' since it's not rendered", section.Begin, filepath.Base(out))
+			GetLogger().Debugf("skipping section '%s' of '%s' since it's not rendered", section.Begin, path.Base(tmpl.Out))
 			continue
 		}
 		if !closed {
-			GetLogger().Warnf("skipping section '%s' of '%s', begin marker is rendered but not its end marker", section.Begin, filepath.Base(out))
+			GetLogger().Warnf("skipping section '%s' of '%s', begin marker is rendered but not its end marker", section.Begin, path.Base(tmpl.Out))
 			continue
 		}
 
 		before, rest, found := bytes.Cut(expected, begin)
 		_, after, closed := bytes.Cut(rest, end)
 		if !found || !closed {
-			GetLogger().Infof("skipping section '%s' of '%s' since its markers are missing", section.Begin, filepath.Base(out))
+			GetLogger().Infof("skipping section '%s' of '%s' since its markers are missing", section.Begin, path.Base(tmpl.Out))
 			continue
 		}
 		expected = slices.Concat(before, begin, inner, end, after)
@@ -72,7 +64,7 @@ func ApplySections[T any](fsys fs.FS, destdir string, tmpl Template[T], data any
 	if bytes.Equal(actual, expected) {
 		return nil
 	}
-	if err := os.WriteFile(out, expected, files.RwRR); err != nil { //nolint:gosec // out is localized and joined under destdir
+	if err := root.WriteFile(tmpl.Out, expected, files.RwRR); err != nil {
 		return fmt.Errorf("write file: %w", err)
 	}
 	return nil
