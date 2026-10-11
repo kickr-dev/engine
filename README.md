@@ -80,9 +80,9 @@ flowchart TB
     CHK -->|yes| ERR["Stop, nothing generated"]
     CHK -->|no| Generation
 
-    subgraph Generation["Generate files (in order)"]
+    subgraph Generation["Generate files (concurrently)"]
         direction LR
-        G1["Generator 1"] --> G2["Generator 2"] --> Gn["Generator N"]
+        G1["Generator 1"] ~~~ G2["Generator 2"] ~~~ Gn["Generator N"]
     end
 
     Generation --> CHK2{"Something failed?"}
