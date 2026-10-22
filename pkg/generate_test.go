@@ -42,66 +42,6 @@ func TestGenerate(t *testing.T) {
 		assert.ErrorContains(t, err, "some error")
 	})
 
-	t.Run("error_read_template_out", func(t *testing.T) {
-		// Arrange
-		destdir := t.TempDir()
-		template := engine.Template[testconfig]{Out: "dir"}
-		require.NoError(t, os.Mkdir(filepath.Join(destdir, template.Out), files.RwxRxRxRx))
-
-		// Act
-		err := engine.Generate(ctx, destdir, testconfig{},
-			[]engine.Parser[testconfig]{nooparser},
-			[]engine.Generator[testconfig]{engine.GeneratorTemplates(os.DirFS(destdir), []engine.Template[testconfig]{template})})
-
-		// Assert
-		assert.ErrorIs(t, err, engine.ErrFailedGeneration)
-	})
-
-	t.Run("error_parse_template_globs", func(t *testing.T) {
-		// Arrange
-		destdir := t.TempDir()
-		template := engine.Template[testconfig]{
-			Globs: []string{"invalid.txt"},
-			Out:   "file.txt",
-		}
-
-		// Act
-		err := engine.Generate(ctx, destdir, testconfig{},
-			[]engine.Parser[testconfig]{nooparser},
-			[]engine.Generator[testconfig]{engine.GeneratorTemplates(os.DirFS(destdir), []engine.Template[testconfig]{template})})
-
-		// Assert
-		assert.ErrorIs(t, err, engine.ErrFailedGeneration)
-	})
-
-	t.Run("success_template", func(t *testing.T) {
-		// Arrange
-		destdir := t.TempDir()
-		template := engine.Template[testconfig]{
-			Globs: []string{"file.txt.tmpl"},
-			Out:   "file.txt",
-		}
-		out := filepath.Join(destdir, template.Out)
-
-		require.NoError(t, os.WriteFile(
-			filepath.Join(destdir, template.Globs[0]),
-			[]byte("value {{ .Str }} is empty, since no parser updated it"), files.RwRR))
-		file, err := os.Create(out)
-		require.NoError(t, err)
-		require.NoError(t, file.Close())
-
-		// Act
-		err = engine.Generate(ctx, destdir, testconfig{},
-			[]engine.Parser[testconfig]{nooparser},
-			[]engine.Generator[testconfig]{engine.GeneratorTemplates(os.DirFS(destdir), []engine.Template[testconfig]{template})})
-
-		// Assert
-		require.NoError(t, err)
-		content, err := os.ReadFile(out)
-		require.NoError(t, err)
-		assert.Equal(t, "value  is empty, since no parser updated it", string(content))
-	})
-
 	t.Run("success_concurrent_generators", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()

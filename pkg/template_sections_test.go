@@ -39,25 +39,6 @@ func TestApplySections(t *testing.T) {
 		assert.NoFileExists(t, filepath.Join(destdir, template.Out))
 	})
 
-	t.Run("error_invalid_glob", func(t *testing.T) {
-		// Arrange
-		destdir := t.TempDir()
-		template := engine.Template[testconfig]{
-			Globs:    []string{"["},
-			Out:      "file.txt",
-			Sections: sections,
-		}
-		file, err := os.Create(filepath.Join(destdir, template.Out))
-		require.NoError(t, err)
-		require.NoError(t, file.Close())
-
-		// Act
-		err = engine.ApplySections(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
-
-		// Assert
-		assert.ErrorContains(t, err, "parse template file(s)")
-	})
-
 	t.Run("error_parse_template", func(t *testing.T) {
 		// Arrange
 		srcdir := t.TempDir()

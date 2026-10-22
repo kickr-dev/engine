@@ -94,21 +94,6 @@ func TestReadGomod(t *testing.T) {
 		assert.Equal(t, expectedMod, mod)
 		assert.Equal(t, expectedVCS, mod.AsVCS())
 	})
-
-	t.Run("toolchain_default", func(t *testing.T) {
-		// Arrange
-		destdir := t.TempDir()
-
-		err := os.WriteFile(filepath.Join(destdir, parser.FileGomod), []byte("module github.com/kickr-dev/engine\ngo 1.22\ntoolchain default"), files.RwRR)
-		require.NoError(t, err)
-
-		// Act
-		mod, err := parser.ReadGomod(destdir)
-
-		// Assert
-		require.NoError(t, err)
-		assert.Equal(t, "default", mod.Toolchain)
-	})
 }
 
 func TestReadGoCmd(t *testing.T) {

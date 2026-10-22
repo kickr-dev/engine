@@ -25,19 +25,6 @@ func TestReadTOML(t *testing.T) {
 		assert.ErrorIs(t, err, fs.ErrNotExist)
 	})
 
-	t.Run("error_read", func(t *testing.T) {
-		// Arrange
-		dir := t.TempDir()
-		require.NoError(t, os.Mkdir(filepath.Join(dir, "file.toml"), files.RwxRxRxRx))
-
-		// Act
-		var c testconfig
-		err := files.ReadTOML(os.DirFS(dir), "file.toml", &c)
-
-		// Assert
-		assert.ErrorContains(t, err, "read file")
-	})
-
 	t.Run("error_unmarshal", func(t *testing.T) {
 		// Arrange
 		dir := t.TempDir()

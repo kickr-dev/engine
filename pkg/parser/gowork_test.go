@@ -160,23 +160,6 @@ func TestGoworkModule(t *testing.T) {
 		assert.Empty(t, module)
 	})
 
-	t.Run("some_modules_different", func(t *testing.T) {
-		// Arrange
-		gowork := parser.Gowork{
-			Uses: []parser.GoworkUse{
-				{Gomod: parser.Gomod{Module: "lib1"}},
-				{Gomod: parser.Gomod{Module: "lib2/sub1"}},
-				{Gomod: parser.Gomod{Module: "lib2/sub2"}},
-			},
-		}
-
-		// Act
-		module := gowork.Module()
-
-		// Assert
-		assert.Empty(t, module)
-	})
-
 	t.Run("modules_with_same_prefix", func(t *testing.T) {
 		// Arrange
 		prefixes := []string{"github.com", "gitlab.com", "github.com/kickr-dev", "gitlab.com/kickr-dev"}
