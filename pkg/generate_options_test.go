@@ -11,6 +11,8 @@ import (
 )
 
 func TestConfigure(t *testing.T) {
+	t.Cleanup(func() { Configure() })
+
 	t.Run("no_options", func(t *testing.T) {
 		// Act
 		Configure()
