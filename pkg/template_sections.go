@@ -11,13 +11,22 @@ import (
 	"github.com/kickr-dev/engine/pkg/files"
 )
 
-// ApplySections regenerates each section defined in input tmpl, the rest of the already existing tmpl file is kept as is.
+// ApplySections regenerates each section defined in input tmpl, if any,
+// in the already existing tmpl file, the rest of the file is kept as is.
 //
-// The whole template is rendered and each rendered section (markers included) replaces its counterpart in the destination,
-// user-added content outside sections is never templatized.
-//
-// The destination must already exist.
+// The whole template is rendered from its Globs (nothing happens without them) and each rendered section (markers included)
+// replaces its counterpart in the destination, user-added content outside sections is never templatized.
 func ApplySections[T any](fsys fs.FS, root *os.Root, tmpl Template[T], data any) error {
+	if len(tmpl.Globs) == 0 {
+		GetLogger().Warnf("empty template 'globs', skipping '%s' sections", tmpl.Out)
+		return nil
+	}
+	if len(tmpl.Sections) == 0 {
+		GetLogger().Debugf("no template 'sections', skipping '%s' sections", tmpl.Out)
+		return nil
+	}
+	GetLogger().Infof("applying sections on '%s'", tmpl.Out)
+
 	actual, err := root.ReadFile(tmpl.Out)
 	if err != nil { // output file should exist since ApplySections is expected to be called from ApplyTemplate or at least after
 		return fmt.Errorf("read file: %w", err)

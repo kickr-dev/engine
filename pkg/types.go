@@ -43,8 +43,12 @@ type Template[T any] struct {
 	// EmptyPolicy is the policy to apply when the generated file is empty.
 	EmptyPolicy EmptyPolicy
 
-	// GeneratePolicy is the generation policy of the current file.
-	GeneratePolicy GeneratePolicy
+	// GeneratePolicy returns the generation policy of the current file (see GeneratePolicyFunc).
+	//
+	// When nil, the default behavior applies (see PolicyDefault).
+	//
+	// Use StaticPolicy for a policy independent of the output path and configuration.
+	GeneratePolicy GeneratePolicyFunc[T]
 
 	// Globs is the slice of globs or specific files to parse during Go templating.
 	//
@@ -70,9 +74,9 @@ type Template[T any] struct {
 	// It must be the full path to destination directory with the filename.
 	Out string
 
-	// Patches is the slice of patches to apply on the file in addition to globs.
+	// Patches is the slice of patches to apply on the file, with or without globs.
 	//
-	// Patches are applied in the slice order after the initial file is generated with globs.
+	// Patches are applied in the slice order after the file is generated with globs or its sections are regenerated.
 	// Additionally, patches are also templatized with Go template.
 	//
 	// A patch should have a name of the form "path/to/file.patch.tmpl" or "path/to/file.diff.tmpl"
@@ -94,14 +98,11 @@ type Template[T any] struct {
 	// See https://en.wikipedia.org/wiki/Diff#Unified_format
 	Patches []string
 
-	// Remove function is run (if not nil) to verify whether the out file should be removed or not.
-	Remove func(config T) bool
-
 	// Sections is the slice of delimited parts regenerated alone when the out file isn't generated as a whole
-	// (see ShouldGenerate, it means the file exists without generated notice, generation isn't forced and the policy isn't PolicyAlways).
+	// (it means the policy is PolicyDefault, generation isn't forced and IsGenerated returns false).
 	//
-	// The whole template is rendered, then the rendered part from the first Begin marker to the next End marker
-	// replaces the same part of the out file, markers included.
+	// The whole template is rendered from Globs (sections are ignored without them), then the rendered part
+	// from the first Begin marker to the next End marker replaces the same part of the out file, markers included.
 	// A rendered value containing a marker shifts the section bounds.
 	//
 	// A section missing from the rendered template or with a missing marker in the out file is skipped,

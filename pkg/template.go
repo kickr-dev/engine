@@ -16,10 +16,25 @@ import (
 	"github.com/kickr-dev/engine/pkg/files"
 )
 
-// ApplyTemplate writes or deletes an input Template with associated data.
+// ApplyTemplate generates an input Template with associated data,
+// or only regenerates its sections when the file is kept (see ApplySections),
+// and then applies its patches (see ApplyPatches).
+//
+// The GeneratePolicy and the force option (see WithForce) decide whether the file is generated, kept, removed or skipped.
+// A removed or skipped file gets no patches.
 func ApplyTemplate[T any](fsys fs.FS, root *os.Root, tmpl Template[T], config T) error {
-	// remove file when tmpl.Remove asks for it
-	if tmpl.Remove != nil && tmpl.Remove(config) {
+	out := filepath.Join(root.Name(), tmpl.Out)
+
+	var policy GeneratePolicy
+	if tmpl.GeneratePolicy != nil {
+		policy = tmpl.GeneratePolicy(out, config)
+	}
+
+	var generate bool
+	switch policy {
+	case PolicyAlways:
+		generate = true
+	case PolicyRemove:
 		if _, err := root.Lstat(tmpl.Out); err != nil {
 			if errors.Is(err, fs.ErrNotExist) {
 				return nil
@@ -32,16 +47,30 @@ func ApplyTemplate[T any](fsys fs.FS, root *os.Root, tmpl Template[T], config T)
 			return fmt.Errorf("remove '%s': %w", tmpl.Out, err)
 		}
 		return nil
+	case PolicySkip:
+		if !Forced() {
+			return nil
+		}
+		generate = true
+	case 0, PolicyDefault:
+		generate = Forced()
+		if !generate {
+			ok, err := IsGenerated(out)
+			if err != nil {
+				return fmt.Errorf("is generated: %w", err)
+			}
+			generate = ok
+		}
+	default:
+		return fmt.Errorf("invalid generate policy %d", policy)
 	}
 
-	// avoid generating file if it already exists or something else
-	ok, err := ShouldGenerate(filepath.Join(root.Name(), tmpl.Out), tmpl.GeneratePolicy)
-	if err != nil {
-		return fmt.Errorf("should generate: %w", err)
-	}
 	switch {
-	case !ok:
+	case !generate:
 		GetLogger().Infof("not generating '%s' since it already exists (or was modified manually)", tmpl.Out)
+		if err := ApplySections(fsys, root, tmpl, config); err != nil {
+			return fmt.Errorf("apply sections: %w", err)
+		}
 	case len(tmpl.Globs) == 0:
 		GetLogger().Warnf("empty template 'globs', skipping '%s' generation", tmpl.Out)
 	default:
@@ -58,18 +87,8 @@ func ApplyTemplate[T any](fsys fs.FS, root *os.Root, tmpl Template[T], config T)
 		}
 	}
 
-	if !ok && len(tmpl.Globs) > 0 && len(tmpl.Sections) > 0 {
-		GetLogger().Infof("applying sections on '%s'", tmpl.Out)
-		if err := ApplySections(fsys, root, tmpl, config); err != nil {
-			return fmt.Errorf("apply sections: %w", err)
-		}
-	}
-
-	if len(tmpl.Patches) > 0 {
-		GetLogger().Infof("applying patches on '%s'", path.Base(tmpl.Out))
-		if err := ApplyPatches(fsys, root, tmpl, config); err != nil {
-			return fmt.Errorf("apply patches: %w", err)
-		}
+	if err := ApplyPatches(fsys, root, tmpl, config); err != nil {
+		return fmt.Errorf("apply patches: %w", err)
 	}
 	return nil
 }

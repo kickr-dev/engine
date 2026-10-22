@@ -31,7 +31,7 @@ func GeneratorTemplates[T any](fsys fs.FS, templates []Template[T]) Generator[T]
 // The modules function extracts the modules slice from the parsed configuration.
 //
 // Each Template.Out is relative to each module where it will be generated
-// and Template.Remove is up to the characteristics of a given module.
+// and Template.GeneratePolicy is up to the characteristics of a given module.
 //
 // Errors encountered during templates generation are logged, in that case a final error being ErrFailedGeneration is returned.
 func GeneratorModules[T any, M Module](fsys fs.FS, modules func(config T) []M, templates []Template[M]) Generator[T] {

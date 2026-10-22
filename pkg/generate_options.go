@@ -21,7 +21,6 @@ func WithLogger(logger Logger) OptionFunc {
 // WithForce sets the engine force option when calling Configure with this option.
 //
 // The force option can then be used to force generation inside Generator[T].
-// The option is by default used in GeneratorTemplates within ShouldGenerate.
 func WithForce(force bool) OptionFunc {
 	return func(o options) options {
 		o.force = force
@@ -48,7 +47,7 @@ func GetLogger() Logger {
 
 // Forced returns true if the options' force is provided.
 //
-// It means that generation should be forced (applied by default in GeneratorTemplates within ShouldGenerate, but must be used manually when writing your own Generator[T]).
+// It means that generation should be forced and as such all generated files should be regenerated unless ones expected to be removed.
 func Forced() bool {
 	opts := o.Load()
 	return opts != nil && opts.force
