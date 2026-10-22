@@ -28,39 +28,6 @@ func TestApplyTemplate(t *testing.T) {
 		t.Cleanup(func() { engine.Configure(engine.WithLogger(initial), funcs) })
 	}
 
-	t.Run("error_missing_out", func(t *testing.T) {
-		// Arrange
-		destdir := t.TempDir()
-
-		// Act
-		err := engine.ApplyTemplate(os.DirFS(destdir), testutils.Root(t, destdir), engine.Template[testconfig]{}, testconfig{})
-
-		// Assert
-		assert.ErrorContains(t, err, "should generate")
-	})
-
-	t.Run("error_symlink_outside_root", func(t *testing.T) {
-		// Arrange
-		tmp := t.TempDir()
-		srcdir := t.TempDir()
-		destdir := filepath.Join(tmp, "dest")
-		require.NoError(t, os.Mkdir(destdir, files.RwxRxRxRx))
-		require.NoError(t, os.Symlink(filepath.Join(tmp, "outside.txt"), filepath.Join(destdir, "file.txt")))
-
-		template := engine.Template[testconfig]{
-			Globs: []string{"file.txt" + engine.TmplExtension},
-			Out:   "file.txt",
-		}
-		require.NoError(t, os.WriteFile(filepath.Join(srcdir, template.Globs[0]), []byte("content"), files.RwRR))
-
-		// Act
-		err := engine.ApplyTemplate(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{})
-
-		// Assert
-		assert.ErrorContains(t, err, "path escapes from parent")
-		assert.NoFileExists(t, filepath.Join(tmp, "outside.txt"))
-	})
-
 	t.Run("error_symlink_remove_outside_root", func(t *testing.T) {
 		// Arrange
 		tmp := t.TempDir()
@@ -70,7 +37,10 @@ func TestApplyTemplate(t *testing.T) {
 		require.NoError(t, os.MkdirAll(outside, files.RwxRxRxRx))
 		require.NoError(t, os.Symlink(filepath.Dir(outside), filepath.Join(destdir, "chart")))
 
-		template := engine.Template[testconfig]{Out: "chart/sub", Remove: func(testconfig) bool { return true }}
+		template := engine.Template[testconfig]{
+			GeneratePolicy: engine.StaticPolicy[testconfig](engine.PolicyRemove),
+			Out:            "chart/sub",
+		}
 
 		// Act
 		err := engine.ApplyTemplate(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
@@ -78,6 +48,39 @@ func TestApplyTemplate(t *testing.T) {
 		// Assert
 		assert.ErrorContains(t, err, "lstat")
 		assert.DirExists(t, outside)
+	})
+
+	t.Run("error_remove", func(t *testing.T) {
+		if os.Geteuid() == 0 {
+			t.Skip("running as root bypasses permission checks")
+		}
+
+		// Arrange
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			GeneratePolicy: engine.StaticPolicy[testconfig](engine.PolicyRemove),
+			Out:            "file.txt",
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Out), []byte("content"), files.RwRR))
+		require.NoError(t, os.Chmod(destdir, 0o500))
+		t.Cleanup(func() { _ = os.Chmod(destdir, files.RwxRxRxRx) })
+
+		// Act
+		err := engine.ApplyTemplate(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+
+		// Assert
+		assert.ErrorContains(t, err, "remove")
+	})
+
+	t.Run("error_missing_out", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+
+		// Act
+		err := engine.ApplyTemplate(os.DirFS(destdir), testutils.Root(t, destdir), engine.Template[testconfig]{}, testconfig{})
+
+		// Assert
+		assert.ErrorContains(t, err, "is generated")
 	})
 
 	t.Run("error_read_template_out", func(t *testing.T) {
@@ -90,7 +93,22 @@ func TestApplyTemplate(t *testing.T) {
 		err := engine.ApplyTemplate(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
-		assert.ErrorContains(t, err, "should generate")
+		assert.ErrorContains(t, err, "is generated")
+	})
+
+	t.Run("error_invalid_policy", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			GeneratePolicy: engine.StaticPolicy[testconfig](engine.GeneratePolicy(42)),
+			Out:            "file.txt",
+		}
+
+		// Act
+		err := engine.ApplyTemplate(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+
+		// Assert
+		assert.ErrorContains(t, err, "invalid generate policy")
 	})
 
 	t.Run("error_template_invalid_globs", func(t *testing.T) {
@@ -125,6 +143,28 @@ func TestApplyTemplate(t *testing.T) {
 		assert.ErrorContains(t, err, "parse template file(s)")
 	})
 
+	t.Run("error_symlink_outside_root", func(t *testing.T) {
+		// Arrange
+		tmp := t.TempDir()
+		srcdir := t.TempDir()
+		destdir := filepath.Join(tmp, "dest")
+		require.NoError(t, os.Mkdir(destdir, files.RwxRxRxRx))
+		require.NoError(t, os.Symlink(filepath.Join(tmp, "outside.txt"), filepath.Join(destdir, "file.txt")))
+
+		template := engine.Template[testconfig]{
+			Globs: []string{"file.txt" + engine.TmplExtension},
+			Out:   "file.txt",
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(srcdir, template.Globs[0]), []byte("content"), files.RwRR))
+
+		// Act
+		err := engine.ApplyTemplate(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{})
+
+		// Assert
+		assert.ErrorContains(t, err, "path escapes from parent")
+		assert.NoFileExists(t, filepath.Join(tmp, "outside.txt"))
+	})
+
 	t.Run("success_template_already_exists", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()
@@ -140,29 +180,7 @@ func TestApplyTemplate(t *testing.T) {
 
 		// Assert
 		require.NoError(t, err)
-		assert.Equal(t, buf.String(), fmt.Sprintf("not generating '%s' since it already exists (or was modified manually)", template.Out))
-	})
-
-	t.Run("error_remove", func(t *testing.T) {
-		if os.Geteuid() == 0 {
-			t.Skip("running as root bypasses permission checks")
-		}
-
-		// Arrange
-		destdir := t.TempDir()
-		template := engine.Template[testconfig]{
-			Out:    "file.txt",
-			Remove: func(testconfig) bool { return true },
-		}
-		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Out), []byte("content"), files.RwRR))
-		require.NoError(t, os.Chmod(destdir, 0o500))
-		t.Cleanup(func() { _ = os.Chmod(destdir, files.RwxRxRxRx) })
-
-		// Act
-		err := engine.ApplyTemplate(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
-
-		// Assert
-		assert.ErrorContains(t, err, "remove")
+		assert.Contains(t, buf.String(), fmt.Sprintf("not generating '%s' since it already exists (or was modified manually)", template.Out))
 	})
 
 	t.Run("success_custom_func", func(t *testing.T) {
@@ -236,6 +254,147 @@ func TestApplyTemplate(t *testing.T) {
 		content, err := os.ReadFile(filepath.Join(destdir, template.Out))
 		require.NoError(t, err)
 		assert.Equal(t, "custom <!-- BEGIN -->value<!-- END --> custom", string(content))
+	})
+
+	t.Run("success_policy_always", func(t *testing.T) {
+		// Arrange
+		srcdir := t.TempDir()
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			GeneratePolicy: engine.StaticPolicy[testconfig](engine.PolicyAlways),
+			Globs:          []string{"file.txt" + engine.TmplExtension},
+			Out:            "file.txt",
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(srcdir, template.Globs[0]), []byte("generated"), files.RwRR))
+		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Out), []byte("live"), files.RwRR))
+
+		// Act
+		err := engine.ApplyTemplate(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{})
+
+		// Assert
+		require.NoError(t, err)
+		content, err := os.ReadFile(filepath.Join(destdir, template.Out))
+		require.NoError(t, err)
+		assert.Equal(t, "generated", string(content))
+	})
+
+	t.Run("success_policy_default_forced", func(t *testing.T) {
+		// Arrange
+		engine.Configure(engine.WithForce(true))
+		t.Cleanup(func() { engine.Configure(engine.WithForce(false)) })
+
+		srcdir := t.TempDir()
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			Globs: []string{"file.txt" + engine.TmplExtension},
+			Out:   "file.txt",
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(srcdir, template.Globs[0]), []byte("generated"), files.RwRR))
+		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Out), []byte("live"), files.RwRR))
+
+		// Act
+		err := engine.ApplyTemplate(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{})
+
+		// Assert
+		require.NoError(t, err)
+		content, err := os.ReadFile(filepath.Join(destdir, template.Out))
+		require.NoError(t, err)
+		assert.Equal(t, "generated", string(content))
+	})
+
+	t.Run("success_policy_skip", func(t *testing.T) {
+		// Arrange
+		srcdir := t.TempDir()
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			GeneratePolicy: engine.StaticPolicy[testconfig](engine.PolicySkip),
+			Globs:          []string{"file.txt" + engine.TmplExtension},
+			Out:            "file.txt",
+			Patches:        []string{"missing.patch"},
+			Sections:       []engine.Section{{Begin: "<!-- BEGIN -->", End: "<!-- END -->"}},
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(srcdir, template.Globs[0]),
+			[]byte(`<!-- BEGIN -->{{ .Str }}<!-- END -->`),
+			files.RwRR))
+		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Out),
+			[]byte("live <!-- BEGIN -->stale<!-- END --> live"),
+			files.RwRR))
+
+		// Act
+		err := engine.ApplyTemplate(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{Str: "value"})
+
+		// Assert
+		require.NoError(t, err)
+		content, err := os.ReadFile(filepath.Join(destdir, template.Out))
+		require.NoError(t, err)
+		assert.Equal(t, "live <!-- BEGIN -->stale<!-- END --> live", string(content))
+	})
+
+	t.Run("success_policy_skip_forced", func(t *testing.T) {
+		// Arrange
+		engine.Configure(engine.WithForce(true))
+		t.Cleanup(func() { engine.Configure(engine.WithForce(false)) })
+
+		srcdir := t.TempDir()
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			GeneratePolicy: engine.StaticPolicy[testconfig](engine.PolicySkip),
+			Globs:          []string{"file.txt" + engine.TmplExtension},
+			Out:            "file.txt",
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(srcdir, template.Globs[0]), []byte("generated"), files.RwRR))
+		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Out), []byte("live"), files.RwRR))
+
+		// Act
+		err := engine.ApplyTemplate(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{})
+
+		// Assert
+		require.NoError(t, err)
+		content, err := os.ReadFile(filepath.Join(destdir, template.Out))
+		require.NoError(t, err)
+		assert.Equal(t, "generated", string(content))
+	})
+
+	t.Run("success_policy_remove_forced", func(t *testing.T) {
+		// Arrange
+		engine.Configure(engine.WithForce(true))
+		t.Cleanup(func() { engine.Configure(engine.WithForce(false)) })
+
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			GeneratePolicy: engine.StaticPolicy[testconfig](engine.PolicyRemove),
+			Out:            "file.txt",
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Out), []byte("live"), files.RwRR))
+
+		// Act
+		err := engine.ApplyTemplate(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+
+		// Assert
+		require.NoError(t, err)
+		assert.NoFileExists(t, filepath.Join(destdir, template.Out))
+	})
+
+	t.Run("success_policy_func_inputs", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+		var gotPath string
+		var gotConfig testconfig
+		template := engine.Template[testconfig]{
+			GeneratePolicy: func(path string, config testconfig) engine.GeneratePolicy {
+				gotPath, gotConfig = path, config
+				return engine.PolicySkip
+			},
+			Out: "file.txt",
+		}
+
+		// Act
+		err := engine.ApplyTemplate(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{Str: "value"})
+
+		// Assert
+		require.NoError(t, err)
+		assert.Equal(t, filepath.Join(destdir, template.Out), gotPath)
+		assert.Equal(t, testconfig{Str: "value"}, gotConfig)
 	})
 }
 
@@ -345,7 +504,10 @@ func TestGeneratorModules(t *testing.T) {
 		require.NoError(t, os.WriteFile(out, []byte("some not empty file"), files.RwRR))
 
 		generator := engine.GeneratorModules(os.DirFS(destdir), modules,
-			[]engine.Template[testmodule]{{Out: "file.txt", Remove: func(testmodule) bool { return true }}})
+			[]engine.Template[testmodule]{{
+				GeneratePolicy: engine.StaticPolicy[testmodule](engine.PolicyRemove),
+				Out:            "file.txt",
+			}})
 
 		// Act
 		err := generator(ctx, testutils.Root(t, destdir), []testmodule{{directory: "apps/api"}})
@@ -372,7 +534,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, dir), filepath.Join("file.txt", "file.txt"), engine.PolicyRemove, 0)
+		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, dir), filepath.Join("file.txt", "file.txt"), engine.PolicyRemoveEmpty, 0)
 
 		// Assert
 		assert.ErrorContains(t, err, "mkdir")
@@ -387,7 +549,7 @@ func TestExecuteTemplate(t *testing.T) {
 		tmpl := template.New("template.txt").Funcs(engine.FuncMap())
 
 		// Act
-		err := engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyRemove, 0)
+		err := engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyRemoveEmpty, 0)
 
 		// Assert
 		assert.ErrorContains(t, err, "template execution")
@@ -414,7 +576,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, data, testutils.Root(t, filepath.Dir(dest)), ".", engine.PolicyRemove, 0)
+		err = engine.ExecuteTemplate(tmpl, data, testutils.Root(t, filepath.Dir(dest)), ".", engine.PolicyRemoveEmpty, 0)
 
 		// Assert
 		assert.ErrorContains(t, err, "open file")
@@ -442,7 +604,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, data, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyRemove, 0)
+		err = engine.ExecuteTemplate(tmpl, data, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyRemoveEmpty, 0)
 
 		// Assert
 		require.NoError(t, err)
@@ -469,7 +631,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyRemove, 0)
+		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyRemoveEmpty, 0)
 
 		// Assert
 		require.NoError(t, err)
@@ -494,7 +656,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyRemove, 0)
+		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyRemoveEmpty, 0)
 
 		// Assert
 		require.NoError(t, err)
@@ -518,7 +680,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, map[string]any{}, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyKeep, files.RwxRxRxRx)
+		err = engine.ExecuteTemplate(tmpl, map[string]any{}, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyKeepEmpty, files.RwxRxRxRx)
 
 		// Assert
 		require.NoError(t, err)
@@ -542,7 +704,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, tmp), filepath.Join("dir", "template-result.txt"), engine.PolicyRemove, 0)
+		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, tmp), filepath.Join("dir", "template-result.txt"), engine.PolicyRemoveEmpty, 0)
 
 		// Assert
 		require.NoError(t, err)
@@ -566,7 +728,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyKeep, 0)
+		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyKeepEmpty, 0)
 
 		// Assert
 		require.NoError(t, err)
@@ -599,7 +761,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyRemove, 0)
+		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyRemoveEmpty, 0)
 
 		// Assert
 		assert.ErrorContains(t, err, "remove")
@@ -621,7 +783,7 @@ func TestExecuteTemplate(t *testing.T) {
 		require.NoError(t, err)
 
 		// Act
-		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyRemove, 0)
+		err = engine.ExecuteTemplate(tmpl, nil, testutils.Root(t, filepath.Dir(dest)), filepath.Base(dest), engine.PolicyRemoveEmpty, 0)
 
 		// Assert
 		require.NoError(t, err)
@@ -634,7 +796,7 @@ func BenchmarkApplyTemplate(b *testing.B) {
 	srcdir := b.TempDir()
 	destdir := b.TempDir()
 	tmpl := engine.Template[testconfig]{
-		GeneratePolicy: engine.PolicyAlways,
+		GeneratePolicy: engine.StaticPolicy[testconfig](engine.PolicyAlways),
 		Globs:          []string{"file.txt" + engine.TmplExtension},
 		Out:            "file.txt",
 	}

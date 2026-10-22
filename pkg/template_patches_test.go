@@ -114,6 +114,19 @@ index 332d5ce..39af8aa 100644
 		assert.ErrorContains(t, err, "apply diff number")
 	})
 
+	t.Run("success_no_patches", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{Out: "file.txt"}
+
+		// Act
+		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+
+		// Assert
+		require.NoError(t, err)
+		assert.NoFileExists(t, filepath.Join(destdir, template.Out))
+	})
+
 	t.Run("success_create", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()

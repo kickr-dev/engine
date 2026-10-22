@@ -97,8 +97,8 @@ flowchart TB
 - `Generate`: runs all given parsers then all given generators against a repository
 - `Configure`: applies `OptionFunc` options (`WithLogger`, `WithForce`, `WithFuncMap`) globally before calling `Generate`
 - `ApplyTemplate`: applies a single `Template` (used internally by `GeneratorTemplates` / `GeneratorModules`)
-- `ApplyPatches`: applies a `Template`'s `Patches` on an already generated file
-- `ApplySections`: regenerates a `Template`'s `Sections` in an already existing file, keeping the rest as is
+- `ApplyPatches`: applies a `Template`'s `Patches` on an already generated file, no-op without `Patches`
+- `ApplySections`: regenerates a `Template`'s `Sections` in an already existing file, keeping the rest as is, no-op without `Globs` or `Sections`
 - `ExecuteTemplate`: executes a parsed Go template and writes it to a file inside an `os.Root`, honoring the given `EmptyPolicy`
 - `FuncMap`: returns the default `template.FuncMap` used during Go templating
 - `ToSlug`: slugifies an input string
@@ -107,11 +107,12 @@ flowchart TB
 - `NewLoggerURL`: wraps an `http.RoundTripper` to log request URLs via the configured `Logger`
 - `NewTestLogger`: creates a `Logger` writing to an `io.Writer`, intended for tests only
 - `WithLogger`: provides a custom `Logger` implementation
-- `WithForce`: forces generation of all defined `Template` (useful when projects removed the generated notice)
+- `WithForce`: forces generation of all defined `Template` (useful when projects removed the generated notice), including `PolicySkip` ones, except templates with `PolicyRemove`
 - `WithFuncMap`: enriches default `template.FuncMap` provided during Go templating
 - `GetLogger`: gets configured `logger` option at any point in the workflow
 - `Forced`: gets configured `force` option at any point in the workflow
-- `ShouldGenerate`: returns whether a file should be generated according to its `GeneratePolicy` (existence, emptiness, generated notice, `PolicyAlways`, `Forced`)
+- `IsGenerated`: returns whether a file is owned by generation (missing, empty or with the generated notice)
+- `StaticPolicy`: returns a `GeneratePolicyFunc` always returning the given policy, regardless of the output path and configuration
 - `IsEmpty`: returns whether a given content is considered empty according to an `EmptyPolicy`
 - `GeneratorTemplates`: returns a `Generator` taking a slice of `Template` to generate from the base of the repository (real path depends on each template `Out` attribute)
 - `GeneratorModules`: returns a `Generator` taking a slice of `Template` to generate from the base of each `Module` (real path depends on each template `Out` attribute).
@@ -121,8 +122,8 @@ flowchart TB
 
 - `PartExtension` (`.part`): extension for template subparts, expected to be used with `TmplExtension`
 - `PatchExtension` (`.patch`): extension for template file patches
-- `PolicyAlways` / `PolicyNone`: `GeneratePolicy` values controlling whether a file is always generated or only per default behavior (default `PolicyNone`)
-- `PolicyKeep` / `PolicyRemove`: `EmptyPolicy` values controlling whether an empty generated file is kept or removed (default `PolicyRemove`)
+- `PolicyAlways` / `PolicyDefault` / `PolicyRemove` / `PolicySkip`: `GeneratePolicy` values controlling whether a file is always generated, generated per default behavior, removed or skipped (default `PolicyDefault`)
+- `PolicyKeepEmpty` / `PolicyRemoveEmpty`: `EmptyPolicy` values controlling whether an empty generated file is kept or removed (default `PolicyRemoveEmpty`)
 - `TmplExtension` (`.tmpl`): extension for template files
 
 ## Helpers

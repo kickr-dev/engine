@@ -21,22 +21,15 @@ func TestApplySections(t *testing.T) {
 		{Begin: "<!-- BEGIN_SECOND -->", End: "<!-- END_SECOND -->"},
 	}
 
-	t.Run("error_missing_out", func(t *testing.T) {
-		// Arrange
-		destdir := t.TempDir()
-
-		// Act
-		err := engine.ApplySections(os.DirFS(destdir), testutils.Root(t, destdir), engine.Template[testconfig]{}, testconfig{})
-
-		// Assert
-		assert.ErrorContains(t, err, "read file")
-	})
-
 	t.Run("error_read_out", func(t *testing.T) {
 		// Arrange
 		srcdir := t.TempDir()
 		destdir := t.TempDir()
-		template := engine.Template[testconfig]{Out: "file.txt", Sections: sections}
+		template := engine.Template[testconfig]{
+			Globs:    []string{"file.txt" + engine.TmplExtension},
+			Out:      "file.txt",
+			Sections: sections,
+		}
 
 		// Act
 		err := engine.ApplySections(os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{})
@@ -107,6 +100,35 @@ func TestApplySections(t *testing.T) {
 		content, err := os.ReadFile(filepath.Join(destdir, template.Out))
 		require.NoError(t, err)
 		assert.Equal(t, existing, string(content))
+	})
+
+	t.Run("success_no_globs", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{Out: "file.txt", Sections: sections}
+
+		// Act
+		err := engine.ApplySections(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+
+		// Assert
+		require.NoError(t, err)
+		assert.NoFileExists(t, filepath.Join(destdir, template.Out))
+	})
+
+	t.Run("success_no_sections", func(t *testing.T) {
+		// Arrange
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			Globs: []string{"file.txt" + engine.TmplExtension},
+			Out:   "file.txt",
+		}
+
+		// Act
+		err := engine.ApplySections(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+
+		// Assert
+		require.NoError(t, err)
+		assert.NoFileExists(t, filepath.Join(destdir, template.Out))
 	})
 
 	t.Run("success_existing_out", func(t *testing.T) {

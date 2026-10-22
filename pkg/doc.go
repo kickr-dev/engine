@@ -74,15 +74,14 @@ It contains two main functions, Initialize and Generate, which split project ini
 			{
 				Delimiters: engine.DelimitersBracket(),
 				// EmptyPolicy can be given to tune empty generated files removal, see the appropriate documentation
-				EmptyPolicy: engine.PolicyKeep,
-				// GeneratePolicy can be given to tune generation, see the appropriate documentation
-				GeneratePolicy: engine.PolicyAlways,
+				EmptyPolicy: engine.PolicyKeepEmpty,
+				// GeneratePolicy can be given to tune generation (always generate, remove or skip the file),
+				// see the appropriate documentation
+				GeneratePolicy: engine.StaticPolicy[config](engine.PolicyAlways),
 				Globs:          engine.GlobsWithPart(name),
 				Out:            name,
 				// Patches applies further transformations to the generated file after it's written
 				Patches: []string{"path/to/file.patch"},
-				// Remove can be given to remove a specific file in some specific case instead of generating it
-				Remove: func(config) bool { return false },
 				// Sections regenerates only delimited parts of an existing file instead of skipping it
 				Sections: []engine.Section{{Begin: "# BEGIN_SECTION", End: "# END_SECTION"}},
 			},

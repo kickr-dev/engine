@@ -13,10 +13,15 @@ import (
 	"github.com/kickr-dev/engine/pkg/files"
 )
 
-// ApplyPatches applies patches defined in input tmpl.
+// ApplyPatches applies patches defined in input tmpl, if any.
 //
 // Each patch is templatized using Go template and then patched on provided tmpl file.
 func ApplyPatches[T any](fsys fs.FS, root *os.Root, tmpl Template[T], data any) error {
+	if len(tmpl.Patches) == 0 {
+		return nil
+	}
+	GetLogger().Infof("applying patches on '%s'", path.Base(tmpl.Out))
+
 	apply := func(diff *gitdiff.File) error {
 		file, err := root.OpenFile(tmpl.Out, os.O_RDWR|os.O_CREATE, files.RwRR)
 		if err != nil {
