@@ -168,6 +168,26 @@ func TestIsGenerated(t *testing.T) {
 	})
 }
 
+func TestRemoveIf(t *testing.T) {
+	policy := engine.RemoveIf(func(c testconfig) bool { return c.Str == "remove" }, engine.PolicyAlways)
+
+	t.Run("success_remove", func(t *testing.T) {
+		// Act
+		actual := policy("file.txt", testconfig{Str: "remove"})
+
+		// Assert
+		assert.Equal(t, engine.PolicyRemove, actual)
+	})
+
+	t.Run("success_otherwise", func(t *testing.T) {
+		// Act
+		actual := policy("file.txt", testconfig{})
+
+		// Assert
+		assert.Equal(t, engine.PolicyAlways, actual)
+	})
+}
+
 func BenchmarkIsGenerated(b *testing.B) {
 	// Arrange
 	dest := filepath.Join(b.TempDir(), "file.txt")

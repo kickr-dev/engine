@@ -89,3 +89,13 @@ func StaticPolicy[T any](policy GeneratePolicy) GeneratePolicyFunc[T] {
 		return policy
 	}
 }
+
+// RemoveIf returns a GeneratePolicyFunc removing the output file when remove returns true, and applying otherwise in other cases.
+func RemoveIf[T any](remove func(T) bool, otherwise GeneratePolicy) GeneratePolicyFunc[T] {
+	return func(_ string, config T) GeneratePolicy {
+		if remove(config) {
+			return PolicyRemove
+		}
+		return otherwise
+	}
+}
