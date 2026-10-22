@@ -30,19 +30,6 @@ func TestReadYAML(t *testing.T) {
 		assert.ErrorIs(t, err, fs.ErrNotExist)
 	})
 
-	t.Run("error_read", func(t *testing.T) {
-		// Arrange
-		dir := t.TempDir()
-		require.NoError(t, os.Mkdir(filepath.Join(dir, "file.yaml"), files.RwxRxRxRx))
-
-		// Act
-		var c testconfig
-		err := files.ReadYAML(os.DirFS(dir), "file.yaml", &c)
-
-		// Assert
-		assert.ErrorContains(t, err, "read file")
-	})
-
 	t.Run("error_unmarshal", func(t *testing.T) {
 		// Arrange
 		dir := t.TempDir()

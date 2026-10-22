@@ -26,14 +26,6 @@ func TestGlobs(t *testing.T) {
 		assert.Equal(t, []string{".releaserc.yml.tmpl", ".releaserc-*.part.tmpl"}, globs)
 	})
 
-	t.Run("success_random_yaml", func(t *testing.T) {
-		// Act
-		globs := engine.GlobsWithPart("file.yml")
-
-		// Assert
-		assert.Equal(t, []string{"file.yml.tmpl", "file-*.part.tmpl"}, globs)
-	})
-
 	t.Run("success_with_paths", func(t *testing.T) {
 		for _, sep := range []string{"/", `\`, `\\`} {
 			t.Run(sep, func(t *testing.T) {

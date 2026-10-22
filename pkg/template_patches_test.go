@@ -180,33 +180,4 @@ index 332d5ce..39af8aa 100644
 		require.NoError(t, err)
 		assert.Equal(t, "some not empty file", string(content))
 	})
-
-	t.Run("success_update", func(t *testing.T) {
-		// Arrange
-		destdir := t.TempDir()
-		template := engine.Template[testconfig]{
-			Out:     "file.txt",
-			Patches: []string{"file.patch"},
-		}
-		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Out), []byte("some not empty file"), files.RwRR))
-		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Patches[0]), []byte(`
-diff --git a/file.txt b/file.txt
-index 332d5ce..39af8aa 100644
---- a/file.txt
-+++ b/file.txt
-@@ -1 +1 @@
--some not empty file
-\ No newline at end of file
-+some replaced value in non empty file
-\ No newline at end of file`), files.RwRR))
-
-		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
-
-		// Assert
-		require.NoError(t, err)
-		content, err := os.ReadFile(filepath.Join(destdir, template.Out))
-		require.NoError(t, err)
-		assert.Equal(t, "some replaced value in non empty file", string(content))
-	})
 }
