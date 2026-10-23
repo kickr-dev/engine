@@ -98,7 +98,7 @@ func RemoveIf[T any](remove func(T) bool, otherwise GeneratePolicy) GeneratePoli
 	}
 }
 
-// SkipIfExists returns PolicySkip when the file (or directory) at path exists, and otherwise in other cases.
+// SkipIfExists returns PolicySkip when the path exists, and otherwise in other cases.
 //
 // It's meant to be called inside a GeneratePolicyFunc with its path,
 // for files generated once and then left to the user.
