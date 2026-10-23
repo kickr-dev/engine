@@ -78,7 +78,7 @@ flowchart TB
 
 ### Templates
 
-Each file has a policy. It can be rewritten every time, removed or left alone,
+Each file has a policy. It can be rewritten every time, generated only once, removed or left alone,
 but by default it's rewritten only while nobody has edited it by hand.
 
 ```mermaid

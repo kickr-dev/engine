@@ -188,6 +188,31 @@ func TestRemoveIf(t *testing.T) {
 	})
 }
 
+func TestSkipIfExists(t *testing.T) {
+	t.Run("success_skip", func(t *testing.T) {
+		// Arrange
+		dest := filepath.Join(t.TempDir(), "file.txt")
+		require.NoError(t, os.WriteFile(dest, []byte("content"), files.RwRR))
+
+		// Act
+		actual := engine.SkipIfExists(dest, engine.PolicyAlways)
+
+		// Assert
+		assert.Equal(t, engine.PolicySkip, actual)
+	})
+
+	t.Run("success_otherwise", func(t *testing.T) {
+		// Arrange
+		dest := filepath.Join(t.TempDir(), "file.txt")
+
+		// Act
+		actual := engine.SkipIfExists(dest, engine.PolicyAlways)
+
+		// Assert
+		assert.Equal(t, engine.PolicyAlways, actual)
+	})
+}
+
 func BenchmarkIsGenerated(b *testing.B) {
 	// Arrange
 	dest := filepath.Join(b.TempDir(), "file.txt")
