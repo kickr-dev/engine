@@ -300,7 +300,7 @@ func TestApplyTemplate(t *testing.T) {
 		require.NoError(t, err)
 		content, err := os.ReadFile(filepath.Join(destdir, template.Out))
 		require.NoError(t, err)
-		assert.Equal(t, "generated", string(content))
+		assert.Equal(t, "live", string(content))
 	})
 
 	t.Run("success_policy_remove_forced", func(t *testing.T) {

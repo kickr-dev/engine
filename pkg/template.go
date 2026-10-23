@@ -48,10 +48,7 @@ func ApplyTemplate[T any](fsys fs.FS, root *os.Root, tmpl Template[T], config T)
 		}
 		return nil
 	case PolicySkip:
-		if !Forced() {
-			return nil
-		}
-		generate = true
+		return nil
 	case 0, PolicyDefault:
 		generate = Forced()
 		if !generate {
