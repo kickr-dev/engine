@@ -76,7 +76,7 @@ It contains two main functions, Initialize and Generate, which split project ini
 				// EmptyPolicy can be given to tune empty generated files removal, see the appropriate documentation
 				EmptyPolicy: engine.PolicyKeepEmpty,
 				// GeneratePolicy can be given to tune generation (always generate, remove or skip the file),
-				// see the appropriate documentation
+				// see the appropriate documentation and StaticPolicy, RemoveIf or SkipIfExists helpers
 				GeneratePolicy: engine.StaticPolicy[config](engine.PolicyAlways),
 				Globs:          engine.GlobsWithPart(name),
 				Out:            name,

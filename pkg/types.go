@@ -48,7 +48,8 @@ type Template[T any] struct {
 	// When nil, the default behavior applies (see PolicyDefault).
 	//
 	// Use StaticPolicy for a policy independent of the output path and configuration,
-	// or RemoveIf to remove the file depending on the configuration.
+	// RemoveIf to remove the file depending on the configuration,
+	// or SkipIfExists to generate the file only once.
 	GeneratePolicy GeneratePolicyFunc[T]
 
 	// Globs is the slice of globs or specific files to parse during Go templating.
