@@ -34,14 +34,12 @@ const (
 
 	// PolicyRemove removes the file (or directory) if it exists, instead of generating it.
 	//
-	// No sections or patches are applied.
 	// It applies even when generation is forced.
 	PolicyRemove
 
 	// PolicySkip skips the file entirely.
 	//
-	// It's neither generated nor removed, and no sections or patches are applied.
-	// Forced generation overrides it (see WithForce).
+	// It applies even when generation is forced.
 	PolicySkip
 )
 
