@@ -86,12 +86,9 @@ flowchart TB
     File["File to generate"] --> Policy{"What does its policy say?"}
 
     Policy -->|remove| Remove["Delete the file"]
-    Policy -->|skip| Forced{"Forced?"}
+    Policy -->|skip| Untouched["Leave the file alone"]
     Policy -->|always| Write
     Policy -->|default| Owned{"Forced, or file<br/>never edited by hand?"}
-
-    Forced -->|no| Untouched["Leave the file alone"]
-    Forced -->|yes| Write
 
     Owned -->|yes| Write["Write the file from its templates"]
     Owned -->|no| Keep["Keep the user's file,<br/>refresh only its marked sections"]
