@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kickr-dev/engine/testutils"
+	"gitlab.com/kickr-dev/engine/testutils"
 )
 
 func TestGit(t *testing.T) {
@@ -75,7 +75,7 @@ func TestGitOriginURL(t *testing.T) {
 		// Arrange
 		repository, err := git.Init(memory.NewStorage(), memfs.New())
 		require.NoError(t, err)
-		_, err = repository.CreateRemote(&config.RemoteConfig{Name: "origin", URLs: []string{"https://github.com/kickr-dev/engine"}})
+		_, err = repository.CreateRemote(&config.RemoteConfig{Name: "origin", URLs: []string{"https://gitlab.com/kickr-dev/engine"}})
 		require.NoError(t, err)
 
 		// Act
@@ -83,7 +83,7 @@ func TestGitOriginURL(t *testing.T) {
 
 		// Assert
 		require.NoError(t, err)
-		assert.Equal(t, "https://github.com/kickr-dev/engine", originURL)
+		assert.Equal(t, "https://gitlab.com/kickr-dev/engine", originURL)
 	})
 }
 
@@ -146,11 +146,11 @@ func TestGitParseRemote(t *testing.T) {
 		// Arrange
 		remotes := []string{
 			"git@github.com:kickr-dev/engine.git",
-			"http://github.com/kickr-dev/engine.git",
-			"http://x-access-token:ghp_xxx@github.com/kickr-dev/engine.git",
-			"https://github.com/kickr-dev/engine.git",
-			"https://x-access-token:ghp_xxx@github.com/kickr-dev/engine.git",
-			"ssh://git@github.com/kickr-dev/engine.git",
+			"http://gitlab.com/kickr-dev/engine.git",
+			"http://x-access-token:ghp_xxx@gitlab.com/kickr-dev/engine.git",
+			"https://gitlab.com/kickr-dev/engine.git",
+			"https://x-access-token:ghp_xxx@gitlab.com/kickr-dev/engine.git",
+			"ssh://git@gitlab.com/kickr-dev/engine.git",
 		}
 		for _, remote := range remotes {
 			t.Run(remote, func(t *testing.T) {

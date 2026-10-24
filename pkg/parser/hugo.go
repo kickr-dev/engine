@@ -6,7 +6,7 @@ import (
 	"io/fs"
 	"os"
 
-	"github.com/kickr-dev/engine/pkg/files"
+	"gitlab.com/kickr-dev/engine/pkg/files"
 )
 
 // HugoCompose is the composition of both hugo.(toml|yaml|yml) configuration files
