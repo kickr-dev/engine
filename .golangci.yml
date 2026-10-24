@@ -299,7 +299,7 @@ formatters:
       sections:
         - standard
         - default
-        - prefix(github.com/kickr-dev/engine)
+        - prefix(gitlab.com/kickr-dev/engine)
     gofmt:
       # Apply the rewrite rules to the source before reformatting.
       # https://pkg.go.dev/cmd/gofmt

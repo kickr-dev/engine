@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kickr-dev/engine/pkg/files"
-	"github.com/kickr-dev/engine/pkg/parser"
+	"gitlab.com/kickr-dev/engine/pkg/files"
+	"gitlab.com/kickr-dev/engine/pkg/parser"
 )
 
 func TestReadGomod(t *testing.T) {
@@ -56,7 +56,7 @@ func TestReadGomod(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()
 
-		err := os.WriteFile(filepath.Join(destdir, parser.FileGomod), []byte("module github.com/kickr-dev/engine"), files.RwRR)
+		err := os.WriteFile(filepath.Join(destdir, parser.FileGomod), []byte("module gitlab.com/kickr-dev/engine"), files.RwRR)
 		require.NoError(t, err)
 
 		// Act
@@ -70,12 +70,12 @@ func TestReadGomod(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()
 
-		err := os.WriteFile(filepath.Join(destdir, parser.FileGomod), []byte("module github.com/kickr-dev/engine\ngo 1.22\ntoolchain go1.23.5"), files.RwRR)
+		err := os.WriteFile(filepath.Join(destdir, parser.FileGomod), []byte("module gitlab.com/kickr-dev/engine\ngo 1.22\ntoolchain go1.23.5"), files.RwRR)
 		require.NoError(t, err)
 
 		expectedMod := parser.Gomod{
 			Go:        "1.22",
-			Module:    "github.com/kickr-dev/engine",
+			Module:    "gitlab.com/kickr-dev/engine",
 			Tools:     []string{},
 			Toolchain: "1.23.5",
 		}

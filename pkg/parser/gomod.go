@@ -11,7 +11,7 @@ import (
 
 	"golang.org/x/mod/modfile"
 
-	"github.com/kickr-dev/engine/pkg/files"
+	"gitlab.com/kickr-dev/engine/pkg/files"
 )
 
 const (
@@ -46,7 +46,7 @@ type Gomod struct {
 	Go string
 
 	// Module is the module statement,
-	// i.e. "module github.com/kickr-dev/engine" without "module" (and space) part.
+	// i.e. "module gitlab.com/kickr-dev/engine" without "module" (and space) part.
 	Module string
 
 	// Toolchain is the toolchain statement,
@@ -63,7 +63,7 @@ func (g Gomod) AsVCS() VCS {
 	sections := strings.Split(g.Module, "/")
 	projectPath := func() string {
 		// retrieve all sections but the last element in case module is suffixed by a major version,
-		// i.e. github.com/kickr-dev/engine/v2
+		// i.e. gitlab.com/kickr-dev/engine/v2
 		if versionRegexp.MatchString(sections[len(sections)-1]) {
 			return strings.Join(sections[1:len(sections)-1], "/")
 		}

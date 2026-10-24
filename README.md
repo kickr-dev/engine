@@ -29,10 +29,10 @@ A Go library to build projects scaffolding CLIs on three main features:
 ## How to use?
 
 ```sh
-go get -u github.com/kickr-dev/engine@latest
+go get -u gitlab.com/kickr-dev/engine@latest
 ```
 
-## Initialize ([pkg.go.dev](https://pkg.go.dev/github.com/kickr-dev/engine/pkg))
+## Initialize ([pkg.go.dev](https://pkg.go.dev/gitlab.com/kickr-dev/engine/pkg))
 
 Runs an interactive form with [**huh**](https://github.com/charmbracelet/huh)
 and alters the created configuration gradually with each `huh.Group`.
@@ -48,7 +48,7 @@ flowchart LR
     Form -->|"user answers each page"| Config["filled config"]
 ```
 
-## Generate ([pkg.go.dev](https://pkg.go.dev/github.com/kickr-dev/engine/pkg))
+## Generate ([pkg.go.dev](https://pkg.go.dev/gitlab.com/kickr-dev/engine/pkg))
 
 Parses a repository with all its configured parsers
 and then runs all generators to create the appropriate files regarding the repository configuration, technologies, languages, etc.
@@ -99,9 +99,9 @@ flowchart TB
 
 ## Helpers
 
-- [`pkg/files`](https://pkg.go.dev/github.com/kickr-dev/engine/pkg/files):
+- [`pkg/files`](https://pkg.go.dev/gitlab.com/kickr-dev/engine/pkg/files):
   read, write, validate (JSON schema) and glob files.
-- [`pkg/generator`](https://pkg.go.dev/github.com/kickr-dev/engine/pkg/generator):
+- [`pkg/generator`](https://pkg.go.dev/gitlab.com/kickr-dev/engine/pkg/generator):
   fetch `.gitignore`, code of conduct and pinned container images.
-- [`pkg/parser`](https://pkg.go.dev/github.com/kickr-dev/engine/pkg/parser):
+- [`pkg/parser`](https://pkg.go.dev/gitlab.com/kickr-dev/engine/pkg/parser):
   detect Git, Go (`go.mod`, `go.work`, `cmd`), Hugo and `package.json`.

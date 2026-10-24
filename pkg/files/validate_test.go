@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kickr-dev/engine/pkg/files"
+	"gitlab.com/kickr-dev/engine/pkg/files"
 )
 
 func TestValidate(t *testing.T) {

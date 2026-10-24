@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kickr-dev/engine/pkg/generator"
+	"gitlab.com/kickr-dev/engine/pkg/generator"
 )
 
 func TestFetchContainerImage(t *testing.T) {

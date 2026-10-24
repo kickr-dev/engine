@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kickr-dev/engine/pkg/files"
+	"gitlab.com/kickr-dev/engine/pkg/files"
 )
 
 func TestReadJSON(t *testing.T) {

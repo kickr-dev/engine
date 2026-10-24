@@ -10,7 +10,7 @@ import (
 
 	"github.com/bluekeyes/go-gitdiff/gitdiff"
 
-	"github.com/kickr-dev/engine/pkg/files"
+	"gitlab.com/kickr-dev/engine/pkg/files"
 )
 
 // ApplyPatches applies patches defined in input tmpl, if any.

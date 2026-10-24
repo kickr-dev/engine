@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/kickr-dev/engine/pkg/files"
+	"gitlab.com/kickr-dev/engine/pkg/files"
 )
 
 // tdv is a OnceValues to ensure testdata path is computed only once

@@ -13,7 +13,7 @@ import (
 
 	"github.com/Masterminds/sprig/v3"
 
-	"github.com/kickr-dev/engine/pkg/files"
+	"gitlab.com/kickr-dev/engine/pkg/files"
 )
 
 // ApplyTemplate generates an input Template with associated data,

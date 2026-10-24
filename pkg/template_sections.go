@@ -8,7 +8,7 @@ import (
 	"path"
 	"slices"
 
-	"github.com/kickr-dev/engine/pkg/files"
+	"gitlab.com/kickr-dev/engine/pkg/files"
 )
 
 // ApplySections regenerates each section defined in input tmpl, if any,

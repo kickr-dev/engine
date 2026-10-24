@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	engine "github.com/kickr-dev/engine/pkg"
+	engine "gitlab.com/kickr-dev/engine/pkg"
 )
 
 // Reference: https://www.alanwood.net/demos/ansi.html

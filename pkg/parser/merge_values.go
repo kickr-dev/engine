@@ -10,7 +10,7 @@ import (
 
 	"dario.cat/mergo"
 
-	"github.com/kickr-dev/engine/pkg/files"
+	"gitlab.com/kickr-dev/engine/pkg/files"
 )
 
 // MergeValues merges all input values files into a single map.

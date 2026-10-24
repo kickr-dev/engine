@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/kickr-dev/engine/pkg/parser"
+	"gitlab.com/kickr-dev/engine/pkg/parser"
 )
 
 func TestValidatePackageJSON(t *testing.T) {
