@@ -80,10 +80,10 @@ func TestReadGomod(t *testing.T) {
 			Toolchain: "1.23.5",
 		}
 		expectedVCS := parser.VCS{
-			ProjectHost: "github.com",
+			ProjectHost: "gitlab.com",
 			ProjectName: "engine",
 			ProjectPath: "kickr-dev/engine",
-			Platform:    parser.GitHub,
+			Platform:    parser.GitLab,
 		}
 
 		// Act

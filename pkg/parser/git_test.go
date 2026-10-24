@@ -145,7 +145,7 @@ func TestGitParseRemote(t *testing.T) {
 	t.Run("success_no_port", func(t *testing.T) {
 		// Arrange
 		remotes := []string{
-			"git@github.com:kickr-dev/engine.git",
+			"git@gitlab.com:kickr-dev/engine.git",
 			"http://gitlab.com/kickr-dev/engine.git",
 			"http://x-access-token:ghp_xxx@gitlab.com/kickr-dev/engine.git",
 			"https://gitlab.com/kickr-dev/engine.git",
@@ -158,7 +158,7 @@ func TestGitParseRemote(t *testing.T) {
 				host, subpath := gitParseRemote(remote)
 
 				// Assert
-				assert.Equal(t, "github.com", host)
+				assert.Equal(t, "gitlab.com", host)
 				assert.Equal(t, "kickr-dev/engine", subpath)
 			})
 		}
