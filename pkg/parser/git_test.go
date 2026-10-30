@@ -1,7 +1,6 @@
 package parser //nolint:testpackage
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/go-git/go-billy/v5/memfs"
@@ -11,8 +10,6 @@ import (
 	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"gitlab.com/kickr-dev/engine/testutils"
 )
 
 func TestGit(t *testing.T) {
@@ -42,6 +39,11 @@ func TestGit(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		// Arrange
+		destdir := t.TempDir()
+		repository, err := git.PlainInit(destdir, false)
+		require.NoError(t, err)
+		_, err = repository.CreateRemote(&config.RemoteConfig{Name: "origin", URLs: []string{"git@gitlab.com:kickr-dev/engine.git"}})
+		require.NoError(t, err)
 		expected := VCS{
 			ProjectHost: "gitlab.com",
 			ProjectName: "engine",
@@ -50,7 +52,7 @@ func TestGit(t *testing.T) {
 		}
 
 		// Act
-		vcs, err := Git(filepath.Join(testutils.Testdata(t), ".."))
+		vcs, err := Git(destdir)
 
 		// Assert
 		require.NoError(t, err)
