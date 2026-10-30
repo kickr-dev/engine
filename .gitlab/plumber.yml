@@ -146,6 +146,7 @@ gitlab:
         - ghcr.io/igorshubovych/markdownlint-cli:*
         - ghcr.io/jdx/mise:*
         - ghcr.io/opentofu/opentofu:*
+        - ghcr.io/oras-project/oras:*
         - ghcr.io/prefix-dev/pixi:*
         - ghcr.io/renovatebot/renovate:*
         - ghcr.io/streetsidesoftware/cspell:*
