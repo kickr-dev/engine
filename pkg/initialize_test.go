@@ -35,8 +35,6 @@ type testconfig struct {
 }
 
 func TestInitialize(t *testing.T) {
-	ctx := t.Context()
-
 	t.Run("success", func(t *testing.T) {
 		// Arrange
 		expected := testconfig{Str: "value1"}
@@ -45,7 +43,7 @@ func TestInitialize(t *testing.T) {
 		reader := strings.NewReader("value1" + defaultSubmit)
 
 		// Act
-		config, err := engine.Initialize(ctx,
+		config, err := engine.Initialize(t.Context(),
 			engine.WithFormGroups(group),
 			engine.WithTeaOptions[testconfig](tea.WithInput(reader)))
 

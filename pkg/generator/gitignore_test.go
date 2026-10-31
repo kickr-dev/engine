@@ -14,8 +14,6 @@ import (
 )
 
 func TestFetchGitignore(t *testing.T) {
-	ctx := t.Context()
-
 	httpmock.Activate()
 	t.Cleanup(httpmock.DeactivateAndReset)
 
@@ -28,7 +26,7 @@ func TestFetchGitignore(t *testing.T) {
 
 	t.Run("error_no_client", func(t *testing.T) {
 		// Act
-		_, err := generator.FetchGitignore(ctx, nil)
+		_, err := generator.FetchGitignore(t.Context(), nil)
 
 		// Assert
 		assert.ErrorIs(t, err, generator.ErrNoClient)
@@ -36,7 +34,7 @@ func TestFetchGitignore(t *testing.T) {
 
 	t.Run("error_no_templates", func(t *testing.T) {
 		// Act
-		_, err := generator.FetchGitignore(ctx, http.DefaultClient)
+		_, err := generator.FetchGitignore(t.Context(), http.DefaultClient)
 
 		// Assert
 		assert.ErrorIs(t, err, generator.ErrNoTemplates)
@@ -48,7 +46,7 @@ func TestFetchGitignore(t *testing.T) {
 			httpmock.NewStringResponder(http.StatusInternalServerError, "some error"))
 
 		// Act
-		_, err := generator.FetchGitignore(ctx, http.DefaultClient, "java")
+		_, err := generator.FetchGitignore(t.Context(), http.DefaultClient, "java")
 
 		// Assert
 		assert.ErrorIs(t, err, generator.ErrInvalidResponse)
@@ -61,7 +59,7 @@ func TestFetchGitignore(t *testing.T) {
 			httpmock.NewStringResponder(http.StatusOK, strings.Repeat("a", 1<<20+1)))
 
 		// Act
-		_, err := generator.FetchGitignore(ctx, http.DefaultClient, "go")
+		_, err := generator.FetchGitignore(t.Context(), http.DefaultClient, "go")
 
 		// Assert
 		assert.ErrorIs(t, err, generator.ErrInvalidResponse)
@@ -74,7 +72,7 @@ func TestFetchGitignore(t *testing.T) {
 			httpmock.NewStringResponder(http.StatusOK, "some content"))
 
 		// Act
-		body, err := generator.FetchGitignore(ctx, http.DefaultClient, "java", "linux")
+		body, err := generator.FetchGitignore(t.Context(), http.DefaultClient, "java", "linux")
 
 		// Assert
 		require.NoError(t, err)

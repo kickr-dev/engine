@@ -15,8 +15,6 @@ import (
 )
 
 func TestGenerate(t *testing.T) {
-	ctx := t.Context()
-
 	nooparser := func(context.Context, string, *testconfig) error { return nil }
 
 	t.Run("error_open_root", func(t *testing.T) {
@@ -24,7 +22,7 @@ func TestGenerate(t *testing.T) {
 		destdir := filepath.Join(t.TempDir(), "missing")
 
 		// Act
-		err := engine.Generate(ctx, destdir, testconfig{}, []engine.Parser[testconfig]{nooparser}, nil)
+		err := engine.Generate(t.Context(), destdir, testconfig{}, []engine.Parser[testconfig]{nooparser}, nil)
 
 		// Assert
 		assert.ErrorContains(t, err, "open root")
@@ -36,7 +34,7 @@ func TestGenerate(t *testing.T) {
 		parser := func(context.Context, string, *testconfig) error { return errors.New("some error") }
 
 		// Act
-		err := engine.Generate(ctx, destdir, testconfig{}, []engine.Parser[testconfig]{parser}, nil)
+		err := engine.Generate(t.Context(), destdir, testconfig{}, []engine.Parser[testconfig]{parser}, nil)
 
 		// Assert
 		assert.ErrorContains(t, err, "some error")
@@ -54,7 +52,7 @@ func TestGenerate(t *testing.T) {
 		failing := func(context.Context, *os.Root, testconfig) error { return errors.New("some error") }
 
 		// Act
-		err := engine.Generate(ctx, destdir, testconfig{},
+		err := engine.Generate(t.Context(), destdir, testconfig{},
 			[]engine.Parser[testconfig]{nooparser},
 			[]engine.Generator[testconfig]{one, two, failing})
 

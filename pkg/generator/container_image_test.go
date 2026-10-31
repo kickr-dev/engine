@@ -12,14 +12,12 @@ import (
 )
 
 func TestFetchContainerImage(t *testing.T) {
-	ctx := t.Context()
-
 	httpmock.Activate()
 	t.Cleanup(httpmock.DeactivateAndReset)
 
 	t.Run("error_no_client", func(t *testing.T) {
 		// Act
-		_, err := generator.FetchContainerImage(ctx, nil, "docker.io/library/golang", "1.25.3-trixie")
+		_, err := generator.FetchContainerImage(t.Context(), nil, "docker.io/library/golang", "1.25.3-trixie")
 
 		// Assert
 		assert.ErrorIs(t, err, generator.ErrNoClient)
@@ -30,7 +28,7 @@ func TestFetchContainerImage(t *testing.T) {
 		t.Setenv("DOCKER_CONFIG", t.TempDir())
 
 		// Act
-		_, err := generator.FetchContainerImage(ctx, http.DefaultClient, "Invalid Repo", "1.25.3-trixie")
+		_, err := generator.FetchContainerImage(t.Context(), http.DefaultClient, "Invalid Repo", "1.25.3-trixie")
 
 		// Assert
 		assert.ErrorContains(t, err, "new repository 'Invalid Repo'")
@@ -44,7 +42,7 @@ func TestFetchContainerImage(t *testing.T) {
 		httpmock.RegisterResponder(http.MethodHead, manifest, httpmock.NewStringResponder(http.StatusNotFound, ""))
 
 		// Act
-		_, err := generator.FetchContainerImage(ctx, http.DefaultClient, "docker.io/library/golang", "1.25.3-trixie")
+		_, err := generator.FetchContainerImage(t.Context(), http.DefaultClient, "docker.io/library/golang", "1.25.3-trixie")
 
 		// Assert
 		assert.ErrorContains(t, err, "resolve 'docker.io/library/golang:1.25.3-trixie'")
@@ -62,7 +60,7 @@ func TestFetchContainerImage(t *testing.T) {
 				SetContentLength())
 
 		// Act
-		image, err := generator.FetchContainerImage(ctx, http.DefaultClient, "docker.io/library/golang", "1.25.3-trixie")
+		image, err := generator.FetchContainerImage(t.Context(), http.DefaultClient, "docker.io/library/golang", "1.25.3-trixie")
 
 		// Assert
 		require.NoError(t, err)

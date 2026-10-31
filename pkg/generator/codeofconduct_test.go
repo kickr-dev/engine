@@ -13,14 +13,12 @@ import (
 )
 
 func TestFetchCodeOfConduct(t *testing.T) {
-	ctx := t.Context()
-
 	httpmock.Activate()
 	t.Cleanup(httpmock.DeactivateAndReset)
 
 	t.Run("error_no_client", func(t *testing.T) {
 		// Act
-		_, err := generator.FetchCodeOfConduct(ctx, nil)
+		_, err := generator.FetchCodeOfConduct(t.Context(), nil)
 
 		// Assert
 		assert.ErrorIs(t, err, generator.ErrNoClient)
@@ -32,7 +30,7 @@ func TestFetchCodeOfConduct(t *testing.T) {
 			httpmock.NewStringResponder(http.StatusInternalServerError, "some error"))
 
 		// Act
-		_, err := generator.FetchCodeOfConduct(ctx, http.DefaultClient)
+		_, err := generator.FetchCodeOfConduct(t.Context(), http.DefaultClient)
 
 		// Assert
 		assert.ErrorIs(t, err, generator.ErrInvalidResponse)
@@ -45,7 +43,7 @@ func TestFetchCodeOfConduct(t *testing.T) {
 			httpmock.NewStringResponder(http.StatusOK, strings.Repeat("a", 1<<20+1)))
 
 		// Act
-		_, err := generator.FetchCodeOfConduct(ctx, http.DefaultClient)
+		_, err := generator.FetchCodeOfConduct(t.Context(), http.DefaultClient)
 
 		// Assert
 		assert.ErrorIs(t, err, generator.ErrInvalidResponse)
@@ -58,7 +56,7 @@ func TestFetchCodeOfConduct(t *testing.T) {
 			httpmock.NewStringResponder(http.StatusOK, "some content"))
 
 		// Act
-		body, err := generator.FetchCodeOfConduct(ctx, http.DefaultClient)
+		body, err := generator.FetchCodeOfConduct(t.Context(), http.DefaultClient)
 
 		// Assert
 		require.NoError(t, err)

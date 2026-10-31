@@ -595,8 +595,6 @@ func TestApplyTemplate(t *testing.T) {
 }
 
 func TestGeneratorTemplates(t *testing.T) {
-	ctx := t.Context()
-
 	t.Run("error_parse_template_globs", func(t *testing.T) {
 		// Arrange
 		destdir := t.TempDir()
@@ -604,7 +602,7 @@ func TestGeneratorTemplates(t *testing.T) {
 			[]engine.Template[testconfig]{{Globs: []string{"invalid.txt"}, Out: "file.txt"}})
 
 		// Act
-		err := generator(ctx, testutils.Root(t, destdir), testconfig{})
+		err := generator(t.Context(), testutils.Root(t, destdir), testconfig{})
 
 		// Assert
 		assert.ErrorIs(t, err, engine.ErrFailedGeneration)
@@ -622,7 +620,7 @@ func TestGeneratorTemplates(t *testing.T) {
 		generator := engine.GeneratorTemplates(os.DirFS(destdir), []engine.Template[testconfig]{template})
 
 		// Act
-		err := generator(ctx, testutils.Root(t, destdir), testconfig{Str: "value"})
+		err := generator(t.Context(), testutils.Root(t, destdir), testconfig{Str: "value"})
 
 		// Assert
 		require.NoError(t, err)
@@ -639,8 +637,6 @@ type testmodule struct {
 func (m testmodule) Dir() string { return m.directory }
 
 func TestGeneratorModules(t *testing.T) {
-	ctx := t.Context()
-
 	modules := func(config []testmodule) []testmodule { return config }
 
 	t.Run("error_parse_template_globs", func(t *testing.T) {
@@ -650,7 +646,7 @@ func TestGeneratorModules(t *testing.T) {
 			[]engine.Template[testmodule]{{Globs: []string{"invalid.txt"}, Out: "file.txt"}})
 
 		// Act
-		err := generator(ctx, testutils.Root(t, destdir), []testmodule{{directory: "."}})
+		err := generator(t.Context(), testutils.Root(t, destdir), []testmodule{{directory: "."}})
 
 		// Assert
 		assert.ErrorIs(t, err, engine.ErrFailedGeneration)
@@ -667,7 +663,7 @@ func TestGeneratorModules(t *testing.T) {
 			[]engine.Template[testmodule]{{Globs: []string{"file.txt" + engine.TmplExtension}, Out: "file.txt"}})
 
 		// Act
-		err := generator(ctx, testutils.Root(t, destdir), []testmodule{{directory: "../outside"}})
+		err := generator(t.Context(), testutils.Root(t, destdir), []testmodule{{directory: "../outside"}})
 
 		// Assert
 		assert.ErrorIs(t, err, engine.ErrFailedGeneration)
@@ -681,7 +677,7 @@ func TestGeneratorModules(t *testing.T) {
 			[]engine.Template[testmodule]{{Globs: []string{"invalid.txt"}, Out: "file.txt"}})
 
 		// Act
-		err := generator(ctx, testutils.Root(t, destdir), nil)
+		err := generator(t.Context(), testutils.Root(t, destdir), nil)
 
 		// Assert
 		require.NoError(t, err)
@@ -700,7 +696,7 @@ func TestGeneratorModules(t *testing.T) {
 		require.NoError(t, os.MkdirAll(filepath.Join(destdir, "apps", "api"), files.RwxRxRxRx))
 
 		// Act
-		err := generator(ctx, testutils.Root(t, destdir), []testmodule{{directory: "."}, {directory: "apps/api"}})
+		err := generator(t.Context(), testutils.Root(t, destdir), []testmodule{{directory: "."}, {directory: "apps/api"}})
 
 		// Assert
 		require.NoError(t, err)
