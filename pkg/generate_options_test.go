@@ -22,9 +22,9 @@ func TestOptionsFromContext(t *testing.T) {
 	t.Run("success_options", func(t *testing.T) {
 		// Arrange
 		ctx := ContextWithOptions(t.Context(), Options{
-			Force:       true,
-			Funcs:       template.FuncMap{"hello": func() string { return "hello" }},
-			StripNotice: true,
+			Force:        true,
+			Funcs:        template.FuncMap{"hello": func() string { return "hello" }},
+			StripMarkers: true,
 		})
 
 		// Act
@@ -32,7 +32,7 @@ func TestOptionsFromContext(t *testing.T) {
 
 		// Assert
 		assert.True(t, opts.Force)
-		assert.True(t, opts.StripNotice)
+		assert.True(t, opts.StripMarkers)
 		f, ok := opts.Funcs["hello"].(func() string)
 		require.True(t, ok)
 		assert.Equal(t, "hello", f())

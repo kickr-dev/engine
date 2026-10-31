@@ -18,11 +18,12 @@ type Options struct {
 	// Funcs is added to every template, on top of the Sprig and engine funcs (see FuncMap).
 	Funcs template.FuncMap
 
-	// StripNotice drops the generated notice lines from every generated file.
+	// StripMarkers drops the generated notice lines from every generated file,
+	// along with its template's section marker lines (see Template.Sections).
 	//
 	// Such a file isn't owned by generation anymore (see IsGenerated),
-	// so later runs only regenerate it when Force is set.
-	StripNotice bool
+	// so later runs only regenerate it when Force is set, and its sections can't be regenerated alone.
+	StripMarkers bool
 }
 
 type optionsKey struct{}

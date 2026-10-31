@@ -93,7 +93,7 @@ func ApplyTemplate[T any](ctx context.Context, fsys fs.FS, root *os.Root, tmpl T
 }
 
 // executeTemplate executes tt with config and writes the result to tmpl.Out inside root,
-// first dropping the generated notice lines when ctx asks for it (see Options.StripNotice).
+// first dropping the generated notice and section marker lines when ctx asks for it (see Options.StripMarkers).
 //
 // An unchanged file is left as is, though its permissions are always reapplied from tmpl.Mode
 // (files.RwRR when zero) minus the system umask (see files.Umask).
@@ -106,8 +106,23 @@ func executeTemplate[T any](ctx context.Context, tt *template.Template, root *os
 	}
 
 	content := buf.Bytes()
-	if opts.StripNotice {
+	if opts.StripMarkers {
 		content = noticeBlock.ReplaceAll(content, nil)
+		if len(tmpl.Sections) > 0 {
+			markers := make(map[string]struct{}, 2*len(tmpl.Sections))
+			for _, s := range tmpl.Sections {
+				markers[s.Begin], markers[s.End] = struct{}{}, struct{}{}
+			}
+
+			stripped := make([]byte, 0, len(content))
+			for line := range bytes.Lines(content) {
+				if _, ok := markers[string(bytes.TrimSpace(line))]; !ok {
+					stripped = append(stripped, line...)
+				}
+			}
+			// an empty last section leaves behind the blank line separating it from the previous content
+			content = append(bytes.TrimRight(stripped, "\n"), '\n')
+		}
 	}
 
 	if ok := IsEmpty(content, tmpl.EmptyPolicy); ok {

@@ -414,7 +414,7 @@ func TestApplyTemplate(t *testing.T) {
 
 	t.Run("success_strip_notice", func(t *testing.T) {
 		// Arrange
-		ctx := engine.ContextWithOptions(t.Context(), engine.Options{StripNotice: true})
+		ctx := engine.ContextWithOptions(t.Context(), engine.Options{StripMarkers: true})
 
 		srcdir := t.TempDir()
 		destdir := t.TempDir()
@@ -434,6 +434,34 @@ func TestApplyTemplate(t *testing.T) {
 		content, err := os.ReadFile(filepath.Join(destdir, template.Out))
 		require.NoError(t, err)
 		assert.Equal(t, "content\n", string(content))
+	})
+
+	t.Run("success_strip_sections", func(t *testing.T) {
+		// Arrange
+		ctx := engine.ContextWithOptions(t.Context(), engine.Options{StripMarkers: true})
+
+		srcdir := t.TempDir()
+		destdir := t.TempDir()
+		template := engine.Template[testconfig]{
+			Globs: []string{"file.txt" + engine.TmplExtension},
+			Out:   "file.txt",
+			Sections: []engine.Section{
+				{Begin: "# BEGIN_SECTION", End: "# END_SECTION"},
+				{Begin: "# BEGIN_EMPTY", End: "# END_EMPTY"},
+			},
+		}
+		require.NoError(t, os.WriteFile(filepath.Join(srcdir, template.Globs[0]),
+			[]byte("before\n  # BEGIN_SECTION\n  section\n  # END_SECTION\n\n# BEGIN_EMPTY\n# END_EMPTY\n"),
+			files.RwRR))
+
+		// Act
+		err := engine.ApplyTemplate(ctx, os.DirFS(srcdir), testutils.Root(t, destdir), template, testconfig{})
+
+		// Assert
+		require.NoError(t, err)
+		content, err := os.ReadFile(filepath.Join(destdir, template.Out))
+		require.NoError(t, err)
+		assert.Equal(t, "before\n  section\n", string(content))
 	})
 
 	t.Run("success_unchanged_content", func(t *testing.T) {
