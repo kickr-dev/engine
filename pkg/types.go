@@ -71,9 +71,10 @@ type Template[T any] struct {
 	// restrictive than requested depending on the running user's umask.
 	Mode os.FileMode
 
-	// Out is the output file path.
+	// Out is where the file is generated, relative to the root it's applied in.
 	//
-	// It must be the full path to destination directory with the filename.
+	// That root is the directory given to Generate,
+	// or each module directory when the template goes through GeneratorModules.
 	Out string
 
 	// Patches is the slice of patches to apply on the file, with or without globs.
@@ -135,9 +136,7 @@ const (
 	// and as such files with only template parts (define) can be created.
 	PartExtension = ".part"
 
-	// PatchExtension is the extension for template file patches.
-	//
-	// It will be used in the future to patch files altered by users to follow updates with fewer generation issues.
+	// PatchExtension is the extension for template patch files (see Template.Patches).
 	PatchExtension = ".patch"
 )
 

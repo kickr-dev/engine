@@ -20,7 +20,7 @@ import (
 //
 //	type config struct { ... }
 //
-//	func GeneratorDockerfile(ctx context.Context, destdir string, c config) error {
+//	func GeneratorDockerfile(ctx context.Context, root *os.Root, c config) error {
 //		image, err := generator.FetchContainerImage(ctx, cleanhttp.DefaultClient(), "docker.io/library/golang", "1.25.3-trixie")
 //		// handle err
 //		...

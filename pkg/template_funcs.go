@@ -71,8 +71,8 @@ func toYAML(v any) string {
 
 var slugRegexp = regexp.MustCompile("[^a-zA-Z0-9]+")
 
-// ToSlug transforms an input string into its slug representation,
-// keeping only letters and numbers and replacing everything else by the dash '-'.
+// ToSlug transforms an input string into its lowercase slug representation,
+// keeping only ASCII letters and numbers and replacing each run of other characters by a single dash '-'.
 func ToSlug(in string) string {
 	spaced := strings.TrimSpace(slugRegexp.ReplaceAllString(in, " "))
 	return strings.ToLower(strings.ReplaceAll(spaced, " ", "-"))

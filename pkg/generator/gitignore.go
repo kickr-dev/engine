@@ -24,7 +24,7 @@ var ErrNoTemplates = errors.New("no templates provided")
 //
 //	type config struct { ... }
 //
-//	func GeneratorGitignore(ctx context.Context, destdir string, c config) error {
+//	func GeneratorGitignore(ctx context.Context, root *os.Root, c config) error {
 //		content, err := generator.FetchGitignore(ctx, cleanhttp.DefaultClient(), "java", "linux")
 //		// handle err
 //		...

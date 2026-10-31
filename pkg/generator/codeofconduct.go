@@ -18,7 +18,7 @@ const (
 //
 //	type config struct { ... }
 //
-//	func GeneratorCodeOfConduct(ctx context.Context, destdir string, c config) error {
+//	func GeneratorCodeOfConduct(ctx context.Context, root *os.Root, c config) error {
 //		content, err := generator.FetchCodeOfConduct(ctx, cleanhttp.DefaultClient())
 //		// handle err
 //		...

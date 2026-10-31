@@ -104,4 +104,4 @@ flowchart TB
 - [`pkg/generator`](https://pkg.go.dev/gitlab.com/kickr-dev/engine/pkg/generator):
   fetch `.gitignore`, code of conduct and pinned container images.
 - [`pkg/parser`](https://pkg.go.dev/gitlab.com/kickr-dev/engine/pkg/parser):
-  detect Git, Go (`go.mod`, `go.work`, `cmd`), Hugo and `package.json`.
+  detect Git, Go (`go.mod`, `go.work`, `cmd`), Hugo and `package.json`, and merge Helm values files.
