@@ -15,6 +15,7 @@ include:
         when: never
       - when: always
   - local: .gitlab/pipelines/kickr.yml
+  - local: .gitlab/pipelines/plumber.yml
   - local: .gitlab/variables.yml
 
 # secret variables
