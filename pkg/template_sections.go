@@ -2,6 +2,7 @@ package engine
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io/fs"
 	"os"
@@ -16,7 +17,7 @@ import (
 //
 // The whole template is rendered from its Globs (nothing happens without them) and each rendered section (markers included)
 // replaces its counterpart in the destination, user-added content outside sections is never templatized.
-func ApplySections[T any](fsys fs.FS, root *os.Root, tmpl Template[T], data any) error {
+func ApplySections[T any](ctx context.Context, fsys fs.FS, root *os.Root, tmpl Template[T], data any) error {
 	if len(tmpl.Globs) == 0 {
 		GetLogger().Warnf("empty template 'globs', skipping '%s' sections", tmpl.Out)
 		return nil
@@ -25,6 +26,7 @@ func ApplySections[T any](fsys fs.FS, root *os.Root, tmpl Template[T], data any)
 		GetLogger().Debugf("no template 'sections', skipping '%s' sections", tmpl.Out)
 		return nil
 	}
+	opts := OptionsFromContext(ctx)
 	GetLogger().Infof("applying sections on '%s'", tmpl.Out)
 
 	actual, err := root.ReadFile(tmpl.Out)
@@ -33,7 +35,7 @@ func ApplySections[T any](fsys fs.FS, root *os.Root, tmpl Template[T], data any)
 	}
 
 	// template the output file as if it was the first generation to get one full rendered content from which to pick all sections
-	tt, err := newTemplate(path.Base(tmpl.Globs[0]), tmpl.Delimiters)
+	tt, err := newTemplate(path.Base(tmpl.Globs[0]), tmpl.Delimiters, opts.Funcs)
 	if err != nil {
 		return fmt.Errorf("new template: %w", err)
 	}

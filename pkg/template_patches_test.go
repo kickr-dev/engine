@@ -32,7 +32,7 @@ index 332d5ce..39af8aa 100644
 +value`), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+		err := engine.ApplyPatches(t.Context(), os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "open file")
@@ -48,7 +48,7 @@ index 332d5ce..39af8aa 100644
 		}
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+		err := engine.ApplyPatches(t.Context(), os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "parse template patch")
@@ -64,7 +64,7 @@ index 332d5ce..39af8aa 100644
 		require.NoError(t, os.WriteFile(filepath.Join(destdir, template.Patches[0]), []byte("{{ .invalid }}"), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+		err := engine.ApplyPatches(t.Context(), os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "template patch execution")
@@ -86,7 +86,7 @@ index 332d5ce..39af8aa 100644
 +value`), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+		err := engine.ApplyPatches(t.Context(), os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "parse git patch")
@@ -108,7 +108,7 @@ index 332d5ce..39af8aa 100644
 +value`), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+		err := engine.ApplyPatches(t.Context(), os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		assert.ErrorContains(t, err, "apply diff number")
@@ -120,7 +120,7 @@ index 332d5ce..39af8aa 100644
 		template := engine.Template[testconfig]{Out: "file.txt"}
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+		err := engine.ApplyPatches(t.Context(), os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		require.NoError(t, err)
@@ -143,7 +143,7 @@ index 332d5ce..39af8aa 100644
 +value`), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+		err := engine.ApplyPatches(t.Context(), os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		require.NoError(t, err)
@@ -172,7 +172,7 @@ index 332d5ce..39af8aa 100644
 \ No newline at end of file`), files.RwRR))
 
 		// Act
-		err := engine.ApplyPatches(os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
+		err := engine.ApplyPatches(t.Context(), os.DirFS(destdir), testutils.Root(t, destdir), template, testconfig{})
 
 		// Assert
 		require.NoError(t, err)

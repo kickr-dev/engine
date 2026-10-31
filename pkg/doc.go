@@ -45,11 +45,12 @@ It contains two main functions, Initialize and Generate, which split project ini
 	}
 
 	func main() {
-		ctx := context.Background()
+		parent := context.Background()
 		destdir, _ := os.Getwd()
 
 		// run generation
-		engine.Configure(engine.WithLogger(logger), engine.WithForce(false))
+		engine.SetLogger(logger)
+		ctx := engine.ContextWithOptions(parent, engine.Options{Force: false})
 		err := engine.Generate(ctx, destdir, config,
 			[]engine.Parser[config]{ParserGit},
 			[]engine.Generator[config]{engine.GeneratorTemplates(os.DirFS("path/to/templates"), Templates())})

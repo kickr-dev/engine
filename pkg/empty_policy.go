@@ -7,6 +7,9 @@ import (
 
 var noticeLine = regexp.MustCompile(notice)
 
+// noticeBlock matches a whole generated notice line and the blank line following it, if any.
+var noticeBlock = regexp.MustCompile(`(?m)^.*` + notice + `.*\n(?:[ \t\r]*\n)?`)
+
 // EmptyPolicy defines the policy to apply when a generated file is empty.
 //
 // By default, the policy is set to PolicyRemoveEmpty,

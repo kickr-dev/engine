@@ -26,7 +26,7 @@ const (
 	// Patches are applied afterwards.
 	PolicyAlways GeneratePolicy = iota + 1
 
-	// PolicyDefault generates the file when it's owned by generation (see IsGenerated) or when generation is forced (see WithForce).
+	// PolicyDefault generates the file when it's owned by generation (see IsGenerated) or when generation is forced (see Options.Force).
 	//
 	// Otherwise, the existing file is kept and only its sections are regenerated.
 	// Patches are applied in both cases.
@@ -103,7 +103,7 @@ func RemoveIf[T any](remove func(T) bool, otherwise GeneratePolicy) GeneratePoli
 // It's meant to be called inside a GeneratePolicyFunc with its path,
 // for files generated once and then left to the user.
 //
-// Unlike PolicyDefault, an existing file is kept even when generation is forced (see WithForce),
+// Unlike PolicyDefault, an existing file is kept even when generation is forced (see Options.Force),
 // with or without the generated notice.
 func SkipIfExists(path string, otherwise GeneratePolicy) GeneratePolicy {
 	if _, err := os.Lstat(path); err == nil {

@@ -16,7 +16,7 @@ import (
 
 // FuncMap returns a minimal template.FuncMap.
 //
-// It can be extended with WithFuncMap.
+// It can be extended with Options.Funcs.
 func FuncMap() template.FuncMap {
 	return template.FuncMap{
 		"cutAfter": cutAfter,

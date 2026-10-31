@@ -11,10 +11,10 @@ import (
 //
 // Errors encountered during templates generation are logged, in that case a final error being ErrFailedGeneration is returned.
 func GeneratorTemplates[T any](fsys fs.FS, templates []Template[T]) Generator[T] {
-	return func(_ context.Context, root *os.Root, config T) error {
+	return func(ctx context.Context, root *os.Root, config T) error {
 		var errcount int
 		for _, tmpl := range templates {
-			if err := ApplyTemplate(fsys, root, tmpl, config); err != nil {
+			if err := ApplyTemplate(ctx, fsys, root, tmpl, config); err != nil {
 				errcount++
 				GetLogger().Errorf("failed to generate '%s': %v", path.Base(tmpl.Out), err)
 			}

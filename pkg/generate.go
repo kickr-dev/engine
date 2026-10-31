@@ -15,11 +15,16 @@ import (
 // Every generation error is logged during processing to avoid a big aggregated error at the end.
 var ErrFailedGeneration = errors.New("some error(s) occurred during generation")
 
-// Generate is the main function of the engine package.
-// It takes a configuration, parsers and generators.
+// Generate generates the repository at destdir from config.
 //
-// It executes all given parsers, in order,
-// and then runs all provided generators concurrently to apply or remove templates.
+// It first runs the parsers one after the other, in their input order,
+// so each one can enrich config for the next ones.
+// When any of them fails, Generate returns all their errors once every parser ran, and nothing is written.
+//
+// The generators then run concurrently with the parsed config.
+// Each failure is logged, and Generate returns ErrFailedGeneration once they're all done.
+//
+// Both parsers and generators get ctx, which carries the generation settings (see ContextWithOptions).
 func Generate[T any](ctx context.Context, destdir string, config T, parsers []Parser[T], generators []Generator[T]) error {
 	// parse repository
 	errs := make([]error, 0, len(parsers))

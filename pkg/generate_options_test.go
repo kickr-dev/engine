@@ -10,51 +10,67 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestConfigure(t *testing.T) {
-	t.Cleanup(func() { Configure() })
-
-	t.Run("no_options", func(t *testing.T) {
+func TestOptionsFromContext(t *testing.T) {
+	t.Run("success_no_options", func(t *testing.T) {
 		// Act
-		Configure()
+		opts := OptionsFromContext(t.Context())
 
 		// Assert
-		assert.False(t, Forced())
+		assert.Equal(t, Options{}, opts)
+	})
+
+	t.Run("success_options", func(t *testing.T) {
+		// Arrange
+		ctx := ContextWithOptions(t.Context(), Options{
+			Force:       true,
+			Funcs:       template.FuncMap{"hello": func() string { return "hello" }},
+			StripNotice: true,
+		})
+
+		// Act
+		opts := OptionsFromContext(ctx)
+
+		// Assert
+		assert.True(t, opts.Force)
+		assert.True(t, opts.StripNotice)
+		f, ok := opts.Funcs["hello"].(func() string)
+		require.True(t, ok)
+		assert.Equal(t, "hello", f())
+	})
+}
+
+func TestSetLogger(t *testing.T) {
+	initial := GetLogger()
+	t.Cleanup(func() { SetLogger(initial) })
+
+	t.Run("success_nil_logger", func(t *testing.T) {
+		// Act
+		SetLogger(nil)
+
+		// Assert
 		assert.NotNil(t, GetLogger())
 	})
 
-	t.Run("options", func(t *testing.T) {
+	t.Run("success_logger", func(t *testing.T) {
 		// Arrange
 		buf := strings.Builder{}
 
 		// Act
-		Configure(
-			WithForce(true),
-			WithFuncMap(template.FuncMap{"hello": func() string { return "hello" }}),
-			WithLogger(NewTestLogger(&buf)))
+		SetLogger(NewTestLogger(&buf))
 
 		// Assert
-		assert.True(t, Forced())
-
-		logger := GetLogger()
-		require.NotNil(t, logger)
-		logger.Infof("some text to verify")
+		GetLogger().Infof("some text to verify")
 		assert.Equal(t, "some text to verify", buf.String())
-
-		require.NotNil(t, funcs())
-		f, ok := funcs()["hello"].(func() string)
-		require.True(t, ok)
-		assert.Equal(t, "hello", f())
 	})
 
-	t.Run("concurrent_configure_and_reads", func(_ *testing.T) {
+	t.Run("success_concurrent_set_and_get", func(_ *testing.T) {
 		// Arrange
 		var wg sync.WaitGroup
 
 		// Act
-		for i := range 20 {
-			wg.Go(func() { Configure(WithForce(i%2 == 0)) })
+		for range 20 {
+			wg.Go(func() { SetLogger(&noopLogger{}) })
 			wg.Go(func() { GetLogger() })
-			wg.Go(func() { Forced() })
 		}
 		wg.Wait()
 

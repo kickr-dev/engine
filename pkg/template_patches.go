@@ -2,6 +2,7 @@ package engine
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -16,10 +17,11 @@ import (
 // ApplyPatches applies patches defined in input tmpl, if any.
 //
 // Each patch is templatized using Go template and then patched on provided tmpl file.
-func ApplyPatches[T any](fsys fs.FS, root *os.Root, tmpl Template[T], data any) error {
+func ApplyPatches[T any](ctx context.Context, fsys fs.FS, root *os.Root, tmpl Template[T], data any) error {
 	if len(tmpl.Patches) == 0 {
 		return nil
 	}
+	opts := OptionsFromContext(ctx)
 	GetLogger().Infof("applying patches on '%s'", path.Base(tmpl.Out))
 
 	apply := func(diff *gitdiff.File) error {
@@ -49,7 +51,7 @@ func ApplyPatches[T any](fsys fs.FS, root *os.Root, tmpl Template[T], data any) 
 		patchname := path.Base(patch)
 		GetLogger().Debugf("applying patch file '%s'", patchname)
 
-		tt, err := newTemplate(patchname, tmpl.Delimiters)
+		tt, err := newTemplate(patchname, tmpl.Delimiters, opts.Funcs)
 		if err != nil {
 			errs = append(errs, fmt.Errorf("new template patch '%s': %w", patchname, err))
 			continue
