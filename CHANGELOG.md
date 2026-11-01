@@ -1,3 +1,36 @@
+## [0.2.0](https://gitlab.com/kickr-dev/engine/compare/v0.1.0...v0.2.0) (2026-11-01)
+
+### Features
+
+* carry generation options in context ([b8fa6d9](https://gitlab.com/kickr-dev/engine/commit/b8fa6d9074f0cf34335459b34e6c8a13d7edf2d9))
+
+### Bug Fixes
+
+* **markers:** also strip sections names when StripMarkers is provided (renamed from StripNotice) ([5c8a5e7](https://gitlab.com/kickr-dev/engine/commit/5c8a5e74956089f15f25d051b03fb3b6955f110f))
+
+### Documentation
+
+* align godoc and readme with code ([c172ae8](https://gitlab.com/kickr-dev/engine/commit/c172ae829ec423178f03c7d3b86a0b3716f85e47))
+
+### Chores
+
+* **deps:** update module golang.org/x/net to v0.62.0 [security] ([0d74ede](https://gitlab.com/kickr-dev/engine/commit/0d74edeaebfcfd67613c731908f677bedacb8eb4))
+* **deps:** update module oras.land/oras-go/v2 to v2.7.0 ([3fecef5](https://gitlab.com/kickr-dev/engine/commit/3fecef5e37f311fc6e3b83d930b63f24f7eb2d47))
+
+### Build System
+
+* **deps:** merge remote-tracking branch 'origin/renovate/main-go-golang.org-x-net-vulnerability' ([a1c2733](https://gitlab.com/kickr-dev/engine/commit/a1c27331a512d45864915bae810e7c2b08d9f18d))
+
+### Continuous Integration
+
+* **layout:** regenerate kickr layout ([c4991c2](https://gitlab.com/kickr-dev/engine/commit/c4991c2b413090b76fe60cd932c0025008296f49))
+* **layout:** regenerate kickr layout ([4f16e4f](https://gitlab.com/kickr-dev/engine/commit/4f16e4fe51c998d79a68306284becfde5ed3704b))
+
+### Tests
+
+* **git:** make it so tests will work with next tags ([b467499](https://gitlab.com/kickr-dev/engine/commit/b467499035efb8eb7121d7c71620dc38ef69ad84))
+* scope contexts to subtests ([aee914b](https://gitlab.com/kickr-dev/engine/commit/aee914b559a1d492468e4603d4f54a65844db443))
+
 ## [0.1.0](https://gitlab.com/kickr-dev/engine/compare/v0.0.1...v0.1.0) (2026-10-24)
 
 ### Features
